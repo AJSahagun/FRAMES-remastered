@@ -1,13 +1,15 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { UserModule } from './user/user.module';
+import { RolesGuard } from './guards/roles/roles.guard';
+import { ApiKeyService } from './services/api-key/api-key.service';
 import { DatabaseModule } from './database/database.module';
-import { UsersModule } from './modules/users/users.module';
-import { UsersController } from './controllers/users/users.controller';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
-  imports: [DatabaseModule, UsersModule],
-  controllers: [AppController, UsersController],
-  providers: [AppService],
+  imports: [UserModule, DatabaseModule],
+  controllers: [AppController],
+  providers: [AppService, ApiKeyService, {provide:APP_GUARD, useClass:RolesGuard}],
 })
 export class AppModule {}
