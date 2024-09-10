@@ -2,7 +2,11 @@ name: Backend_CI
 
 on:
   pull_request: 
-    branches: ["*"]
+    branches: 
+      - develop-local
+  push:
+    branches: 
+      - feature/*
 
 jobs:
   Test:
@@ -26,3 +30,7 @@ jobs:
       - name: Run backend tests
         run: npm run test
         working-directory: ./backend  
+
+      - name: Build backend
+        run: npm run build
+        working-directory: ./backend
