@@ -3,9 +3,7 @@ import { Module } from '@nestjs/common';
 import { neon } from '@neondatabase/serverless';
 
 // Load Environment Variables
-config({
-  path: ['.env', '.env.production', '.env.local'],
-});
+config()
 
 const sql = neon(process.env.FRAMES_DB_URL);
 
