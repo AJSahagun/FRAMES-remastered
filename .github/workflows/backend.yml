@@ -1,0 +1,28 @@
+name: Backend_CI
+
+on:
+  pull_request: 
+    branches: ["*"]
+
+jobs:
+  Test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: ['20.15']
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.15'
+
+      - name: Installing backend dependencies
+        run: npm install
+        working-directory: ./backend  
+
+      - name: Run backend tests
+        run: npm run test
+        working-directory: ./backend  
