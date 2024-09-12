@@ -2,9 +2,9 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { createBrowserRouter, RouterProvider} from 'react-router-dom';
 
-import './globals.css'
-import LandingPage from './pages/LandingPage';
-import InputInfo from './pages/register/InputInfo';
+import './index.css'
+import LandingPage from './App';
+import Register from './pages/register/register-page';
 
 const router = createBrowserRouter([
   {
@@ -12,8 +12,8 @@ const router = createBrowserRouter([
     element: <LandingPage/>
   },
   {
-    path: 'register/input-info',
-    element: <InputInfo/>
+    path: 'register',
+    element: <Register/>
   }
 
 ])

@@ -21,6 +21,10 @@ module.exports = {
           "background-hover": "hsl(var(--btn-background-hover))",
         },
       },
+      fontFamily: {
+        poppins: ["Poppins", "sans-serif"],
+        noto_sans: ["Noto_Sans", "sans-serif"]
+      }
     },
   },
   plugins: [],
