@@ -2,9 +2,9 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, ValidationPipe, SetM
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { Role } from 'src/config/role.enum';
-import { Roles } from 'src/decorators/roles/roles.decorator';
-import { RolesGuard } from 'src/guards/roles/roles.guard';
+import { Role } from '../config/role.enum';
+import { Roles } from '../decorators/roles/roles.decorator';
+import { RolesGuard } from '../guards/roles/roles.guard';
 
 @Controller('user')
 @UseGuards(RolesGuard)
