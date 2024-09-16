@@ -103,7 +103,11 @@ export default function InputInfo({ onValidate }: InputInfoProps) {
 
   return (
     <form onSubmit={(e) => e.preventDefault()} className="w-full">
-      <div className="mt-8 space-y-3">
+      <div className="text-center mt-4">
+        <h1 className="text-tc font-poppins">Registration</h1>
+      </div>
+
+      <div className="mt-8 space-y-3 mx-12">
         <input
           type="text"
           name="firstName"

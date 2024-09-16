@@ -6,6 +6,8 @@ interface PaginationProps {
 
 const Pagination: React.FC<PaginationProps> = ({ currentPage }) => {
   return (
+    <>
+    
     <div className="flex justify-center items-center space-x-3 my-6">
       <span
         className={`${
@@ -23,6 +25,7 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage }) => {
         } h-3 bg-secondary rounded-full transition-all ease-in-out duration-300`}
       />
     </div>
+    </>
   );
 };
 

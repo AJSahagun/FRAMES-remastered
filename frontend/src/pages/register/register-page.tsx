@@ -36,9 +36,7 @@ export default function Register() {
         <Pagination currentPage={currentPage} />
       </div>
 
-      <div className="text-center mt-4">
-        <h1 className="text-tc font-poppins">Registration</h1>
-      </div>
+      
 
       <div className="flex justify-center items-center">
         {currentPage === 1 && (
@@ -60,16 +58,19 @@ export default function Register() {
           <div>
             <RegisterFace />
             <div className="flex justify-between mt-4">
-              <button className="btn" onClick={prevPage}>Back</button>
-              <button className="btn" onClick={nextPage}>Next</button>
+              <button className="border-2 border-tc hover:btnHover font-poppins text-tc rounded-lg w-3/5 py-2 h-10" onClick={prevPage}>Back</button>
+              <button className="bg-btnBg hover:btnHover font-poppins text-background rounded-lg w-3/5 py-2 h-10 shadow-md " onClick={nextPage}>Next</button>
             </div>
           </div>
         )}
 
         {currentPage === 3 && (
-          <div>
+          <div className="flex flex-col w-full justify-center">
             {formData && <CheckInfo formData={formData} />} {/* Ensure CheckInfo receives formData */}
-            <button className="btn mt-4" onClick={prevPage}>Back</button>
+            <div className="justify-start w-full">
+              <button className="border-2 border-tc hover:btnHover font-poppins text-tc rounded-lg w-1/4 py-2 h-10 mt-8 ml-4" onClick={prevPage}>Back</button>
+
+            </div>
           </div>
         )}
       </div>
