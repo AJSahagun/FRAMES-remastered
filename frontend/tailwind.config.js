@@ -16,10 +16,9 @@ module.exports = {
         sf: "hsla(var(--secondary-faded))",
 
         foreground: "hsl(var(--foreground))",
-        btn: {
-          background: "hsl(var(--btn-background))",
-          "background-hover": "hsl(var(--btn-background-hover))",
-        },
+        btnBg: "hsl(var(--btn-bg))",
+        btnHover: "hsla(var(--btn-hover))"
+
       },
       fontFamily: {
         poppins: ["Poppins", "sans-serif"],

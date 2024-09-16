@@ -11,11 +11,11 @@
     --secondary: 213, 49%, 61%;
     --accent: 245, 24%, 18%;
     --textcolor: 3, 51%, 14%;
-    --secondary-faded: 213, 49%, 61%, 24%;
+    --secondary-faded: 213, 49%, 80%, 28%;
 
-    --btn-background: 200, 10%, 91%;
-    --btn-background-hover: 200, 10%, 89%;
-    --foreground: 200, 50%, 3%;
+    --btn-bg: 352, 88%, 41%;
+    --btn-hover: 352, 79%, 31%, 100%;
+    --foreground: 200, 50%, 3% ;
 
 
 
