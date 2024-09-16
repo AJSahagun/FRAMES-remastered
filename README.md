@@ -44,11 +44,11 @@ Frontend
 
 * [![React][React.js]][React-url]
 * [![Tailwind CSS][Tailwindcss.com]][Tailwind-url]
+* [![Zustand][Zustand]][Zustand-url]
 
 Backend
 * [![PostgreSQL][Postgresql]][Postgresql-url]
 * [![Nest JS][Nestjs]][Nestjs-url]
-* [![Zustand][Zustand]][Zustand-url]
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -66,6 +66,12 @@ Before you start, ensure you have the following prerequisite installed on your s
   ```sh
   npm install npm@latest -g
   ```
+Befor running the application, you need to configure a PostgreSQL database:
+  * Set up PostgreSQL, can be local or remote.
+  * Configure the `.env` file
+    ```sh
+    FRAMES_DB_URL
+    ```
 
 ### Installation
 
@@ -75,9 +81,18 @@ _To get started with the project, follow these installation steps:_
    ```sh
    git clone https://github.com/AJSahagun/FRAMES-remastered
    ```
+   Change the file directory depending on what you want to run first.
+      * For frontend:
+        ```sh
+        cd frontend
+        ```
+      * For backend:  
+          ```sh
+        cd backend
+        ```
 2. Install NPM packages
    ```sh
-   npm install
+   npm ci
    ```
 3. Change git remote url to avoid accidental pushes to base project
    ```sh
@@ -94,12 +109,17 @@ _To get started with the project, follow these installation steps:_
 Once you have the project set up and running, you can start using it according to your needs. This section provides examples and details on how to use the project effectively.
 
 1. Start the Application
-   ```sh
-   npm start
-   ```
+  * For frontend:
+    ```sh
+    npm run dev
+    ```
+  * For backend:  
+      ```sh
+    npm run start:dev
+    ```
 2. Access the Application
    ```sh
-   Open your web browser and navigate to http://localhost:3000. You should see the application’s main interface.
+   Open your web browser and navigate to 'http://localhost:5173/'. You should see the application’s main interface.
    ```
 
 _For more examples, please refer to the [Documentation](https://docs.google.com/document/d/18jTxHmaoQ9cInYI0wiQmSqhfgr80RPoC0KiAPIvPIbc/edit?usp=sharing)_
@@ -126,11 +146,6 @@ _For more examples, please refer to the [Documentation](https://docs.google.com/
 
 
 <!-- MARKDOWN LINKS & IMAGES -->
-<!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[forks-shield]: https://img.shields.io/github/forks/othneildrew/Best-README-Template.svg?style=for-the-badge
-[forks-url]: https://github.com/othneildrew/Best-README-Template/network/members
-[stars-shield]: https://img.shields.io/github/stars/othneildrew/Best-README-Template.svg?style=for-the-badge
-[stars-url]: https://github.com/othneildrew/Best-README-Template/stargazers
 [React.js]: https://img.shields.io/badge/React%20-%20%2338bdf8?style=for-the-badge&logo=react&logoColor=38bdf8&labelColor=gray
 [React-url]: https://reactjs.org/
 [Tailwindcss.com]: https://img.shields.io/badge/Tailwind%20CSS%20-%20%2338bdf8?style=for-the-badge&logo=tailwind%20css&logoColor=38bdf8&labelColor=gray
