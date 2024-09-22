@@ -1,8 +1,20 @@
 import React, { useState } from 'react';
 import { useRegistrationStore } from './stores/useRegistrationStore';
 import { usePaginationStore } from './stores/usePaginationStore';
+interface UserFormData {
+  firstName: string;
+  middleName?: string;
+  lastName: string;
+  suffix?: string;
+  srCode: string;
+  department: string;
+  course: string;
+}
+interface CheckInfoProps {
+  formData: UserFormData;
+}
 
-const CheckInfo: React.FC = () => {
+const CheckInfo: React.FC<CheckInfoProps> = () => {
   const { formData, resetForm } = useRegistrationStore();
   const { prevPage } = usePaginationStore();
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
@@ -16,7 +28,7 @@ const CheckInfo: React.FC = () => {
   };
 
   const handleConfirmSubmit = () => {
-    const isValid = Object.values(formData).every(value => value !== '');
+    const isValid = Object.entries(formData).every(([key, value]) => key === 'suffix' || value !== '');
     if (isValid) {
       handleSubmit();
     } else {

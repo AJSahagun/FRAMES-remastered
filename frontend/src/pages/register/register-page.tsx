@@ -5,6 +5,7 @@ import Pagination from "../../components/Pagination";
 import InputInfo from "./InputInfo";
 import RegisterFace from "./RegisterFace";
 import CheckInfo from "./CheckInfo";
+import FosterWeelerTag from '../../components/FosterWheelerTag';
 
 export default function Register() {
   const { currentPage, nextPage, prevPage } = usePaginationStore();
@@ -22,21 +23,26 @@ export default function Register() {
 
   return (
     <div className="relative w-full min-h-screen flex flex-col justify-between bg-background">
-      <div className="flex flex-col items-center">
-        <div className="w-11/12 mt-16 ml-3">
-          <img src="/logos/FRAMES_title-logo.png" alt="FRAMES Logo" className="w-4/5 mx-auto" />
+      <FosterWeelerTag />
+
+      <div className="flex flex-col items-center lg:items-start">
+
+        <div className="sm:w-4/5 mt-16 ml-3
+          min-[320px]:w-2/3 md:w-2/3 md:max-w-sm lg:relative lg:ml-24 lg:mt-12">
+          <img src="/logos/FRAMES_title-logo.png" alt="FRAMES Logo" className="w-4/5 mx-auto lg:ml-0 " />
         </div>
 
         <div className="w-full mb-4">
           <Pagination />
         </div>
 
-        <div className="w-full px-4 flex justify-center">
+        <div className="w-full px-10 flex justify-center lg:w-screen">
           {currentPage === 1 && (
-            <div className="w-full max-w-md flex flex-col items-center">
+            <div className="w-full max-w-md flex flex-col items-center justify-center">
               <InputInfo formData={formData} />
               <button
-                className={`font-poppins text-background rounded-lg w-full max-w-xs py-2 mt-8 shadow-md transition-all ${
+                className={`font-poppins text-md text-background rounded-lg w-2/3 py-2 mt-10 shadow-md transition-all
+                   ${
                   isFormValid
                     ? "bg-btnBg hover:bg-btnHover"
                     : "bg-btnBg opacity-50 cursor-not-allowed"
