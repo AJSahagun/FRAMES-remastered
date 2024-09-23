@@ -3,11 +3,11 @@ import * as faceapi from "@vladmandic/face-api";
 import { FaCamera, FaRedo } from "react-icons/fa";
 
 export default function RegisterFace() {
-  const videoRef = useRef(null);
-  const canvasRef = useRef(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [isModelsLoaded, setIsModelsLoaded] = useState(false);
-  const [capturedImage, setCapturedImage] = useState(null);
-  const [faceDescriptor, setFaceDescriptor] = useState(null);
+  const [capturedImage, setCapturedImage] = useState<string | null>(null);
+  const [faceDescriptor, setFaceDescriptor] = useState<number[] | null>(null);
   const [isCapturing, setIsCapturing] = useState(false);
   const parameters = [
     "Well lit environment",
@@ -39,7 +39,9 @@ export default function RegisterFace() {
       const startWebcam = async () => {
         try {
           const stream = await navigator.mediaDevices.getUserMedia({ video: {} });
-          videoRef.current.srcObject = stream;
+          if (videoRef?.current) {
+            videoRef.current.srcObject = stream;
+          }
         } catch (error) {
           console.error("Error accessing webcam: ", error);
         }
@@ -52,9 +54,9 @@ export default function RegisterFace() {
   // Handle window resize to adjust canvas size
   useEffect(() => {
     const handleResize = () => {
-      if (videoRef.current && canvasRef.current) {
-        const video = videoRef.current;
-        const canvas = canvasRef.current;
+      const video = videoRef.current as HTMLVideoElement;
+      const canvas = canvasRef.current as HTMLCanvasElement;
+      if (video && canvas) {
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
       }
@@ -64,31 +66,37 @@ export default function RegisterFace() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  useEffect(() => {
+    if (faceDescriptor) {
+      console.log("Captured face descriptor:", faceDescriptor);
+    }
+  }, [faceDescriptor]);  
+
   // 3 & 4. Capture and process face detection + Generate face encodings
   const handleCapture = async () => {
     if (!isModelsLoaded || !videoRef.current) return;
 
     setIsCapturing(true);
 
-    const video = videoRef.current;
+    const video = videoRef.current as HTMLVideoElement;
 
-    // Ensure video is ready
     if (video.readyState !== 4) {
       console.error("Video not ready for capture.");
       setIsCapturing(false);
       return;
     }
 
-    // Create a canvas to capture the current frame
     const captureCanvas = document.createElement("canvas");
     captureCanvas.width = video.videoWidth;
     captureCanvas.height = video.videoHeight;
     const captureContext = captureCanvas.getContext("2d");
-    captureContext.drawImage(video, 0, 0, captureCanvas.width, captureCanvas.height);
-    const imageDataUrl = captureCanvas.toDataURL("image/png");
-    setCapturedImage(imageDataUrl); // Save captured image
+    if (captureContext) {
+      captureContext.drawImage(video, 0, 0, captureCanvas.width, captureCanvas.height);
+    }
 
-    // Perform face detection on the captured image
+    const imageDataUrl = captureCanvas.toDataURL("image/png");
+    setCapturedImage(imageDataUrl);
+
     const img = await faceapi.fetchImage(imageDataUrl);
     const detections = await faceapi
       .detectSingleFace(img)
@@ -96,13 +104,10 @@ export default function RegisterFace() {
       .withFaceDescriptor();
 
     if (detections) {
-      // Save face descriptor
       setFaceDescriptor(Array.from(detections.descriptor));
-      console.log("Face Descriptor:", detections.descriptor);
 
-      // Draw detections on the main canvas
       if (canvasRef.current) {
-        const canvas = canvasRef.current;
+        const canvas = canvasRef.current as HTMLCanvasElement;
         const displaySize = { width: video.videoWidth, height: video.videoHeight };
         faceapi.matchDimensions(canvas, displaySize);
         const resizedDetections = faceapi.resizeResults(detections, displaySize);
@@ -125,7 +130,6 @@ export default function RegisterFace() {
     setIsCapturing(false);
   };
 
-  // Reset the captured data
   const handleReset = () => {
     setCapturedImage(null);
     setFaceDescriptor(null);
