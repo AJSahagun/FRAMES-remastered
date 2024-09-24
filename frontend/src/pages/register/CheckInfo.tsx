@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useRegistrationStore } from './stores/useRegistrationStore';
 import { usePaginationStore } from './stores/usePaginationStore';
+import { registerUser } from '../../services/RegisterService';
 interface UserFormData {
   firstName: string;
   middleName?: string;
@@ -23,6 +24,16 @@ const CheckInfo: React.FC<CheckInfoProps> = () => {
 
   const handleSubmit = () => {
     console.log('Form submitted:', formData);
+    const data= {
+      firstName: formData.firstName,
+      middleName: formData.middleName,
+      lastName: formData.lastName,
+      department: formData.department,
+      program: formData.course,
+      encoding:"sample"
+      }
+    console.log("testing")
+    registerUser(data);
     setShowSuccessAlert(true);
     resetForm();
   };
