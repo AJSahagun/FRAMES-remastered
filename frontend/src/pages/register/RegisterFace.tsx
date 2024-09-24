@@ -9,6 +9,7 @@ export default function RegisterFace() {
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [faceDescriptor, setFaceDescriptor] = useState<number[] | null>(null);
   const [isCapturing, setIsCapturing] = useState(false);
+  const [videoDimensions, setVideoDimensions] = useState({ width: 0, height: 0 });
   const parameters = [
     "Well lit environment",
     "No other faces present",
@@ -36,35 +37,9 @@ export default function RegisterFace() {
   // 2. Access Webcam using MediaDevices API
   useEffect(() => {
     if (isModelsLoaded && videoRef.current) {
-      const startWebcam = async () => {
-        try {
-          const stream = await navigator.mediaDevices.getUserMedia({ video: {} });
-          if (videoRef?.current) {
-            videoRef.current.srcObject = stream;
-          }
-        } catch (error) {
-          console.error("Error accessing webcam: ", error);
-        }
-      };
-
       startWebcam();
     }
   }, [isModelsLoaded]);
-
-  // Handle window resize to adjust canvas size
-  useEffect(() => {
-    const handleResize = () => {
-      const video = videoRef.current as HTMLVideoElement;
-      const canvas = canvasRef.current as HTMLCanvasElement;
-      if (video && canvas) {
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-      }
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
 
   useEffect(() => {
     if (faceDescriptor) {
@@ -72,13 +47,30 @@ export default function RegisterFace() {
     }
   }, [faceDescriptor]);  
 
+  const startWebcam = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: {} });
+      if (videoRef?.current) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.onloadedmetadata = () => {
+          setVideoDimensions({
+            width: videoRef.current?.videoWidth || 0,
+            height: videoRef.current?.videoHeight || 0
+          });
+        };
+      }
+    } catch (error) {
+      console.error("Error accessing webcam: ", error);
+    }
+  };
+
   // 3 & 4. Capture and process face detection + Generate face encodings
   const handleCapture = async () => {
     if (!isModelsLoaded || !videoRef.current) return;
 
     setIsCapturing(true);
 
-    const video = videoRef.current as HTMLVideoElement;
+    const video = videoRef.current;
 
     if (video.readyState !== 4) {
       console.error("Video not ready for capture.");
@@ -107,7 +99,7 @@ export default function RegisterFace() {
       setFaceDescriptor(Array.from(detections.descriptor));
 
       if (canvasRef.current) {
-        const canvas = canvasRef.current as HTMLCanvasElement;
+        const canvas = canvasRef.current;
         const displaySize = { width: video.videoWidth, height: video.videoHeight };
         faceapi.matchDimensions(canvas, displaySize);
         const resizedDetections = faceapi.resizeResults(detections, displaySize);
@@ -137,6 +129,8 @@ export default function RegisterFace() {
       const context = canvasRef.current.getContext("2d");
       if (context) context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
     }
+
+    startWebcam();
   };
 
   return (
@@ -151,28 +145,35 @@ export default function RegisterFace() {
           <div className="md:w-1/2 mb-4 md:mb-0 md:ml-4 relative">
             <div className="bg-gray-200 rounded-lg max-w-md max-h-4xl w-full overflow-hidden">
               {/* Webcam feed or Captured Image */}
-              {capturedImage ? (
-                <img
-                  src={capturedImage}
-                  alt="Captured"
-                  className="w-full h-auto object-cover rounded-lg"
-                />
-              ) : (
-                <video
-                  ref={videoRef}
-                  autoPlay
-                  muted
-                  className="w-full h-auto object-cover rounded-lg"
-                />
-              )}
+              <div className="relative w-full h-0 pb-[75%] md:pb-[56.25%] lg:w-[448px] lg:h-[336px] lg:pb-0">
+                {capturedImage ? (
+                  <img
+                    src={capturedImage}
+                    alt="Captured"
+                    className="absolute top-0 left-0 w-full h-full object-cover rounded-lg"
+                  />
+                ) : (
+                  <video
+                    ref={videoRef}
+                    autoPlay
+                    muted
+                    className="absolute top-0 left-0 w-full h-full object-cover rounded-lg"
+                  />
+                )}
 
-              {/* Canvas Overlay */}
-              {capturedImage && (
+                {/* Canvas Overlay */}
                 <canvas
                   ref={canvasRef}
                   className="absolute top-0 left-0 w-full h-full rounded-lg"
+                  width={videoDimensions.width}
+                  height={videoDimensions.height}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover'
+                  }}
                 />
-              )}
+              </div>
 
               {/* Capture and Reset Buttons */}
               <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-4">
@@ -182,21 +183,21 @@ export default function RegisterFace() {
                     disabled={isCapturing}
                     className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full flex items-center justify-center"
                   >
-                    <FaCamera size={20} />
+                    <FaCamera className="size-3 md:size-2 lg:size-5 lg:m-1"/>
                   </button>
                 ) : (
                   <button
                     onClick={handleReset}
                     className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full flex items-center justify-center"
                   >
-                    <FaRedo size={20} />
+                    <FaRedo className="size-3 md:size-2 lg:size-5 lg:m-1"/>
                   </button>
                 )}
               </div>
             </div>
           </div>
 
-          <div className="md:w-1/2">
+          <div className="md:w-1/2 self-center">
             <ul className="space-y-2 justify-end">
               {parameters.map((param, index) => (
                 <li key={index} className="flex items-center justify-end">
