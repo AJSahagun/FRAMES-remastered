@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import * as faceapi from "@vladmandic/face-api";
 import { FaCamera, FaRedo } from "react-icons/fa";
+import { ToastContainer, toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
+import { ClipLoader } from "react-spinners";
 
 export default function RegisterFace() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -18,7 +21,7 @@ export default function RegisterFace() {
     "Hold still",
   ];
 
-  // 1. Load Face-API models
+  // Load Face-API models
   useEffect(() => {
     const loadModels = async () => {
       try {
@@ -28,13 +31,14 @@ export default function RegisterFace() {
         setIsModelsLoaded(true);
       } catch (error) {
         console.error("Error loading Face-API models: ", error);
+        toast.error("Failed to load face recognition models.");
       }
     };
 
     loadModels();
   }, []);
 
-  // 2. Access Webcam using MediaDevices API
+  // Access Webcam using MediaDevices API
   useEffect(() => {
     if (isModelsLoaded && videoRef.current) {
       startWebcam();
@@ -46,11 +50,11 @@ export default function RegisterFace() {
       console.log("Captured face descriptor:", faceDescriptor);
     }
   }, [faceDescriptor]);  
-
+  
   const startWebcam = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: {} });
-      if (videoRef?.current) {
+      if (videoRef.current) {
         videoRef.current.srcObject = stream;
         videoRef.current.onloadedmetadata = () => {
           setVideoDimensions({
@@ -61,10 +65,11 @@ export default function RegisterFace() {
       }
     } catch (error) {
       console.error("Error accessing webcam: ", error);
+      toast.error("Failed to access webcam. Please check your device permissions.");
     }
   };
 
-  // 3 & 4. Capture and process face detection + Generate face encodings
+  // Capture and process face detection + Generate face encodings
   const handleCapture = async () => {
     if (!isModelsLoaded || !videoRef.current) return;
 
@@ -74,6 +79,7 @@ export default function RegisterFace() {
 
     if (video.readyState !== 4) {
       console.error("Video not ready for capture.");
+      toast.error("Video feed is not ready.");
       setIsCapturing(false);
       return;
     }
@@ -89,34 +95,36 @@ export default function RegisterFace() {
     const imageDataUrl = captureCanvas.toDataURL("image/png");
     setCapturedImage(imageDataUrl);
 
-    const img = await faceapi.fetchImage(imageDataUrl);
-    const detections = await faceapi
-      .detectSingleFace(img)
-      .withFaceLandmarks()
-      .withFaceDescriptor();
+    try {
+      const img = await faceapi.fetchImage(imageDataUrl);
+      const detections = await faceapi
+        .detectSingleFace(img)
+        .withFaceLandmarks()
+        .withFaceDescriptor();
 
-    if (detections) {
-      setFaceDescriptor(Array.from(detections.descriptor));
+      if (detections) {
+        setFaceDescriptor(Array.from(detections.descriptor));
 
-      if (canvasRef.current) {
-        const canvas = canvasRef.current;
-        const displaySize = { width: video.videoWidth, height: video.videoHeight };
-        faceapi.matchDimensions(canvas, displaySize);
-        const resizedDetections = faceapi.resizeResults(detections, displaySize);
-        const context = canvas.getContext("2d");
-        if (context) {
-          context.clearRect(0, 0, canvas.width, canvas.height);
-          faceapi.draw.drawDetections(canvas, resizedDetections);
-          faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
+        if (canvasRef.current) {
+          const canvas = canvasRef.current;
+          const displaySize = { width: video.videoWidth, height: video.videoHeight };
+          faceapi.matchDimensions(canvas, displaySize);
+          const resizedDetections = faceapi.resizeResults(detections, displaySize);
+          const context = canvas.getContext("2d");
+          if (context) {
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            faceapi.draw.drawDetections(canvas, resizedDetections);
+            faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
+          }
         }
+      } else {
+        console.warn("No face detected.");
+        toast.warn("No face detected. Please try again.");
+        setFaceDescriptor(null);
       }
-    } else {
-      console.warn("No face detected.");
-      setFaceDescriptor(null);
-      if (canvasRef.current) {
-        const context = canvasRef.current.getContext("2d");
-        if (context) context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-      }
+    } catch (error) {
+      console.error("Error during face detection: ", error);
+      toast.error("Face detection failed. Please try again.");
     }
 
     setIsCapturing(false);
@@ -135,6 +143,7 @@ export default function RegisterFace() {
 
   return (
     <div className="w-full flex flex-col items-center">
+      <ToastContainer />
       <div className="text-center">
         <h1 className="text-tc font-poppins md:text-5xl lg:mt-2">Scan Face</h1>
       </div>
@@ -153,12 +162,19 @@ export default function RegisterFace() {
                     className="absolute top-0 left-0 w-full h-full object-cover rounded-lg"
                   />
                 ) : (
-                  <video
-                    ref={videoRef}
-                    autoPlay
-                    muted
-                    className="absolute top-0 left-0 w-full h-full object-cover rounded-lg"
-                  />
+                  <>
+                    <video
+                      ref={videoRef}
+                      autoPlay
+                      muted
+                      className="absolute top-0 left-0 w-full h-full object-cover rounded-lg"
+                    />
+                    {isCapturing && (
+                      <div className="absolute top-0 left-0 w-full h-full flex justify-center items-center bg-opacity-50 bg-gray-700">
+                        <ClipLoader color="#ffffff" size={50} />
+                      </div>
+                    )}
+                  </>
                 )}
 
                 {/* Canvas Overlay */}
