@@ -156,17 +156,10 @@ export default function RegisterFace() {
               {/* Webcam feed or Captured Image */}
               <div className="relative w-full h-0 pb-[75%] md:pb-[56.25%] lg:w-[448px] lg:h-[336px] lg:pb-0">
                 {capturedImage ? (
-                  <img
-                    src={capturedImage}
-                    alt="Captured"
-                    className="absolute top-0 left-0 w-full h-full object-cover rounded-lg"
-                  />
-                ) : (
                   <>
-                    <video
-                      ref={videoRef}
-                      autoPlay
-                      muted
+                    <img
+                      src={capturedImage}
+                      alt="Captured"
                       className="absolute top-0 left-0 w-full h-full object-cover rounded-lg"
                     />
                     {isCapturing && (
@@ -175,6 +168,13 @@ export default function RegisterFace() {
                       </div>
                     )}
                   </>
+                ) : (
+                  <video
+                    ref={videoRef}
+                    autoPlay
+                    muted
+                    className="absolute top-0 left-0 w-full h-full object-cover rounded-lg"
+                  />
                 )}
 
                 {/* Canvas Overlay */}
