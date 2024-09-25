@@ -22,7 +22,7 @@ module.exports = {
       },
       fontFamily: {
         poppins: ["Poppins", "sans-serif"],
-        noto_sans: ["Noto_Sans", "sans-serif"]
+        noto_sans: ["Noto Sans", "sans-serif"]
       }
     },
   },
