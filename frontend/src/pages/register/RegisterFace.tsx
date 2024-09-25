@@ -27,6 +27,9 @@ export default function RegisterFace() {
       try {
         await faceapi.nets.ssdMobilenetv1.loadFromUri("/models");
         await faceapi.nets.faceLandmark68Net.loadFromUri("/models");
+
+        // await faceapi.nets.tinyFaceDetector.loadFromUri("/models");
+        // await faceapi.nets.faceLandmark68TinyNet.loadFromUri("/models");
         await faceapi.nets.faceRecognitionNet.loadFromUri("/models");
         setIsModelsLoaded(true);
       } catch (error) {
@@ -84,12 +87,41 @@ export default function RegisterFace() {
       return;
     }
 
+    const detections = await faceapi.detectAllFaces(videoRef.current);
+    // const detections = await faceapi.detectAllFaces(videoRef.current, new faceapi.TinyFaceDetectorOptions());
+    if (detections.length > 1) {
+      console.warn("Please make sure only one face is present.");
+      toast.warn("Please make sure only one face is present.");
+      setIsCapturing(false);
+      return;
+    }
+
     const captureCanvas = document.createElement("canvas");
     captureCanvas.width = video.videoWidth;
     captureCanvas.height = video.videoHeight;
     const captureContext = captureCanvas.getContext("2d");
-    if (captureContext) {
-      captureContext.drawImage(video, 0, 0, captureCanvas.width, captureCanvas.height);
+    if (captureContext === null) {
+      console.error("An error has occurred in getting context.");
+      toast.error("An error has occurred in getting context.");
+      setIsCapturing(false);
+      return;
+    }
+    captureContext.drawImage(video, 0, 0, captureCanvas.width, captureCanvas.height);
+
+    const imageData = captureContext.getImageData(0, 0, captureCanvas.width, captureCanvas.height);
+    let totalBrightness = 0;
+    for (let i = 0; i < imageData.data.length; i += 4) {
+      const r = imageData.data[i];
+      const g = imageData.data[i + 1];
+      const b = imageData.data[i + 2];
+      totalBrightness += (r + g + b) / 3;
+    }
+    const averageBrightness = totalBrightness / (captureCanvas.width * captureCanvas.height);
+    if (averageBrightness < 60) { // Threshold for darkness
+      console.warn("Please capture image on a well lit environment.");
+      toast.warn("Please capture image on a well lit environment.");
+      setIsCapturing(false);
+      return;
     }
 
     const imageDataUrl = captureCanvas.toDataURL("image/png");
@@ -101,6 +133,12 @@ export default function RegisterFace() {
         .detectSingleFace(img)
         .withFaceLandmarks()
         .withFaceDescriptor();
+
+      // const useTinyModel = true;
+      // const detections = await faceapi
+      //   .detectSingleFace(img, new faceapi.TinyFaceDetectorOptions())
+      //   .withFaceLandmarks(useTinyModel)
+      //   .withFaceDescriptor();
 
       if (detections) {
         setFaceDescriptor(Array.from(detections.descriptor));
@@ -169,12 +207,16 @@ export default function RegisterFace() {
                     )}
                   </>
                 ) : (
-                  <video
-                    ref={videoRef}
-                    autoPlay
-                    muted
-                    className="absolute top-0 left-0 w-full h-full object-cover rounded-lg"
-                  />
+                  <>
+                    <video
+                      ref={videoRef}
+                      autoPlay
+                      muted
+                      className="absolute top-0 left-0 w-full h-full object-cover rounded-lg"
+                    />
+
+                    <div className="face-guide"></div>
+                  </>
                 )}
 
                 {/* Canvas Overlay */}
@@ -239,6 +281,9 @@ export default function RegisterFace() {
             </ul>
           </div>
         </div>
+          <p className="text-sm lg:text-base text-gray-600 mt-4 text-center">
+          Note: Please ensure the image is as clear as possible for optimal face recognition accuracy.
+          </p>
       </div>
     </div>
   );
