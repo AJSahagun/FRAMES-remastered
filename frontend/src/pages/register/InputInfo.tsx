@@ -2,7 +2,7 @@
 import React, { useEffect, useCallback } from "react";
 import { useRegistrationStore } from "./stores/useRegistrationStore";
 import { useSrCodeStore } from "./stores/srCodeStore";
-import { useSelectedDeptStore } from "./stores/selectedDeptStore"; 
+import { useDeptStore } from "./stores/useDeptStore"; 
 import Dropdown from "../../components/Dropdown";
 
 const departmentOptions = [
@@ -51,7 +51,7 @@ interface InputInfoProps {
 const InputInfo: React.FC<InputInfoProps> = () => {
   const { localFormData, setLocalFormData, setIsFormValid } = useRegistrationStore();
   const { srCodeError, setSrCodeError } = useSrCodeStore();
-  const { setSelectedDept } = useSelectedDeptStore();
+  const { setSelectedDept } = useDeptStore();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -145,7 +145,7 @@ const InputInfo: React.FC<InputInfoProps> = () => {
         </div>
 
         {/* column 2 */}
-        <div className="space-y-3 flex flex-col justify-center items-center w-full lg:space-y-4">
+        <div className="space-y-3 flex flex-col justify-center items-center w-full lg:space-y-4 mt-3 lg:mt-0">
           {/* <div className="w-full mt-6 mb-1 opacity-50 text-sm ml-1 lg:text-left lg:-mb-2">
             Please follow the format <span className="font-semibold">24-12345</span>
           </div> */}
