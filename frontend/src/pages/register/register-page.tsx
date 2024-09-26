@@ -57,7 +57,7 @@ export default function Register() {
 
           {currentPage === 2 && (
             <div className="w-full max-w-md">
-              <RegisterFace />
+              <RegisterFace formData={formData} />
               <div className="flex justify-between mt-4">
                 <button
                   className="border-2 border-tc hover:bg-btnHover font-poppins text-tc rounded-lg w-5/12 py-2 transition-colors"
@@ -66,8 +66,14 @@ export default function Register() {
                   Back
                 </button>
                 <button
-                  className="bg-btnBg hover:bg-btnHover font-poppins text-background rounded-lg w-5/12 py-2 shadow-md transition-colors"
-                  onClick={nextPage}
+                  className={`font-poppins text-background rounded-lg w-5/12 py-2 shadow-md transition-colors
+                   ${
+                  isFormValid
+                    ? "bg-btnBg hover:bg-btnHover"
+                    : "bg-btnBg opacity-50 cursor-not-allowed"
+                }`}
+                onClick={handleNextClick}
+                disabled={!isFormValid}
                 >
                   Next
                 </button>

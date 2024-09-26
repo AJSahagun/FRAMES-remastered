@@ -42,6 +42,7 @@ interface UserFormData {
   srCode: string;
   department: string;
   course: string;
+  encoding: number[];
 }
 
 interface InputInfoProps {

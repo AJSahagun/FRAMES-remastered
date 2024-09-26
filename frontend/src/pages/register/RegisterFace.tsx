@@ -1,16 +1,33 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import * as faceapi from "@vladmandic/face-api";
+import { useRegistrationStore } from "./stores/useRegistrationStore";
 import { FaCamera, FaRedo } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { ClipLoader } from "react-spinners";
 
-export default function RegisterFace() {
+interface UserFormData {
+  firstName: string;
+  middleName?: string;
+  lastName: string;
+  suffix?: string;
+  srCode: string;
+  department: string;
+  course: string;
+  encoding: number[];
+}
+
+interface RegisterFaceProps {
+  formData: UserFormData;
+}
+
+const RegisterFace: React.FC<RegisterFaceProps> = () => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [isModelsLoaded, setIsModelsLoaded] = useState(false);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [faceDescriptor, setFaceDescriptor] = useState<number[] | null>(null);
+  const { localFormData, setLocalFormData, setIsFaceValid } = useRegistrationStore();
   const [isCapturing, setIsCapturing] = useState(false);
   const [videoDimensions, setVideoDimensions] = useState({ width: 0, height: 0 });
   const parameters = [
@@ -52,7 +69,18 @@ export default function RegisterFace() {
     if (faceDescriptor) {
       console.log("Captured face descriptor:", faceDescriptor);
     }
-  }, [faceDescriptor]);  
+  }, [faceDescriptor]);
+
+  const validateForm = useCallback(() => {
+    const isValid =
+      Boolean(localFormData.encoding)
+    return isValid;
+  }, [localFormData.encoding]);
+
+  useEffect(() => {
+    const isValid = validateForm();
+    setIsFaceValid(isValid);
+  }, [localFormData, validateForm, setIsFaceValid]);
   
   const startWebcam = async () => {
     try {
@@ -141,7 +169,7 @@ export default function RegisterFace() {
       //   .withFaceDescriptor();
 
       if (detections) {
-        setFaceDescriptor(Array.from(detections.descriptor));
+        setLocalFormData({ encoding: Array.from(detections.descriptor) });
 
         if (canvasRef.current) {
           const canvas = canvasRef.current;
@@ -158,7 +186,6 @@ export default function RegisterFace() {
       } else {
         console.warn("No face detected.");
         toast.warn("No face detected. Please try again.");
-        setFaceDescriptor(null);
       }
     } catch (error) {
       console.error("Error during face detection: ", error);
@@ -288,3 +315,5 @@ export default function RegisterFace() {
     </div>
   );
 }
+
+export default React.memo(RegisterFace);
