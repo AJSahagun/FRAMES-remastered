@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, { useEffect, useRef, useState} from "react";
 import * as faceapi from "@vladmandic/face-api";
 import { useRegistrationStore } from "./stores/useRegistrationStore";
 import { FaCamera, FaRedo } from "react-icons/fa";
@@ -26,7 +26,7 @@ const RegisterFace: React.FC<RegisterFaceProps> = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [isModelsLoaded, setIsModelsLoaded] = useState(false);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
-  const { localFormData, setLocalFormData, setIsFaceValid } = useRegistrationStore();
+  const { setLocalFormData } = useRegistrationStore();
   const [isCapturing, setIsCapturing] = useState(false);
   const [videoDimensions, setVideoDimensions] = useState({ width: 0, height: 0 });
   const parameters = [
@@ -63,17 +63,6 @@ const RegisterFace: React.FC<RegisterFaceProps> = () => {
       startWebcam();
     }
   }, [isModelsLoaded]);
-
-  const validateForm = useCallback(() => {
-    const isValid =
-      Boolean(localFormData.encoding)
-    return isValid;
-  }, [localFormData.encoding]);
-
-  useEffect(() => {
-    const isValid = validateForm();
-    setIsFaceValid(isValid);
-  }, [localFormData, validateForm, setIsFaceValid]);
   
   const startWebcam = async () => {
     try {

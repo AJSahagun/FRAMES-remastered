@@ -68,12 +68,12 @@ export default function Register() {
                 <button
                   className={`font-poppins text-background rounded-lg w-5/12 py-2 shadow-md transition-colors
                    ${
-                  isFormValid
+                    localFormData.encoding.length > 0
                     ? "bg-btnBg hover:bg-btnHover"
                     : "bg-btnBg opacity-50 cursor-not-allowed"
                 }`}
                 onClick={handleNextClick}
-                disabled={!isFormValid}
+                disabled={localFormData.encoding.length <= 0}
                 >
                   Next
                 </button>

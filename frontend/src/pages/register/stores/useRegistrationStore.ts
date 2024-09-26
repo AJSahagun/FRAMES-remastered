@@ -16,11 +16,9 @@ interface RegistrationState {
   localFormData: UserFormData;
   isFormValid: boolean;
   isEditing: boolean;
-  isFaceValid: boolean;
   setFormData: (data: Partial<UserFormData>) => void;
   setLocalFormData: (data: Partial<UserFormData>) => void;
   setIsFormValid: (isValid: boolean) => void;
-  setIsFaceValid: (hasEncodings: boolean) => void;
   submitForm: () => void;
   setIsEditing: (isEditing: boolean) => void;
   resetForm: () => void;
@@ -42,7 +40,6 @@ export const useRegistrationStore = create<RegistrationState>((set) => ({
   localFormData: initialFormData,
   isFormValid: false,
   isEditing: false,
-  isFaceValid: false,
   setFormData: (data) => set((state) => ({
     formData: { ...state.formData, ...data },
   })),
@@ -50,10 +47,9 @@ export const useRegistrationStore = create<RegistrationState>((set) => ({
     localFormData: { ...state.localFormData, ...data },
   })),
   setIsFormValid: (isValid) => set({ isFormValid: isValid }),
-  setIsFaceValid: (hasEncodings) => set({ isFaceValid: hasEncodings }),
   submitForm: () => set((state) => ({
     formData: state.localFormData,
   })),
   setIsEditing: (isEditing) => set({ isEditing }),
-  resetForm: () => set({ formData: initialFormData, localFormData: initialFormData, isFormValid: false }),
+  resetForm: () => set({ formData: initialFormData, localFormData: initialFormData, isFormValid: false}),
 }));
