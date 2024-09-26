@@ -8,6 +8,7 @@ interface UserFormData {
   srCode: string;
   department: string;
   course: string;
+  encoding: number[];
 }
 
 interface RegistrationState {
@@ -31,6 +32,7 @@ const initialFormData: UserFormData = {
   srCode: "",
   department: "",
   course: "",
+  encoding: []
 };
 
 export const useRegistrationStore = create<RegistrationState>((set) => ({
@@ -49,5 +51,5 @@ export const useRegistrationStore = create<RegistrationState>((set) => ({
     formData: state.localFormData,
   })),
   setIsEditing: (isEditing) => set({ isEditing }),
-  resetForm: () => set({ formData: initialFormData, localFormData: initialFormData, isFormValid: false }),
+  resetForm: () => set({ formData: initialFormData, localFormData: initialFormData, isFormValid: false}),
 }));
