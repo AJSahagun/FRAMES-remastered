@@ -72,9 +72,11 @@ const InputInfo: React.FC<InputInfoProps> = () => {
       Boolean(localFormData.firstName?.trim()) &&
       Boolean(localFormData.lastName?.trim()) &&
       Boolean(localFormData.srCode?.trim()) &&
+      Boolean(localFormData.department?.trim()) &&
+      Boolean(localFormData.course?.trim()) &&
       !srCodeError;
     return isValid;
-  }, [localFormData.firstName, localFormData.lastName, localFormData.srCode, srCodeError]);
+  }, [localFormData.firstName, localFormData.lastName, localFormData.srCode, localFormData.department, localFormData.course, srCodeError]);
 
   useEffect(() => {
     const isValid = validateForm();
@@ -113,6 +115,7 @@ const InputInfo: React.FC<InputInfoProps> = () => {
             required
             value={localFormData.firstName}
             onChange={handleInputChange}
+            
           />
           <input
             type="text"
@@ -142,6 +145,7 @@ const InputInfo: React.FC<InputInfoProps> = () => {
             md:py-3 md:text-lg"
             value={localFormData.suffix}
             onChange={handleInputChange}
+            
           />
         </div>
 

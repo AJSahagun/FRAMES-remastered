@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import 'react-toastify/dist/ReactToastify.css';
 import { useRegistrationStore } from './stores/useRegistrationStore';
 import { usePaginationStore } from './stores/usePaginationStore';
 import { registerUser } from '../../services/RegisterService';
@@ -10,6 +11,7 @@ interface UserFormData {
   srCode: string;
   department: string;
   course: string;
+  encoding: number[];
 }
 interface CheckInfoProps {
   formData: UserFormData;
@@ -39,7 +41,7 @@ const CheckInfo: React.FC<CheckInfoProps> = () => {
   };
 
   const handleConfirmSubmit = () => {
-    const isValid = Object.entries(formData).every(([key, value]) => key === 'suffix' || value !== '');
+    const isValid = Object.entries(formData).every(([key, value]) => key === 'suffix' || key === 'middleName' || value !== '');
     if (isValid) {
       handleSubmit();
     } else {
@@ -47,6 +49,11 @@ const CheckInfo: React.FC<CheckInfoProps> = () => {
     }
     setShowConfirmDialog(false);
   };
+
+  const filteredFormData = Object.entries(formData).filter(
+    ([key]) => key !== 'encoding',
+
+  );
 
   return (
     <div className="w-full relative justify-center items-center">
@@ -58,14 +65,16 @@ const CheckInfo: React.FC<CheckInfoProps> = () => {
         placeholder card
       </div>
 
-      <div className="">
-      {Object.entries(formData).map(([key, value]) => (
-          <div key={key} className="flex flex-row mt-4 mx-12 w-4/5">
-            <span className="font-semibold text-tc w-full">{key.charAt(0).toUpperCase() + key.slice(1)}</span>
-            <span className="w-full px-6 py-2 rounded-lg bg-sf">{value.toUpperCase()}</span>
-          </div>
-        ))}
+      <div className="space-y-3 flex flex-col justify-center items-center w-full lg:space-y-4">
+        {(filteredFormData).map(([key, value]) => (
+            <div key={key} className="flex flex-col mt-4 mx-12 w-4/5 lg:flex-row lg:w-full lg:mt-7">
+              <span className="font-semibold text-tc w-full">{key.charAt(0).toUpperCase() + key.slice(1)}</span>
+              <span className="w-full px-6 py-2 rounded-lg bg-sf">{typeof value === 'string' ? (value as string).toUpperCase() : value}</span>
+            </div>
+          ))}
 
+        
+        
 
       </div>
 
@@ -73,13 +82,13 @@ const CheckInfo: React.FC<CheckInfoProps> = () => {
       <div className="flex justify-between mt-8">
         <button
           onClick={prevPage}
-          className="border-2 border-tc hover:bg-btnHover font-poppins text-tc rounded-lg w-5/12 py-2 transition-colors"
+          className="border-2 border-tc hover:bg-tc hover:text-background font-poppins text-tc rounded-lg w-5/12 py-2 transition-colors duration-300 "
           >
           Back  
           </button>
         <button
           onClick={() => setShowConfirmDialog(true)}
-          className="bg-btnBg hover:bg-btnHover font-poppins text-background rounded-lg w-5/12 py-2 shadow-md transition-colors"
+          className="bg-btnBg font-poppins text-background rounded-lg w-5/12 py-2 shadow-md transition-all duration-500 ease-in-out hover:bg-gradient-to-br hover:from-accent hover:to-btnBg transform hover:scale-105 "
         >
           Submit
         </button>

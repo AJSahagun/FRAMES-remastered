@@ -29,7 +29,7 @@ export default function Register() {
 
         <div className="sm:w-4/5 mt-16 ml-3
           min-[320px]:w-2/3 md:w-2/3 md:max-w-sm lg:relative lg:ml-24 lg:mt-12">
-          <img src="/logos/FRAMES_title-logo.png" alt="FRAMES Logo" className="w-4/5 mx-auto lg:ml-0 " />
+          <img src="/logos/FRAMES_title-logo.png" alt="FRAMES Logo" className="w-4/5 mx-auto lg:ml-0 lg:w-3/5" />
         </div>
 
         <div className="w-full mb-4">
@@ -41,10 +41,10 @@ export default function Register() {
             <div className="w-full max-w-md flex flex-col items-center justify-center">
               <InputInfo formData={formData} />
               <button
-                className={`font-poppins text-md text-background rounded-lg w-2/3 py-2 mt-10 shadow-md transition-all
+                className={`font-poppins text-md text-background rounded-lg w-2/3 py-2 mt-10 shadow-md transition-all duration-500  ease-in-out lg:mt-20
                    ${
                   isFormValid
-                    ? "bg-btnBg hover:bg-btnHover"
+                    ? "bg-btnBg hover:bg-gradient-to-br hover:from-accent hover:to-btnBg transform hover:scale-105"
                     : "bg-btnBg opacity-50 cursor-not-allowed"
                 }`}
                 onClick={handleNextClick}
@@ -60,16 +60,16 @@ export default function Register() {
               <RegisterFace formData={formData} />
               <div className="flex justify-between mt-4">
                 <button
-                  className="border-2 border-tc hover:bg-btnHover font-poppins text-tc rounded-lg w-5/12 py-2 transition-colors"
+                  className="border-2 border-tc hover:bg-tc hover:text-background font-poppins text-tc rounded-lg w-5/12 py-2 transition-colors duration-300"
                   onClick={prevPage}
                 >
                   Back
                 </button>
                 <button
-                  className={`font-poppins text-background rounded-lg w-5/12 py-2 shadow-md transition-colors
+                  className={`w-5/12 py-2 font-poppins text-background rounded-lg shadow-md transition-all duration-500 ease-in-out
                    ${
                     localFormData.encoding.length > 0
-                    ? "bg-btnBg hover:bg-btnHover"
+                    ? "bg-btnBg hover:bg-gradient-to-br hover:from-accent hover:to-btnBg transform hover:scale-105"
                     : "bg-btnBg opacity-50 cursor-not-allowed"
                 }`}
                 onClick={handleNextClick}
