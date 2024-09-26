@@ -26,7 +26,6 @@ const RegisterFace: React.FC<RegisterFaceProps> = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [isModelsLoaded, setIsModelsLoaded] = useState(false);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
-  const [faceDescriptor, setFaceDescriptor] = useState<number[] | null>(null);
   const { localFormData, setLocalFormData, setIsFaceValid } = useRegistrationStore();
   const [isCapturing, setIsCapturing] = useState(false);
   const [videoDimensions, setVideoDimensions] = useState({ width: 0, height: 0 });
@@ -64,12 +63,6 @@ const RegisterFace: React.FC<RegisterFaceProps> = () => {
       startWebcam();
     }
   }, [isModelsLoaded]);
-
-  useEffect(() => {
-    if (faceDescriptor) {
-      console.log("Captured face descriptor:", faceDescriptor);
-    }
-  }, [faceDescriptor]);
 
   const validateForm = useCallback(() => {
     const isValid =
@@ -197,7 +190,7 @@ const RegisterFace: React.FC<RegisterFaceProps> = () => {
 
   const handleReset = () => {
     setCapturedImage(null);
-    setFaceDescriptor(null);
+    setLocalFormData({ encoding: [] });
     if (canvasRef.current) {
       const context = canvasRef.current.getContext("2d");
       if (context) context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
