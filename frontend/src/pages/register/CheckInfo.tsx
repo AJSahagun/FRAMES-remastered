@@ -26,16 +26,7 @@ const CheckInfo: React.FC<CheckInfoProps> = () => {
 
   const handleSubmit = () => {
     console.log('Form submitted:', formData);
-    const data= {
-      firstName: formData.firstName,
-      middleName: formData.middleName,
-      lastName: formData.lastName,
-      department: formData.department,
-      program: formData.course,
-      encoding:"sample"
-      }
-    console.log("testing")
-    registerUser(data);
+    registerUser(formData);
     setShowSuccessAlert(true);
     resetForm();
   };
@@ -62,16 +53,22 @@ const CheckInfo: React.FC<CheckInfoProps> = () => {
       </div>
 
       <div className="flex items-center justify-center border-2 shadow-md border-tc rounded-2xl mt-8 h-40 w-2/5 mx-auto">
-        placeholder card
+      {formData.imageUrl ? (
+        <img src={formData.imageUrl} alt="Captured" />
+      ) : (
+        <p>No image captured.</p>
+      )}
       </div>
 
       <div className="space-y-3 flex flex-col justify-center items-center w-full lg:space-y-4">
         {(filteredFormData).map(([key, value]) => (
+          key=='imageUrl'? null:(
             <div key={key} className="flex flex-col mt-4 mx-12 w-4/5 lg:flex-row lg:w-full lg:mt-7">
               <span className="font-semibold text-tc w-full">{key.charAt(0).toUpperCase() + key.slice(1)}</span>
               <span className="w-full px-6 py-2 rounded-lg bg-sf">{typeof value === 'string' ? (value as string).toUpperCase() : value}</span>
             </div>
-          ))}
+          )
+        ))}
 
         
         
