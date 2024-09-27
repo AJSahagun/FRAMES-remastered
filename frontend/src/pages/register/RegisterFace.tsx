@@ -135,6 +135,7 @@ const RegisterFace: React.FC<RegisterFaceProps> = () => {
     }
 
     const imageDataUrl = captureCanvas.toDataURL("image/png");
+    setLocalFormData({ imageUrl: imageDataUrl });
     setCapturedImage(imageDataUrl);
 
     try {
