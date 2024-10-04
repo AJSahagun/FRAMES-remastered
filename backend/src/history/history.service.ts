@@ -10,14 +10,32 @@ export class HistoryService {
 
 
   async create(createHistoryDto: CreateHistoryDto):Promise<any> {
-    const srCode=createHistoryDto.srCode
+    const schoolId=createHistoryDto.schoolId
     const timeIn=createHistoryDto.timeIn
     const timeOut=createHistoryDto.timeOut
+    const encoding = JSON.stringify(createHistoryDto.encoding);
 
     try {
-      const res = timeOut ? await this.sql(`insert into history("sr_code", "time_in", "time_out") values('${srCode}','${timeIn}','${timeOut}')`)
-      : await this.sql(`insert into history("sr_code", "time_in") values('${srCode}','${timeIn}')`)
-      
+      // insert history
+      timeOut ? await this.sql(
+        `insert into history("school_id", "time_in", "time_out") values('${schoolId}','${timeIn}','${timeOut}')
+        `)
+      : await this.sql(
+        `insert into history("school_id", "time_in") values('${schoolId}','${timeIn}')
+        `)
+
+      // insert recent encodings
+      await this.sql(
+        `insert into encodings(school_id, encoding) values('${schoolId}', '${encoding}')
+        `)
+
+      // delete old encodings
+      await this.sql(
+        `delete from encodings where uuid not in
+        (select uuid from encodings where school_id= '${schoolId}' order by date_created desc limit 5)
+        and school_id= '${schoolId}'
+      `)
+        
     } catch (error) {
       console.log(error)
       throw new HttpException(`${error}`, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -29,7 +47,4 @@ export class HistoryService {
     return await this.sql(`SELECT * FROM history`);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} history`;
-  }
 }

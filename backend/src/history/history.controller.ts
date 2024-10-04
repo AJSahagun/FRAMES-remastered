@@ -22,9 +22,4 @@ export class HistoryController {
     return this.historyService.findAll();
   }
 
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.historyService.findOne(+id);
-  // }
-
 }

@@ -29,31 +29,38 @@ export class UserService {
 
   async create(createUserDto: CreateUserDto) {
     const name = `${createUserDto.firstName} ${createUserDto.middleName} ${createUserDto.lastName}`;
-    const srCode = createUserDto.srCode;
+    const schoolId = createUserDto.schoolId;
     const encoding = JSON.stringify(createUserDto.encoding);
 
     try {
-      await this.sql(
-        `INSERT INTO users(first_name, middle_name, last_name, sr_Code, department, program)
-        values('${createUserDto.firstName}','${createUserDto.middleName}','${createUserDto.lastName}', '${createUserDto.srCode}', '${createUserDto.department}', '${createUserDto.program}')
-        `,
-      );
+      await this.sql(`
+        INSERT INTO users(first_name, middle_name, last_name, school_id, department, program)
+        VALUES (
+          '${createUserDto.firstName}',
+          ${createUserDto.middleName ? `'${createUserDto.middleName}'` : 'NULL'},
+          '${createUserDto.lastName}',
+          '${createUserDto.schoolId}',
+          '${createUserDto.department}',
+          '${createUserDto.program}'
+        )
+    `);
+    
 
       const idAi = await this.sql(
-        `INSERT INTO encodings(encoding, sr_code)
-        values('${encoding}','${createUserDto.srCode}')
+        `INSERT INTO encodings(encoding, school_id)
+        values('${encoding}','${createUserDto.schoolId}')
         returning id_ai
         `,
       );
       this.eventEmitter.emit('onRegister', {
         id: idAi[0]['id_ai'],
         name,
-        srCode,
+        schoolId,
         encoding,
       });
     } catch (error) {
       if (error.code === '23505')
-        throw new HttpException('Existing srCode', HttpStatus.CONFLICT);
+        throw new HttpException('Existing school Id', HttpStatus.CONFLICT);
       else
         throw new HttpException(`${error}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -81,8 +88,8 @@ export class UserService {
   async findAllEncodings(latestId: number, callback: (result: any) => void) {
     try {
       const latestEncodings = await this.sql(
-        `SELECT concat(u.first_name, ' ', u.middle_name, ' ', u.last_name) as name, e.id_ai as "idAi", e.sr_code as "srCode", e."encoding" from encodings e 
-        left join users u on e.sr_code = u.sr_code
+        `SELECT concat(u.first_name, ' ', u.middle_name, ' ', u.last_name) as name, e.id_ai as "idAi", e.school_id as "schoolId", e."encoding" from encodings e 
+        left join users u on e.school_id = u.school_id
         where e.id_ai > ${latestId}`,
       );
       callback({ success: true, data: latestEncodings });
