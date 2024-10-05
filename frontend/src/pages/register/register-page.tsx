@@ -7,6 +7,7 @@ import RegisterFace from "./RegisterFace";
 import CheckInfo from "./CheckInfo";
 import FosterWeelerTag from '../../components/FosterWheelerTag';
 
+
 export default function Register() {
   const { currentPage, nextPage, prevPage } = usePaginationStore();
   const { formData, localFormData, isFormValid, submitForm } = useRegistrationStore();
@@ -97,7 +98,7 @@ export default function Register() {
         </div>
       </div>
 
-      <div className="font-poppins text-accent text-sm opacity-40 text-center py-6">
+      <div className="lg:hidden font-poppins text-accent text-sm opacity-40 text-center py-6">
         Foster Wheeler - Alangilan
       </div>
     </div>
