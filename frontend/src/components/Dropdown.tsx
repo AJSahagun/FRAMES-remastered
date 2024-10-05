@@ -23,9 +23,10 @@ const Dropdown: React.FC<DropdownProps> = ({
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleDropdown = () => !disabled && setIsOpen(!isOpen);
+
   const selectOption = (optionValue: string) => {
-    onChange(optionValue);
-    setIsOpen(false);
+    onChange(optionValue);  // Pass selected option to parent
+    setIsOpen(false);  // Close dropdown after selection
   };
 
   return (
@@ -62,3 +63,4 @@ const Dropdown: React.FC<DropdownProps> = ({
 };
 
 export default Dropdown;
+

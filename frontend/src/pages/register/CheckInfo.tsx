@@ -10,8 +10,9 @@ interface UserFormData {
   suffix?: string;
   srCode: string;
   department: string;
-  course: string;
+  program: string;
   encoding: number[];
+  imageUrl: string;
 }
 interface CheckInfoProps {
   formData: UserFormData;

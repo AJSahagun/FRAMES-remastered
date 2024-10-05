@@ -39,10 +39,10 @@ export default function Register() {
 
         <div className="w-full px-10 flex justify-center lg:w-screen">
           {currentPage === 1 && (
-            <div className="w-full max-w-md flex flex-col items-center justify-center">
+            <div className="w-full max-w-md lg:max-w-full flex flex-col items-center justify-center">
               <InputInfo formData={formData} />
               <button
-                className={`font-poppins text-md text-background rounded-lg w-2/3 py-2 mt-10 shadow-md transition-all duration-500  ease-in-out lg:mt-20
+                className={`font-poppins text-md text-background rounded-lg w-2/3 py-2 mt-10 shadow-md transition-all duration-500  ease-in-out lg:mt-20 lg:w-1/4
                    ${
                   isFormValid
                     ? "bg-btnBg hover:bg-gradient-to-br hover:from-accent hover:to-btnBg transform hover:scale-105"
