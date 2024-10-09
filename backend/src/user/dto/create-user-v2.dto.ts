@@ -1,7 +1,7 @@
 import { IsJSON, IsNotEmpty, IsOptional } from 'class-validator';
 import { Role } from 'src/config/role.enum';
 
-export class CreateUserDto {
+export class CreateUserV2Dto {
 
   @IsNotEmpty()
   firstName: string;
@@ -11,13 +11,12 @@ export class CreateUserDto {
   @IsNotEmpty()
   lastName: string;
   @IsNotEmpty()
-  srCode: string;
+  schoolId: string;
   @IsNotEmpty()
   department: string;
   @IsNotEmpty()
   program: string;
 
-  // @IsJSON()
   @IsNotEmpty()
   encoding: number[];
 }

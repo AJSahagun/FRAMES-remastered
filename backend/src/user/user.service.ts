@@ -1,23 +1,14 @@
 import {
-  forwardRef,
-  HttpCode,
   HttpException,
   HttpStatus,
   Inject,
   Injectable,
-  Module,
 } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import {
-  MessageBody,
-  SubscribeMessage,
-  WebSocketGateway,
-  WebSocketServer,
-} from '@nestjs/websockets';
-import { Server, Socket } from 'socket.io';
-import { UserGateway } from './user.gateway';
+
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
+import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserV2Dto } from './dto/create-user-v2.dto';
 
 @Injectable()
 export class UserService {
@@ -28,6 +19,40 @@ export class UserService {
   ) {}
 
   async create(createUserDto: CreateUserDto) {
+    const name = `${createUserDto.firstName} ${createUserDto.middleName} ${createUserDto.lastName}`;
+    const srCode = createUserDto.srCode;
+    const encoding = JSON.stringify(createUserDto.encoding);
+
+    try {
+      await this.sql(
+        `INSERT INTO users(first_name, middle_name, last_name, school_id, department, program)
+        values('${createUserDto.firstName}',${createUserDto.middleName ? `'${createUserDto.middleName}'` : 'NULL'},'${createUserDto.lastName}', '${createUserDto.srCode}', '${createUserDto.department}', '${createUserDto.program}')
+        `,
+      );
+
+      const idAi = await this.sql(
+        `INSERT INTO encodings(encoding, school_id)
+        values('${encoding}','${createUserDto.srCode}')
+        returning id_ai
+        `,
+      );
+      this.eventEmitter.emit('onRegister', {
+        id: idAi[0]['id_ai'],
+        name,
+        srCode,
+        encoding,
+      });
+    } catch (error) {
+      if (error.code === '23505')
+        throw new HttpException('Existing srCode', HttpStatus.CONFLICT);
+      else
+        throw new HttpException(`${error}`, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    throw new HttpException('Success', HttpStatus.ACCEPTED);
+  }
+
+  async createV2(createUserDto: CreateUserV2Dto) {
     const name = `${createUserDto.firstName} ${createUserDto.middleName} ${createUserDto.lastName}`;
     const schoolId = createUserDto.schoolId;
     const encoding = JSON.stringify(createUserDto.encoding);

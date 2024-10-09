@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Version } from '@nestjs/common';
 import { HistoryService } from './history.service';
 import { CreateHistoryDto } from './dto/create-history.dto';
 import { UpdateHistoryDto } from './dto/update-history.dto';
@@ -11,11 +11,13 @@ import { RolesGuard } from '../guards/roles/roles.guard';
 export class HistoryController {
   constructor(private readonly historyService: HistoryService) {}
 
+  @Version('2')
   @Post()
   create(@Body() createHistoryDto: CreateHistoryDto) {
     return this.historyService.create(createHistoryDto);
   }
 
+  @Version('2')
   @Get()
   @Roles(Role.Dev, Role.Admin)
   findAll() {
