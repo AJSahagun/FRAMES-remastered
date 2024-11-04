@@ -35,24 +35,8 @@ export class UserGateway {
     })
   }
 
-  // @OnEvent('syncEncodings')
-  // handleEncodingsSync(idAi:number, name:string, srCode:string, encoding:string){
-  //   this.server.emit('onMessage', {idAi, name, srCode, encoding});
-  // }
-
   @OnEvent('onRegister')
-  handleUserCreated(idAi:number, name:string, srCode:string, encoding:string){
-    this.server.emit('onMessage', {idAi, name, srCode, encoding});
+  handleUserCreated(idAi:number, name:string, schoolId:string, encoding:string){
+    this.server.emit('onMessage', {idAi, name, schoolId, encoding});
   }
-
-  // @SubscribeMessage('newMessage')
-  // onNewMessage(@MessageBody() body: any) {
-  //   console.log(body);
-
-  //   // from server to 
-  //   // this.server.emit('onMessage', {
-  //   //   message: 'New registered encoding',
-  //   //   content: body,
-  //   // });
-  // }
 }
