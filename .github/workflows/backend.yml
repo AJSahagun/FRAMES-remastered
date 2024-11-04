@@ -11,6 +11,8 @@ on:
 jobs:
   Test:
     runs-on: ubuntu-latest
+    env:
+      FRAMES_DB_URL: ${{ secrets.FRAMES_DB_URL }}
     strategy:
       matrix:
         node-version: ['20.15']
