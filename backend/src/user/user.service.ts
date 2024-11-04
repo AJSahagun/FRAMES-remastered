@@ -91,6 +91,8 @@ export class UserService {
     }
 
     throw new HttpException('Success', HttpStatus.ACCEPTED);
+
+    throw new HttpException('Success', HttpStatus.ACCEPTED);
   }
 
   async findAll(): Promise<any[]> {
