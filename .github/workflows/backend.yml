@@ -11,8 +11,6 @@ on:
 jobs:
   Test:
     runs-on: ubuntu-latest
-    env:
-      FRAMES_DB_URL: ${{ secrets.FRAMES_DB_URL }}
     strategy:
       matrix:
         node-version: ['20.15']
@@ -28,6 +26,12 @@ jobs:
       - name: Installing backend dependencies
         run: npm install
         working-directory: ./backend  
+
+      - name: Set-up environment variables
+        run: |
+          touch .env
+          echo FRAMES_DB_URL=${{ secrets.FRAMES_DB_URL }} >> .env
+        working-directory: ./backend
 
       - name: Run backend tests
         run: npm run test
