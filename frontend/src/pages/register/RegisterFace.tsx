@@ -5,20 +5,10 @@ import { FaCamera, FaRedo } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { ClipLoader } from "react-spinners";
-
-interface UserFormData {
-  firstName: string;
-  middleName?: string;
-  lastName: string;
-  suffix?: string;
-  srCode: string;
-  department: string;
-  course: string;
-  encoding: number[];
-}
+import { UserRegistrationData } from '../../types/user.types';
 
 interface RegisterFaceProps {
-  formData: UserFormData;
+  formData: UserRegistrationData;
 }
 
 const RegisterFace: React.FC<RegisterFaceProps> = () => {
@@ -135,6 +125,7 @@ const RegisterFace: React.FC<RegisterFaceProps> = () => {
     }
 
     const imageDataUrl = captureCanvas.toDataURL("image/png");
+    setLocalFormData({ imageUrl: imageDataUrl });
     setCapturedImage(imageDataUrl);
 
     try {

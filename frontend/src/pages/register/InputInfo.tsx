@@ -2,8 +2,9 @@
 import React, { useEffect, useCallback } from "react";
 import { useRegistrationStore } from "./stores/useRegistrationStore";
 import { useSrCodeStore } from "./stores/srCodeStore";
-import { useSelectedDeptStore } from "./stores/selectedDeptStore"; 
+import { useDeptStore } from "./stores/useDeptStore"; 
 import Dropdown from "../../components/Dropdown";
+import { UserRegistrationData } from '../../types/user.types';
 
 const departmentOptions = [
   { value: "CAFAD", label: "College of Architecture, Fine Arts & Design" },
@@ -34,25 +35,14 @@ const courseOptions: Record<string, { value: string; label: string }[]> = {
   ],
 };
 
-interface UserFormData {
-  firstName: string;
-  middleName?: string;
-  lastName: string;
-  suffix?: string;
-  srCode: string;
-  department: string;
-  course: string;
-  encoding: number[];
-}
-
 interface InputInfoProps {
-  formData: UserFormData;
+  formData: UserRegistrationData;
 }
 
 const InputInfo: React.FC<InputInfoProps> = () => {
   const { localFormData, setLocalFormData, setIsFormValid } = useRegistrationStore();
   const { srCodeError, setSrCodeError } = useSrCodeStore();
-  const { setSelectedDept } = useSelectedDeptStore();
+  const { setSelectedDept } = useDeptStore();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -72,9 +62,11 @@ const InputInfo: React.FC<InputInfoProps> = () => {
       Boolean(localFormData.firstName?.trim()) &&
       Boolean(localFormData.lastName?.trim()) &&
       Boolean(localFormData.srCode?.trim()) &&
+      Boolean(localFormData.department?.trim()) &&
+      Boolean(localFormData.course?.trim()) &&
       !srCodeError;
     return isValid;
-  }, [localFormData.firstName, localFormData.lastName, localFormData.srCode, srCodeError]);
+  }, [localFormData.firstName, localFormData.lastName, localFormData.srCode, localFormData.department, localFormData.course, srCodeError]);
 
   useEffect(() => {
     const isValid = validateForm();
@@ -113,6 +105,7 @@ const InputInfo: React.FC<InputInfoProps> = () => {
             required
             value={localFormData.firstName}
             onChange={handleInputChange}
+            
           />
           <input
             type="text"
@@ -142,11 +135,12 @@ const InputInfo: React.FC<InputInfoProps> = () => {
             md:py-3 md:text-lg"
             value={localFormData.suffix}
             onChange={handleInputChange}
+            
           />
         </div>
 
         {/* column 2 */}
-        <div className="space-y-3 flex flex-col justify-center items-center w-full lg:space-y-4">
+        <div className="space-y-3 flex flex-col justify-center items-center w-full lg:space-y-4 mt-3 lg:mt-0">
           {/* <div className="w-full mt-6 mb-1 opacity-50 text-sm ml-1 lg:text-left lg:-mb-2">
             Please follow the format <span className="font-semibold">24-12345</span>
           </div> */}

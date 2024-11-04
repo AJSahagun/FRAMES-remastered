@@ -6,7 +6,7 @@ interface DeptState {
   setSelectedDept: (dept: string) => void;
 }
 
-export const useSelectedDeptStore = create<DeptState>((set) => ({
+export const useDeptStore = create<DeptState>((set) => ({
   selectedDept: '',
   setSelectedDept: (dept) => set({ selectedDept: dept }),
 }));
