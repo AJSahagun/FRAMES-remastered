@@ -4,6 +4,7 @@ import { useRegistrationStore } from "./stores/useRegistrationStore";
 import { useSrCodeStore } from "./stores/srCodeStore";
 import { useDeptStore } from "./stores/useDeptStore"; 
 import Dropdown from "../../components/Dropdown";
+import { UserRegistrationData } from '../../types/user.types';
 
 const departmentOptions = [
   { value: "CAFAD", label: "College of Architecture, Fine Arts & Design" },
@@ -34,19 +35,8 @@ const courseOptions: Record<string, { value: string; label: string }[]> = {
   ],
 };
 
-interface UserFormData {
-  firstName: string;
-  middleName?: string;
-  lastName: string;
-  suffix?: string;
-  srCode: string;
-  department: string;
-  course: string;
-  encoding: number[];
-}
-
 interface InputInfoProps {
-  formData: UserFormData;
+  formData: UserRegistrationData;
 }
 
 const InputInfo: React.FC<InputInfoProps> = () => {

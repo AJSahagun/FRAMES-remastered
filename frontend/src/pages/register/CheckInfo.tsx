@@ -2,19 +2,11 @@ import React, { useState } from 'react';
 import 'react-toastify/dist/ReactToastify.css';
 import { useRegistrationStore } from './stores/useRegistrationStore';
 import { usePaginationStore } from './stores/usePaginationStore';
-import { registerUser } from '../../services/RegisterService';
-interface UserFormData {
-  firstName: string;
-  middleName?: string;
-  lastName: string;
-  suffix?: string;
-  srCode: string;
-  department: string;
-  course: string;
-  encoding: number[];
-}
+import { UserService } from '../../services/user.service';
+import { UserRegistrationData } from '../../types/user.types';
+
 interface CheckInfoProps {
-  formData: UserFormData;
+  formData: UserRegistrationData;
 }
 
 const CheckInfo: React.FC<CheckInfoProps> = () => {
@@ -24,17 +16,22 @@ const CheckInfo: React.FC<CheckInfoProps> = () => {
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
-  const handleSubmit = () => {
-    console.log('Form submitted:', formData);
-    registerUser(formData);
-    setShowSuccessAlert(true);
-    resetForm();
+  const handleSubmit = async (formData: UserRegistrationData) => {
+    try {
+      const response = await UserService.registerUser(formData);
+      console.log('Form submitted:', formData);
+      console.log('Registration successful:', response);
+      setShowSuccessAlert(true);
+      resetForm();
+    } catch (error) {
+      console.error('Registration failed:', error);
+    }
   };
 
   const handleConfirmSubmit = () => {
     const isValid = Object.entries(formData).every(([key, value]) => key === 'suffix' || key === 'middleName' || value !== '');
     if (isValid) {
-      handleSubmit();
+      handleSubmit(formData);
     } else {
       setShowErrorAlert(true);
     }
