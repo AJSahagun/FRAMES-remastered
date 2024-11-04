@@ -1,56 +1,65 @@
-// import '@testing-library/jest-dom';
-// import { render, screen, fireEvent } from '@testing-library/react';
-// import App from './App';
+import { render, screen, act } from '@testing-library/react';
+import '@testing-library/jest-dom';
+import App from './App';
+import * as useSidebarStore from './stores/useSidebarStore';
+import * as useSliderStore from './stores/useSliderStore';
+import * as useImageStore from './stores/useImageStore';
 
-// // Mock the CSS import
-// jest.mock('./App.css', () => ({}));
+// Mock the stores
+jest.mock('./stores/useSidebarStore');
+jest.mock('./stores/useSliderStore');
+jest.mock('./stores/useImageStore');
 
-// describe('App', () => {
-//   test('renders Vite and React logos', () => {
-//     render(<App />);
-//     const viteLogo = screen.getByAltText('Vite logo');
-//     const reactLogo = screen.getByAltText('React logo');
-//     expect(viteLogo).toBeInTheDocument();
-//     expect(reactLogo).toBeInTheDocument();
-//     expect(viteLogo.tagName).toBe('IMG');
-//     expect(reactLogo.tagName).toBe('IMG');
-//   });
+describe('App Component', () => {
+  // Setup default mock values
+  const mockToggleSidebar = jest.fn();
+  const mockSetActiveIndex = jest.fn();
+  const mockSetImagesLoaded = jest.fn();
 
-//   test('renders header text', () => {
-//     render(<App />);
-//     expect(screen.getByText('Vite + React')).toBeInTheDocument();
-//   });
+  beforeEach(() => {
+    // Reset all mocks before each test
+    jest.clearAllMocks();
 
-//   test('renders count button with initial count of 0', () => {
-//     render(<App />);
-//     const button = screen.getByRole('button');
-//     expect(button).toHaveTextContent('count is 0');
-//   });
+    // Setup default mock implementations
+    jest.spyOn(useSidebarStore, 'useSidebarStore').mockImplementation(() => ({
+      isOpen: false,
+      toggleSidebar: mockToggleSidebar
+    }));
 
-//   test('increases count when button is clicked', () => {
-//     render(<App />);
-//     const button = screen.getByRole('button');
-//     fireEvent.click(button);
-//     expect(button).toHaveTextContent('count is 1');
-//   });
+    jest.spyOn(useSliderStore, 'useSliderStore').mockImplementation(() => ({
+      activeIndex: 0,
+      setActiveIndex: mockSetActiveIndex
+    }));
 
-//   test('renders HMR instruction text', () => {
-//     render(<App />);
-//     expect(screen.getByText(/Edit/i)).toBeInTheDocument();
-//     expect(screen.getByText(/src\/App\.tsx/i)).toBeInTheDocument();
-//     expect(screen.getByText(/and save to test HMR/i)).toBeInTheDocument();
-//   });
+    jest.spyOn(useImageStore, 'useImageStore').mockImplementation(() => ({
+      imagesLoaded: true,
+      setImagesLoaded: mockSetImagesLoaded
+    }));
+  });
 
-//   test('renders "read the docs" text', () => {
-//     render(<App />);
-//     expect(screen.getByText(/Click on the Vite and React logos to learn more/i)).toBeInTheDocument();
-//   });
+  test('renders without crashing', () => {
+    render(<App />);
+    expect(screen.getByAltText('FRAMES logo')).toBeInTheDocument();
+  });
 
-//   test('Vite and React links have correct hrefs', () => {
-//     render(<App />);
-//     const viteLink = screen.getByRole('link', { name: /vite logo/i });
-//     const reactLink = screen.getByRole('link', { name: /react logo/i });
-//     expect(viteLink).toHaveAttribute('href', 'https://vitejs.dev');
-//     expect(reactLink).toHaveAttribute('href', 'https://react.dev');
-//   });
-// });
+  test('renders navigation links', () => {
+    render(<App />);
+    expect(screen.getAllByText('Home')[0]).toBeInTheDocument();
+    expect(screen.getAllByText('Schedule')[0]).toBeInTheDocument();
+    expect(screen.getAllByText('About us')[0]).toBeInTheDocument();
+    expect(screen.getAllByText('Register')[0]).toBeInTheDocument();
+  });
+
+  test('image slider changes after interval', () => {
+    jest.useFakeTimers();
+    render(<App />);
+    
+    act(() => {
+      jest.advanceTimersByTime(6000);
+    });
+
+    expect(mockSetActiveIndex).toHaveBeenCalled();
+    
+    jest.useRealTimers();
+  });
+});
