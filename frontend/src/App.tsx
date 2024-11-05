@@ -16,10 +16,25 @@ export default function App() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setActiveIndex((activeIndex + 1) % images.length);
-    }, 6000);
+      if (window.innerWidth < 1024) {
+        // Calculate the new index outside of setActiveIndex
+        const newIndex = (activeIndex + 1) % images.length;
+        setActiveIndex(newIndex);
+      }  
+    }, 5000); // Set interval to 3 seconds
 
-    return () => clearInterval(interval); // Cleanup
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) {
+        setActiveIndex(0); // Reset to the first image on larger screens
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      clearInterval(interval); // Cleanup interval
+      window.removeEventListener('resize', handleResize);
+    };
   }, [activeIndex, images.length, setActiveIndex]);
 
   useEffect(() => {
@@ -57,9 +72,9 @@ export default function App() {
         <a href="/" className="w-auto">
           <p className="font-poppins">Home</p></a>
         <a href="/schedule" className="w-auto">
-          <p className="font-poppins">Schedule</p></a>
+          <p className="font-poppins">Tutorial</p></a>
         <a href="/about-us" className="w-auto">
-          <p className="font-poppins" >About us</p></a>
+          <p className="font-poppins" >Techtonic</p></a>
         <a href="/register" className="w-32">
           <button className="w-full bg-gradient-to-br from-accent to-btnBg text-background text-sm py-3 rounded-md font-poppins font-extralight shadow-lg hover:brightness-150 duration-300">
             Register
@@ -103,16 +118,18 @@ export default function App() {
 
         <div className="p-4">
           <ul className="mt-4 space-y-3">
-            <li><a href="#" className="block font-poppins text-lg text-center">Home</a></li>
-            <li><a href="#" className="block font-poppins text-lg text-center">Schedule</a></li>
-            <li><a href="#" className="block font-poppins text-lg text-center">About us</a></li>
+            <li><a href="/home" className="block font-poppins text-lg text-center">Home</a></li>
+            <li><a href="/tutorial" className="block font-poppins text-lg text-center">Tutorial</a></li>
+            <li><a href="/techtonic" className="block font-poppins text-lg text-center">Techtonic</a></li>
           </ul>
         </div>
 
         <div className="w-full flex my-10 justify-center items-center">
-          <button className="w-2/3 bg-gradient-to-br from-accent to-btnBg text-background py-2 rounded-md font-poppins font-extralight shadow-lg ">
-            Register
-          </button>
+          <a href="/register" className="w-full flex justify-center items-center">
+            <button className="w-2/3 bg-gradient-to-br from-accent to-btnBg text-background py-2 rounded-md font-poppins font-extralight shadow-lg ">
+              Register
+            </button>
+          </a>
         </div>
       </div>
 
@@ -128,7 +145,8 @@ export default function App() {
             <path d="M50 0H100L50 100H0L50 0Z" />
           </svg>
 
-          <div className="relative w-full h-56 md:h-96 lg:flex lg:h-5/6 lg:mt-8">
+          {/* Image slider */}
+          <div className="relative w-full h-60 md:h-96 lg:flex lg:h-5/6 lg:mt-8">
             {imagesLoaded && images.map((img, index) => (
               <div
                 key={index}
@@ -137,18 +155,19 @@ export default function App() {
                 }`}
               >
                 <img
-                  className="object-cover w-full h-full rounded shadow-lg lg:rounded-none lg:shadow-none"
+                  className="object-cover w-full h-full rounded-lg shadow-lg lg:rounded-none lg:shadow-none"
                   src={img}
                   alt={`Slide ${index + 1}`}
                 />
               </div>
             ))}
+            
           </div>
           {/* Foster Wheeler Tag */}
-          <div className="hidden lg:flex w-4/6 absolute bottom-14 right-0 mt-8 ml-10 text-poppins">
+          <div className="hidden lg:flex w-4/6 absolute bottom-14 right-0 mt-8 ml-10 font-poppins">
             <div className="flex w-full ">
               <div className="flex w-full h-10 px-9 pr-1 bg-primary py-6 justify-center items-center  text-white shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)]">
-                <p className="text-lg text-poppins md:text-base align-middle tracking-wide">
+                <p className="text-lg font-poppins md:text-base align-middle tracking-wide">
                   Foster Wheeler - Alangilan
                 </p>
               </div>
@@ -174,18 +193,31 @@ export default function App() {
           </div>
 
         </div>
-        <div className="relative flex flex-col items-start w-full max-w-xl px-8 mx-auto md:px-0 lg:px-8 lg:max-w-screen-xl">
-          <div className="mb-16 lg:my-40 lg:max-w-lg lg:pr-5 min-[430px]:px-2">
-            <h2 className="mb-5 text-3xl font-medium tracking-tight font-poppins text-tc sm:text-6xl sm:leading-none">
+        <div className="flex items-start w-full max-w-xl px-8 mx-auto md:px-0 lg:px-8 lg:max-w-screen-xl">
+
+          {/* White Rectangle */}
+          <div className="hidden lg:block absolute w-full h-full -left-20 bg-background" 
+            style={{ clipPath: 'polygon(0 0, 79% 0, 41% 100%, 0% 100%)',
+              zIndex: 1,
+              }}>
+          </div>
+
+          {/* Text Content */}
+          <div className="flex flex-col justify-center mb-16 z-20 lg:mb-48 lg:mt-24 lg:pr-5 min-[430px]:px-2 ">
+            <h2 className="mb-5 text-3xl font-medium tracking-tight lg:tracking-normal font-poppins text-tc sm:text-6xl sm:leading-none lg:text-7xl">
+
+              {/* //TODO: heading text to be changed */ }
               Access the{' '}
               <br className="hidden md:block" />
               Campus Library{' '}
-              <span className="inline-block text-400">
-                Seamlessly
+              <br className="hidden md:block" />
+              with {' '}
+              <span className="inline-block text-400 text-primary font-aldrich lg:text-7xl">
+                FRAMES
               </span>
             </h2>
-            <p className="pr-5 mb-5 text-base font-light font-noto_sans md:text-lg">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+            <p className="pr-5 mb-5 font-light font-noto_sans md:text-lg">
+              Facial Recognition Access Monitoring Enhanced System [FRAMES] is a ...
             </p>
             <div className="flex items-center">
               <a href="/register">
@@ -194,7 +226,7 @@ export default function App() {
                 </button>
 
               </a>
-              <button className="inline-flex items-center font-semibold text-gray-800 transition-colors duration-200 hover:text-accent">
+              <button className="inline-flex items-center justify-center h-12 px-6 mr-6 font-poppins font-semibold tracking-wide bg-slate-200 text-accent bg-sf rounded-md shadow-md transition duration-500 hover:bg-slate-300 ">
                 Learn more
               </button>
             </div>
@@ -205,8 +237,10 @@ export default function App() {
             </div>
           </div>
           
+          
           {/* Second Slider Indicator */}
           <div className="justify-center items-center space-x-3 my-6 hidden">
+
         
           {images.map((_, index) => (
             <span

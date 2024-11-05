@@ -11,6 +11,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fontsource/aldrich": "^5.1.0",
     "@fontsource/noto-sans": "^5.1.0",
     "@fontsource/poppins": "^5.1.0",
     "@next/font": "^14.2.9",

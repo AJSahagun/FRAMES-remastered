@@ -22,7 +22,8 @@ module.exports = {
       },
       fontFamily: {
         poppins: ["Poppins", "sans-serif"],
-        noto_sans: ["Noto Sans", "sans-serif"]
+        noto_sans: ["Noto Sans", "sans-serif"],
+        aldrich: ["Aldrich", "sans-serif"]
       }
     },
   },
