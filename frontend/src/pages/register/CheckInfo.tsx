@@ -55,23 +55,15 @@ const CheckInfo: React.FC<CheckInfoProps> = () => {
       ) : (
         <p>No image captured.</p>
       )}
-      {formData.imageUrl ? (
-        <img src={formData.imageUrl} alt="Captured" />
-      ) : (
-        <p>No image captured.</p>
-      )}
       </div>
 
       <div className="space-y-3 flex flex-col justify-center items-center w-full lg:space-y-4">
         {(filteredFormData).map(([key, value]) => (
           key=='imageUrl'? null:(
-          key=='imageUrl'? null:(
             <div key={key} className="flex flex-col mt-4 mx-12 w-4/5 lg:flex-row lg:w-full lg:mt-7">
               <span className="font-semibold text-tc w-full">{key.charAt(0).toUpperCase() + key.slice(1)}</span>
               <span className="w-full px-6 py-2 rounded-lg bg-sf">{typeof value === 'string' ? (value as string).toUpperCase() : value}</span>
             </div>
-          )
-        ))}
           )
         ))}
 

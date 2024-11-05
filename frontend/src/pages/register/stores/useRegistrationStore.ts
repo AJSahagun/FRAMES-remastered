@@ -7,29 +7,21 @@ interface UserFormData {
   suffix: string;
   srCode: string;
   department: string;
-  program: string;
+  course: string;
   encoding: number[];
-  imageUrl: string;
   imageUrl: string;
 }
 
 interface RegistrationState {
   formData: UserFormData;
   localFormData: UserFormData;
-  setLocalFormData: (formData: UserFormData) => void;
-
   isFormValid: boolean;
-  setIsFormValid: (isValid: boolean) => void;
-
-  selectedDept: string;
-  setSelectedDept: (dept: string) => void;
-  selectedProgram: { value: string; label: string }[];
-  setSelectedProgram: (options: { value: string; label: string }[]) => void;
-  
-  srCodeError: string;
+  isEditing: boolean;
   setFormData: (data: Partial<UserFormData>) => void;
-  setSrCodeError: (error: string) => void;
+  setLocalFormData: (data: Partial<UserFormData>) => void;
+  setIsFormValid: (isValid: boolean) => void;
   submitForm: () => void;
+  setIsEditing: (isEditing: boolean) => void;
   resetForm: () => void;
 }
 
@@ -49,9 +41,7 @@ export const useRegistrationStore = create<RegistrationState>((set) => ({
   formData: initialFormData,
   localFormData: initialFormData,
   isFormValid: false,
-  srCodeError: "",
-  selectedDept: '',
-  selectedProgram: [],
+  isEditing: false,
   setFormData: (data) => set((state) => ({
     formData: { ...state.formData, ...data },
   })),
@@ -59,16 +49,9 @@ export const useRegistrationStore = create<RegistrationState>((set) => ({
     localFormData: { ...state.localFormData, ...data },
   })),
   setIsFormValid: (isValid) => set({ isFormValid: isValid }),
-  setSrCodeError: (error) => set({ srCodeError: error }),
-  setSelectedDept: (dept) => set({ selectedDept: dept }),
-  setSelectedProgram: (options) => set({ selectedProgram: options }),
   submitForm: () => set((state) => ({
     formData: state.localFormData,
   })),
-  resetForm: () => set({ 
-    formData: initialFormData, 
-    localFormData: initialFormData, 
-    isFormValid: false,
-    selectedProgram: []
-  }),
+  setIsEditing: (isEditing) => set({ isEditing }),
+  resetForm: () => set({ formData: initialFormData, localFormData: initialFormData, isFormValid: false}),
 }));
