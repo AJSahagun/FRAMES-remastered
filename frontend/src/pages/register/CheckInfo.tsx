@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import 'react-toastify/dist/ReactToastify.css';
 import { useRegistrationStore } from './stores/useRegistrationStore';
 import { usePaginationStore } from './stores/usePaginationStore';
-import { registerUser } from '../../services/RegisterService';
+// import { registerUser } from '../../services/RegisterService';
 
 interface UserFormData {
   firstName: string;
@@ -29,7 +29,8 @@ const CheckInfo: React.FC<CheckInfoProps> = () => {
 
   const handleSubmit = () => {
     console.log('Form submitted:', formData);
-    registerUser(formData);
+    // FIXME: uncomment this when RegisterService.ts "response" is used
+    // registerUser(formData); 
     setShowSuccessAlert(true);
     resetForm();
   };
