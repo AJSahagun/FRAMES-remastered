@@ -1,19 +1,21 @@
-// import React from "react";
+// import { useState } from "react";
 import { useRegistrationStore } from "./stores/useRegistrationStore";
 import { usePaginationStore } from "./stores/usePaginationStore";
 import Pagination from "../../components/Pagination";
-import InputInfo from "./InputInfo";
 import RegisterFace from "./RegisterFace";
 import CheckInfo from "./CheckInfo";
 import FosterWeelerTag from '../../components/FosterWheelerTag';
+
+import InputInfo from "./InputInfo";
 
 
 export default function Register() {
   const { currentPage, nextPage, prevPage } = usePaginationStore();
   const { formData, localFormData, isFormValid, submitForm } = useRegistrationStore();
-  
 
   const handleNextClick = () => {
+    submitForm(); 
+    
     if (isFormValid) {
       submitForm();
       localStorage.setItem("formData", JSON.stringify(localFormData));
@@ -40,19 +42,8 @@ export default function Register() {
         <div className="w-full px-10 flex justify-center lg:w-screen">
           {currentPage === 1 && (
             <div className="w-full max-w-md lg:max-w-full flex flex-col items-center justify-center">
-              <InputInfo formData={formData} />
-              <button
-                className={`font-poppins text-md text-background rounded-lg w-2/3 py-2 mt-10 shadow-md transition-all duration-500  ease-in-out lg:mt-20 lg:w-1/4
-                   ${
-                  isFormValid
-                    ? "bg-btnBg hover:bg-gradient-to-br hover:from-accent hover:to-btnBg transform hover:scale-105"
-                    : "bg-btnBg opacity-50 cursor-not-allowed"
-                }`}
-                onClick={handleNextClick}
-                disabled={!isFormValid}
-              >
-                Next
-              </button>
+              <InputInfo formData={formData} onNext={handleNextClick} />
+
             </div>
           )}
 

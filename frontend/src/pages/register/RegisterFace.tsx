@@ -11,9 +11,9 @@ interface UserFormData {
   middleName?: string;
   lastName: string;
   suffix?: string;
-  srCode: string;
-  department: string;
-  program: string;
+  userCode: string;
+  department?: string;
+  program?: string;
   encoding: number[];
   imageUrl: string; 
 }
