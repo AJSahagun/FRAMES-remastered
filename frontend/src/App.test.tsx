@@ -1,56 +1,45 @@
-// import '@testing-library/jest-dom';
-// import { render, screen, fireEvent } from '@testing-library/react';
-// import App from './App';
+import { render, screen } from '@testing-library/react';
+import App from './App';
+import './index.css'; 
 
-// // Mock the CSS import
-// jest.mock('./App.css', () => ({}));
+describe("App Component", () => {
+  beforeEach(() => {
+    render(<App />);
+  });
 
-// describe('App', () => {
-//   test('renders Vite and React logos', () => {
-//     render(<App />);
-//     const viteLogo = screen.getByAltText('Vite logo');
-//     const reactLogo = screen.getByAltText('React logo');
-//     expect(viteLogo).toBeInTheDocument();
-//     expect(reactLogo).toBeInTheDocument();
-//     expect(viteLogo.tagName).toBe('IMG');
-//     expect(reactLogo.tagName).toBe('IMG');
-//   });
+  test("renders the FRAMES logo", () => {
+    const framesText = screen.getByText(/FRAMES/i);
+    expect(framesText).toBeInTheDocument();
+  });
 
-//   test('renders header text', () => {
-//     render(<App />);
-//     expect(screen.getByText('Vite + React')).toBeInTheDocument();
-//   });
+  test("renders BatStateU logo text", () => {
+    const bsuText = screen.getByText(/Foster Wheeler Library - Alangilan/i);
+    expect(bsuText).toBeInTheDocument();
+  });
 
-//   test('renders count button with initial count of 0', () => {
-//     render(<App />);
-//     const button = screen.getByRole('button');
-//     expect(button).toHaveTextContent('count is 0');
-//   });
+  test("renders main tutorial text", () => {
+    const tutorialText = screen.getByText(/Access the Campus Library with FRAMES/i);
+    expect(tutorialText).toBeInTheDocument();
+  });
 
-//   test('increases count when button is clicked', () => {
-//     render(<App />);
-//     const button = screen.getByRole('button');
-//     fireEvent.click(button);
-//     expect(button).toHaveTextContent('count is 1');
-//   });
+  test("renders description about the library system", () => {
+    const descriptionText = screen.getByText(/Face Recognition Access Monitoring Enhanced System/i);
+    expect(descriptionText).toBeInTheDocument();
+  });
 
-//   test('renders HMR instruction text', () => {
-//     render(<App />);
-//     expect(screen.getByText(/Edit/i)).toBeInTheDocument();
-//     expect(screen.getByText(/src\/App\.tsx/i)).toBeInTheDocument();
-//     expect(screen.getByText(/and save to test HMR/i)).toBeInTheDocument();
-//   });
+  test("renders the REGISTER NOW button", () => {
+    const registerButton = screen.getByRole('button', { name: /REGISTER NOW/i });
+    expect(registerButton).toBeInTheDocument();
+  });
 
-//   test('renders "read the docs" text', () => {
-//     render(<App />);
-//     expect(screen.getByText(/Click on the Vite and React logos to learn more/i)).toBeInTheDocument();
-//   });
+  test("renders the Learn More button", () => {
+    const learnMoreButton = screen.getByRole('button', { name: /Learn More/i });
+    expect(learnMoreButton).toBeInTheDocument();
+  });
 
-//   test('Vite and React links have correct hrefs', () => {
-//     render(<App />);
-//     const viteLink = screen.getByRole('link', { name: /vite logo/i });
-//     const reactLink = screen.getByRole('link', { name: /react logo/i });
-//     expect(viteLink).toHaveAttribute('href', 'https://vitejs.dev');
-//     expect(reactLink).toHaveAttribute('href', 'https://react.dev');
-//   });
-// });
+  test("renders navigation links", () => {
+    expect(screen.getByText(/Home/i)).toBeInTheDocument();
+    expect(screen.getByText(/Schedule/i)).toBeInTheDocument();
+    expect(screen.getByText(/About us/i)).toBeInTheDocument();
+  });
+});
