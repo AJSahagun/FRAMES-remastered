@@ -7,21 +7,29 @@ interface UserFormData {
   suffix: string;
   srCode: string;
   department: string;
-  course: string;
+  program: string;
   encoding: number[];
+  imageUrl: string;
   imageUrl: string;
 }
 
 interface RegistrationState {
   formData: UserFormData;
   localFormData: UserFormData;
+  setLocalFormData: (formData: UserFormData) => void;
+
   isFormValid: boolean;
-  isEditing: boolean;
-  setFormData: (data: Partial<UserFormData>) => void;
-  setLocalFormData: (data: Partial<UserFormData>) => void;
   setIsFormValid: (isValid: boolean) => void;
+
+  selectedDept: string;
+  setSelectedDept: (dept: string) => void;
+  selectedProgram: { value: string; label: string }[];
+  setSelectedProgram: (options: { value: string; label: string }[]) => void;
+  
+  srCodeError: string;
+  setFormData: (data: Partial<UserFormData>) => void;
+  setSrCodeError: (error: string) => void;
   submitForm: () => void;
-  setIsEditing: (isEditing: boolean) => void;
   resetForm: () => void;
 }
 
@@ -41,7 +49,9 @@ export const useRegistrationStore = create<RegistrationState>((set) => ({
   formData: initialFormData,
   localFormData: initialFormData,
   isFormValid: false,
-  isEditing: false,
+  srCodeError: "",
+  selectedDept: '',
+  selectedProgram: [],
   setFormData: (data) => set((state) => ({
     formData: { ...state.formData, ...data },
   })),
@@ -49,9 +59,16 @@ export const useRegistrationStore = create<RegistrationState>((set) => ({
     localFormData: { ...state.localFormData, ...data },
   })),
   setIsFormValid: (isValid) => set({ isFormValid: isValid }),
+  setSrCodeError: (error) => set({ srCodeError: error }),
+  setSelectedDept: (dept) => set({ selectedDept: dept }),
+  setSelectedProgram: (options) => set({ selectedProgram: options }),
   submitForm: () => set((state) => ({
     formData: state.localFormData,
   })),
-  setIsEditing: (isEditing) => set({ isEditing }),
-  resetForm: () => set({ formData: initialFormData, localFormData: initialFormData, isFormValid: false}),
+  resetForm: () => set({ 
+    formData: initialFormData, 
+    localFormData: initialFormData, 
+    isFormValid: false,
+    selectedProgram: []
+  }),
 }));
