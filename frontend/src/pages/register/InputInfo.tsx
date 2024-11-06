@@ -3,21 +3,22 @@ import { useRegistrationStore } from "./stores/useRegistrationStore";
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import Dropdown from "../../components/Dropdown";
+import { UserRegistrationData } from '../../types/user.types';
 
-interface UserFormData {
-  firstName: string;
-  middleName: string;
-  lastName: string;
-  suffix: string;
-  userCode: string;
-  department: string;
-  program: string;
-  encoding: number[];
-  imageUrl: string; 
-}
+// interface UserFormData {
+//   firstName: string;
+//   middleName: string;
+//   lastName: string;
+//   suffix: string;
+//   userCode: string;
+//   department: string;
+//   program: string;
+//   encoding: number[];
+//   imageUrl: string; 
+// }
 
 interface InputInfoProps {
-  formData: UserFormData;
+  formData: UserRegistrationData;
   onNext: () => void;
 }
 
@@ -101,7 +102,7 @@ const InputInfo: React.FC<InputInfoProps> = ({ onNext }) => {
     onNext(); // Call the passed callback from register-page.tsx
   };
 
-  const handleSubmit = (values: UserFormData) => {
+  const handleSubmit = (values: UserRegistrationData) => {
     setLocalFormData(values);
     console.log("Submitted values:", values);
     setIsFormValid(true); // not working 

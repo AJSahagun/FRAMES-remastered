@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import Register from './pages/register/register-page'; // Importing the Register component
-import '@testing-library/jest-dom/extend-expect';
+import Register from './pages/register/register-page'; 
+import '@testing-library/jest-dom';
 
 describe('Registration Page Tests', () => {
   // Test that only letters are accepted in name fields

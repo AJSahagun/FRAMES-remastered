@@ -21,7 +21,7 @@ export default function App() {
         const newIndex = (activeIndex + 1) % images.length;
         setActiveIndex(newIndex);
       }  
-    }, 5000); // Set interval to 3 seconds
+    }, 6000);
 
     const handleResize = () => {
       if (window.innerWidth >= 1024) {
@@ -69,12 +69,9 @@ export default function App() {
         </a>
         </div>
         <div className="hidden w-2/3 md:flex flex-row justify-end items-center space-x-14 mt-8 mr-24 lg:ml-36 xl:mt-1 text-tc">
-        <a href="/" className="w-auto">
-          <p className="font-poppins">Home</p></a>
-        <a href="/schedule" className="w-auto">
-          <p className="font-poppins">Tutorial</p></a>
-        <a href="/about-us" className="w-auto">
-          <p className="font-poppins" >Techtonic</p></a>
+        <a href="/" className="w-auto"><p className="font-poppins">Home</p></a>
+        <a href="/tutorial" className="w-auto"><p className="font-poppins">Tutorial</p></a>
+        <a href="/techtonic" className="w-auto"><p className="font-poppins" >Techtonic</p></a>
         <a href="/register" className="w-32">
           <button className="w-full bg-gradient-to-br from-accent to-btnBg text-background text-sm py-3 rounded-md font-poppins font-extralight shadow-lg hover:brightness-150 duration-300">
             Register
@@ -118,7 +115,7 @@ export default function App() {
 
         <div className="p-4">
           <ul className="mt-4 space-y-3">
-            <li><a href="/home" className="block font-poppins text-lg text-center">Home</a></li>
+            <li><a href="/" className="block font-poppins text-lg text-center">Home</a></li>
             <li><a href="/tutorial" className="block font-poppins text-lg text-center">Tutorial</a></li>
             <li><a href="/techtonic" className="block font-poppins text-lg text-center">Techtonic</a></li>
           </ul>
@@ -168,7 +165,7 @@ export default function App() {
             <div className="flex w-full ">
               <div className="flex w-full h-10 px-9 pr-1 bg-primary py-6 justify-center items-center  text-white shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)]">
                 <p className="text-lg font-poppins md:text-base align-middle tracking-wide">
-                  Foster Wheeler - Alangilan
+                  Foster Wheeler Library - Alangilan
                 </p>
               </div>
               <div className="">
@@ -217,7 +214,7 @@ export default function App() {
               </span>
             </h2>
             <p className="pr-5 mb-5 font-light font-noto_sans md:text-lg">
-              Facial Recognition Access Monitoring Enhanced System [FRAMES] is a ...
+              Face Recognition Access Monitoring Enhanced System [FRAMES] is a ...
             </p>
             <div className="flex items-center">
               <a href="/register">
@@ -257,7 +254,7 @@ export default function App() {
 
         </div>
         <div className="flex justify-center items-center bottom-5 font-poppins text-accent text-sm opacity-40 lg:hidden">
-          Foster Wheeler - Alangilan
+          Foster Wheeler Library - Alangilan
         </div>
       </div>
 

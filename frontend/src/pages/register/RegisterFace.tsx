@@ -5,21 +5,10 @@ import { FaCamera, FaRedo } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { ClipLoader } from "react-spinners";
-
-interface UserFormData {
-  firstName: string;
-  middleName?: string;
-  lastName: string;
-  suffix?: string;
-  userCode: string;
-  department?: string;
-  program?: string;
-  encoding: number[];
-  imageUrl: string; 
-}
+import { UserRegistrationData } from '../../types/user.types';
 
 interface RegisterFaceProps {
-  formData: UserFormData;
+  formData: UserRegistrationData;
 }
 
 const RegisterFace: React.FC<RegisterFaceProps> = () => {

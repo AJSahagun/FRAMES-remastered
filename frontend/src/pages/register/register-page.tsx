@@ -8,7 +8,6 @@ import FosterWeelerTag from '../../components/FosterWheelerTag';
 
 import InputInfo from "./InputInfo";
 
-
 export default function Register() {
   const { currentPage, nextPage, prevPage } = usePaginationStore();
   const { formData, localFormData, isFormValid, submitForm } = useRegistrationStore();

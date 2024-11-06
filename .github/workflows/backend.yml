@@ -27,6 +27,12 @@ jobs:
         run: npm install
         working-directory: ./backend  
 
+      - name: Set-up environment variables
+        run: |
+          touch .env
+          echo FRAMES_DB_URL=${{ secrets.FRAMES_DB_URL }} >> .env
+        working-directory: ./backend
+
       - name: Run backend tests
         run: npm run test
         working-directory: ./backend  
