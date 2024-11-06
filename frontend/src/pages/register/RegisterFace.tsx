@@ -31,11 +31,11 @@ const RegisterFace: React.FC<RegisterFaceProps> = () => {
   useEffect(() => {
     const loadModels = async () => {
       try {
-        await faceapi.nets.ssdMobilenetv1.loadFromUri("/models");
-        await faceapi.nets.faceLandmark68Net.loadFromUri("/models");
+        // await faceapi.nets.ssdMobilenetv1.loadFromUri("/models");
+        // await faceapi.nets.faceLandmark68Net.loadFromUri("/models");
 
-        // await faceapi.nets.tinyFaceDetector.loadFromUri("/models");
-        // await faceapi.nets.faceLandmark68TinyNet.loadFromUri("/models");
+        await faceapi.nets.tinyFaceDetector.loadFromUri("/models");
+        await faceapi.nets.faceLandmark68TinyNet.loadFromUri("/models");
         await faceapi.nets.faceRecognitionNet.loadFromUri("/models");
         setIsModelsLoaded(true);
       } catch (error) {
@@ -87,8 +87,8 @@ const RegisterFace: React.FC<RegisterFaceProps> = () => {
       return;
     }
 
-    const detections = await faceapi.detectAllFaces(videoRef.current);
-    // const detections = await faceapi.detectAllFaces(videoRef.current, new faceapi.TinyFaceDetectorOptions());
+    // const detections = await faceapi.detectAllFaces(videoRef.current);
+    const detections = await faceapi.detectAllFaces(videoRef.current, new faceapi.TinyFaceDetectorOptions());
     if (detections.length > 1) {
       console.warn("Please make sure only one face is present.");
       toast.warn("Please make sure only one face is present.");
@@ -130,16 +130,16 @@ const RegisterFace: React.FC<RegisterFaceProps> = () => {
 
     try {
       const img = await faceapi.fetchImage(imageDataUrl);
-      const detections = await faceapi
-        .detectSingleFace(img)
-        .withFaceLandmarks()
-        .withFaceDescriptor();
-
-      // const useTinyModel = true;
       // const detections = await faceapi
-      //   .detectSingleFace(img, new faceapi.TinyFaceDetectorOptions())
-      //   .withFaceLandmarks(useTinyModel)
+      //   .detectSingleFace(img)
+      //   .withFaceLandmarks()
       //   .withFaceDescriptor();
+
+      const useTinyModel = true;
+      const detections = await faceapi
+        .detectSingleFace(img, new faceapi.TinyFaceDetectorOptions())
+        .withFaceLandmarks(useTinyModel)
+        .withFaceDescriptor();
 
       if (detections) {
         setLocalFormData({ encoding: Array.from(detections.descriptor) });
