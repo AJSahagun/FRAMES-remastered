@@ -14,7 +14,6 @@
     "@fontsource/noto-sans": "^5.1.0",
     "@fontsource/poppins": "^5.1.0",
     "@next/font": "^14.2.9",
-    "@vladmandic/face-api": "^1.7.14",
     "axios": "^1.7.7",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

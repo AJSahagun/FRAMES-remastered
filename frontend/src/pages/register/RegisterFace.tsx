@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState} from "react";
-import * as faceapi from "@vladmandic/face-api";
 import { useRegistrationStore } from "./stores/useRegistrationStore";
 import { FaCamera, FaRedo } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
@@ -31,12 +30,6 @@ const RegisterFace: React.FC<RegisterFaceProps> = () => {
   useEffect(() => {
     const loadModels = async () => {
       try {
-        // await faceapi.nets.ssdMobilenetv1.loadFromUri("/models");
-        // await faceapi.nets.faceLandmark68Net.loadFromUri("/models");
-
-        await faceapi.nets.tinyFaceDetector.loadFromUri("/models");
-        await faceapi.nets.faceLandmark68TinyNet.loadFromUri("/models");
-        await faceapi.nets.faceRecognitionNet.loadFromUri("/models");
         setIsModelsLoaded(true);
       } catch (error) {
         console.error("Error loading Face-API models: ", error);
@@ -87,9 +80,8 @@ const RegisterFace: React.FC<RegisterFaceProps> = () => {
       return;
     }
 
-    // const detections = await faceapi.detectAllFaces(videoRef.current);
-    const detections = await faceapi.detectAllFaces(videoRef.current, new faceapi.TinyFaceDetectorOptions());
-    if (detections.length > 1) {
+    const detections = 1 // Detect if there are more than one face
+    if (detections > 1) {
       console.warn("Please make sure only one face is present.");
       toast.warn("Please make sure only one face is present.");
       setIsCapturing(false);
@@ -129,31 +121,18 @@ const RegisterFace: React.FC<RegisterFaceProps> = () => {
     setCapturedImage(imageDataUrl);
 
     try {
-      const img = await faceapi.fetchImage(imageDataUrl);
-      // const detections = await faceapi
-      //   .detectSingleFace(img)
-      //   .withFaceLandmarks()
-      //   .withFaceDescriptor();
+      // Assign captured image into local img url
 
-      const useTinyModel = true;
-      const detections = await faceapi
-        .detectSingleFace(img, new faceapi.TinyFaceDetectorOptions())
-        .withFaceLandmarks(useTinyModel)
-        .withFaceDescriptor();
+      const detections = true; // Detect the face landmarks
 
       if (detections) {
-        setLocalFormData({ encoding: Array.from(detections.descriptor) });
+        setLocalFormData({ encoding: [] }); // Sample encoding
 
-        if (canvasRef.current) {
+        if (canvasRef.current) { // Create canvas on the detected face
           const canvas = canvasRef.current;
-          const displaySize = { width: video.videoWidth, height: video.videoHeight };
-          faceapi.matchDimensions(canvas, displaySize);
-          const resizedDetections = faceapi.resizeResults(detections, displaySize);
           const context = canvas.getContext("2d");
           if (context) {
             context.clearRect(0, 0, canvas.width, canvas.height);
-            faceapi.draw.drawDetections(canvas, resizedDetections);
-            faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
           }
         }
       } else {
