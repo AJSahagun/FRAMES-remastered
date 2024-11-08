@@ -56,13 +56,17 @@ const RegisterFace: React.FC<RegisterFaceProps> = () => {
 
     loadModels();
     
-    return () => {
+    // Cleanup function to stop the camera stream
+    const cleanup = () => {
       if (streamRef.current) {
         streamRef.current.getTracks().forEach(track => track.stop());
       }
       clearInterval(detectionIntervalRef.current);
       clearTimeout(holdTimerRef.current);
     };
+
+    // Return the cleanup function
+    return cleanup;
   }, []);
 
   useEffect(() => {
