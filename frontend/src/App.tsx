@@ -194,9 +194,11 @@ export default function App() {
                 </button>
 
               </a>
+              <a href="/registrationguide">
               <button className="inline-flex items-center font-semibold text-gray-800 transition-colors duration-200 hover:text-accent">
                 Learn more
               </button>
+              </a>
             </div>
             <div className="flex">
               <p className="mt-4 text-sm text-accent italic opacity-60 font-noto_sans xl:not-italic">
