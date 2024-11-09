@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { DatabaseModule } from '../database/database.module';
+import { DatabaseModule } from '../core/database/database.module';
 import { UserService } from './user.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { HttpException, HttpStatus } from '@nestjs/common';

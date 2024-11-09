@@ -1,9 +1,9 @@
 import { CanActivate, ExecutionContext, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Observable } from 'rxjs';
-import { Role } from '../../config/role.enum';
-import { ROLES_KEY } from '../../decorators/roles/roles.decorator';
-import { ApiKeyService } from '../../services/api-key/api-key.service';
+import { Role } from '../config/role.enum';
+import { ROLES_KEY } from '../../core/decorators/roles/roles.decorator';
+import { ApiKeyService } from '../../core/services/api-key/api-key.service';
 
 @Injectable()
 export class RolesGuard implements CanActivate {

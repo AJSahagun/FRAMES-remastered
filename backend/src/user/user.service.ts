@@ -53,18 +53,18 @@ export class UserService {
   }
 
   async createV2(createUserDto: CreateUserV2Dto) {
-    const name = `${createUserDto.firstName} ${createUserDto.middleName} ${createUserDto.lastName}`;
-    const schoolId = createUserDto.schoolId;
+    const name = `${createUserDto.first_name} ${createUserDto.middle_name} ${createUserDto.last_name}`;
+    const schoolId = createUserDto.school_id;
     const encoding = JSON.stringify(createUserDto.encoding);
 
     try {
       await this.sql(`
         INSERT INTO users(first_name, middle_name, last_name, school_id, department, program)
         VALUES (
-          '${createUserDto.firstName}',
-          ${createUserDto.middleName ? `'${createUserDto.middleName}'` : 'NULL'},
-          '${createUserDto.lastName}',
-          '${createUserDto.schoolId}',
+          '${createUserDto.first_name}',
+          ${createUserDto.middle_name ? `'${createUserDto.middle_name}'` : 'NULL'},
+          '${createUserDto.last_name}',
+          '${createUserDto.school_id}',
           '${createUserDto.department}',
           '${createUserDto.program}'
         )
@@ -73,7 +73,7 @@ export class UserService {
 
       const idAi = await this.sql(
         `INSERT INTO encodings(encoding, school_id)
-        values('${encoding}','${createUserDto.schoolId}')
+        values('${encoding}','${createUserDto.school_id}')
         returning id_ai
         `,
       );
@@ -91,24 +91,10 @@ export class UserService {
     }
 
     throw new HttpException('Success', HttpStatus.ACCEPTED);
-
-    throw new HttpException('Success', HttpStatus.ACCEPTED);
   }
 
   async findAll(): Promise<any[]> {
     return await this.sql(`SELECT * FROM users`);
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
-  }
-
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} user`;
   }
 
   @OnEvent('syncEncodings')
