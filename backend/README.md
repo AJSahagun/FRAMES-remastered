@@ -37,7 +37,7 @@ For prod: `API_URL: https://frames-nest.onrender.com/api/`
 ```
 ### Checklist:
 - API key on header
-- Request body (case sensitive) - firstName, middleName, lastName, srCode(v1) schoolId(v2), department, program, encoding
+- Request body (case sensitive) - first_name, middle_name, last_name, srCode(v1) school_id(v2), department, program, encoding
 
 #### Visitor history
 
@@ -45,7 +45,8 @@ For prod: `API_URL: https://frames-nest.onrender.com/api/`
   POST /api/v2/history
 ```
 ### Checklist:
-- Request body (case sensitive) - encoding, schoolId, timeIn, timeOut
+- Request body (case sensitive) - encoding, school_id, time_in, time_out [optional]
+- Ensure that time_in and time_out is ISO8601 format
 
 
 ## Error Codes

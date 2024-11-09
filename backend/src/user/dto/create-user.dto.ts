@@ -1,5 +1,5 @@
 import { IsJSON, IsNotEmpty, IsOptional } from 'class-validator';
-import { Role } from 'src/config/role.enum';
+import { Role } from 'src/core/config/role.enum';
 
 export class CreateUserDto {
 

@@ -4,9 +4,12 @@ import { UserService } from './user.service';
 import { Server } from 'socket.io';
 import { forwardRef, Inject } from '@nestjs/common';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
+import { configDotenv } from 'dotenv';
+
+configDotenv();
 @WebSocketGateway({
   cors: {
-    origin: ['http://localhost:5173'],
+    origin: process.env.FRAMES_FRONTEND_URL || '*'
   },
 })
 export class UserGateway {
@@ -14,7 +17,6 @@ export class UserGateway {
   server: Server
   
   constructor(
-      // @Inject(forwardRef(()=>UserService)) private readonly userService:UserService
       private eventEmitter: EventEmitter2
   ){}
 

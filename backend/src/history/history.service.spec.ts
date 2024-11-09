@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { HistoryService } from './history.service';
-import { DatabaseModule } from '../database/database.module';
+import { DatabaseModule } from '../core/database/database.module';
 
 describe('HistoryService', () => {
   let service: HistoryService;

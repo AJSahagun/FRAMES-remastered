@@ -1,17 +1,17 @@
 import { IsJSON, IsNotEmpty, IsOptional } from 'class-validator';
-import { Role } from 'src/config/role.enum';
+import { Role } from 'src/core/config/role.enum';
 
 export class CreateUserV2Dto {
 
   @IsNotEmpty()
-  firstName: string;
+  first_name: string;
 
   @IsOptional()
-  middleName: string=null;
+  middle_name: string=null;
   @IsNotEmpty()
-  lastName: string;
+  last_name: string;
   @IsNotEmpty()
-  schoolId: string;
+  school_id: string;
   @IsNotEmpty()
   department: string;
   @IsNotEmpty()

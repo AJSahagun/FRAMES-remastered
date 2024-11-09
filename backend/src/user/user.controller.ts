@@ -1,11 +1,11 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, ValidationPipe, SetMetadata, UseGuards, Version } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { Role } from '../config/role.enum';
-import { Roles } from '../decorators/roles/roles.decorator';
-import { RolesGuard } from '../guards/roles/roles.guard';
+import { Role } from '../core/config/role.enum';
+import { Roles } from '../core/decorators/roles/roles.decorator';
 import { CreateUserDto } from './dto/create-user.dto';
 import { CreateUserV2Dto } from './dto/create-user-v2.dto';
+import { RolesGuard } from '../core/roles/roles.guard';
 
 @Controller('user')
 @UseGuards(RolesGuard)
@@ -30,18 +30,4 @@ export class UserController {
     return this.userService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(+id, updateUserDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userService.remove(+id);
-  }
 }
