@@ -1,4 +1,4 @@
-// import { useState } from "react";
+// register-page.tsx
 import { useRegistrationStore } from "./stores/useRegistrationStore";
 import { usePaginationStore } from "./stores/usePaginationStore";
 import Pagination from "../../components/Pagination";
@@ -7,14 +7,14 @@ import CheckInfo from "./CheckInfo";
 import FosterWeelerTag from '../../components/FosterWheelerTag';
 
 import InputInfo from "./InputInfo";
+import { useFormStore } from "./stores/useFormStore";
 
 export default function Register() {
   const { currentPage, nextPage, prevPage } = usePaginationStore();
-  const { formData, localFormData, isFormValid, submitForm } = useRegistrationStore();
+  const { formData, localFormData, submitForm } = useRegistrationStore();
+  const { isFormValid } = useFormStore();
 
   const handleNextClick = () => {
-    submitForm(); 
-    
     if (isFormValid) {
       submitForm();
       localStorage.setItem("formData", JSON.stringify(localFormData));
@@ -42,7 +42,6 @@ export default function Register() {
           {currentPage === 1 && (
             <div className="w-full max-w-md lg:max-w-full flex flex-col items-center justify-center">
               <InputInfo formData={formData} onNext={handleNextClick} />
-
             </div>
           )}
 

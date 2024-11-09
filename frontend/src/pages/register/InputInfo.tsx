@@ -1,46 +1,17 @@
 // InputInfo.tsx
-import React from "react";
+import { useEffect } from "react";
 import { useRegistrationStore } from "./stores/useRegistrationStore";
 import { Formik, Form, Field, ErrorMessage } from 'formik';
-import * as Yup from 'yup';
 import Dropdown from "../../components/Dropdown";
 import { UserRegistrationData } from '../../types/user.types';
-import { useFormValidation } from "./stores/userFormValidation";
+import { useFormStore, validationSchema, srCodeRegex } from "./stores/useFormStore";
 
 interface InputInfoProps {
   formData: UserRegistrationData;
   onNext: () => void;
 }
 
-const userCodeRegex = /^(2\d-\d{5}$|P-\d{5})$/;
-const srCodeRegex = /^(2\d-\d{5}$)/;
 
-const validationSchema = Yup.object({
-  firstName: Yup.string().required('First Name is required'),
-  middleName: Yup.string(),
-  lastName: Yup.string().required('Last Name is required'),
-  suffix: Yup.string(),
-  userCode: Yup.string()
-    .required('This field is required')
-    .matches(userCodeRegex, 'Example format: "20-12345" or "P-12345"')
-    .test(
-      'is-valid-format',
-      'SR-CODE format: 24-12345, Employee ID format: P-12345',
-      value => {
-        return /^2\d-\d{5}$/.test(value) || /^P-\d{5}$/.test(value);
-      }
-    ),
-  department: Yup.string().when('userCode', {
-    is: (userCode: string | undefined) => srCodeRegex.test(userCode || ''),
-    then: schema => schema.required('Department is required'),
-    otherwise: schema => schema.notRequired(),
-  }),
-  program: Yup.string().when('userCode', {
-    is: (userCode: string | undefined) => srCodeRegex.test(userCode || ''),
-    then: schema => schema.required('Program is required'),
-    otherwise: schema => schema.notRequired(),
-  }),
-});
 
 const departmentOptions = [
   { value: "CAFAD", label: "College of Architecture, Fine Arts & Design" },
@@ -81,7 +52,11 @@ const InputInfo: React.FC<InputInfoProps> = ({ onNext }) => {
     setSelectedProgram,
     submitForm
   } = useRegistrationStore();
-  const { isFormValid, validateForm } = useFormValidation();
+  const { isFormValid, validateForm } = useFormStore();
+
+  useEffect(() => {
+    validateForm(localFormData);
+  }, [localFormData, validateForm]);
 
   const handleSubmit = (values: UserRegistrationData) => {
     setLocalFormData(values);
@@ -200,4 +175,4 @@ const InputInfo: React.FC<InputInfoProps> = ({ onNext }) => {
   );
 };
 
-export default React.memo(InputInfo);
+export default InputInfo;
