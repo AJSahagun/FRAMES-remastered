@@ -1,21 +1,11 @@
+// InputInfo.tsx
 import React from "react";
 import { useRegistrationStore } from "./stores/useRegistrationStore";
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import Dropdown from "../../components/Dropdown";
 import { UserRegistrationData } from '../../types/user.types';
-
-// interface UserFormData {
-//   firstName: string;
-//   middleName: string;
-//   lastName: string;
-//   suffix: string;
-//   userCode: string;
-//   department: string;
-//   program: string;
-//   encoding: number[];
-//   imageUrl: string; 
-// }
+import { useFormValidation } from "./stores/userFormValidation";
 
 interface InputInfoProps {
   formData: UserRegistrationData;
@@ -29,7 +19,7 @@ const validationSchema = Yup.object({
   firstName: Yup.string().required('First Name is required'),
   middleName: Yup.string(),
   lastName: Yup.string().required('Last Name is required'),
-  suffix:  Yup.string(),
+  suffix: Yup.string(),
   userCode: Yup.string()
     .required('This field is required')
     .matches(userCodeRegex, 'Example format: "20-12345" or "P-12345"')
@@ -40,16 +30,16 @@ const validationSchema = Yup.object({
         return /^2\d-\d{5}$/.test(value) || /^P-\d{5}$/.test(value);
       }
     ),
-    department: Yup.string().when('userCode', {
-      is: (userCode: string | undefined) => srCodeRegex.test(userCode || ''),
-      then: schema => schema.required('Department is required'),
-      otherwise: schema => schema.notRequired(),
-    }),
-    program: Yup.string().when('userCode', {
-      is: (userCode: string | undefined) => srCodeRegex.test(userCode || ''),
-      then: schema => schema.required('Program is required'),
-      otherwise: schema => schema.notRequired(),
-    }),
+  department: Yup.string().when('userCode', {
+    is: (userCode: string | undefined) => srCodeRegex.test(userCode || ''),
+    then: schema => schema.required('Department is required'),
+    otherwise: schema => schema.notRequired(),
+  }),
+  program: Yup.string().when('userCode', {
+    is: (userCode: string | undefined) => srCodeRegex.test(userCode || ''),
+    then: schema => schema.required('Program is required'),
+    otherwise: schema => schema.notRequired(),
+  }),
 });
 
 const departmentOptions = [
@@ -82,30 +72,24 @@ const courseOptions: Record<string, { value: string; label: string }[]> = {
 };
 
 const InputInfo: React.FC<InputInfoProps> = ({ onNext }) => {
-  const { 
-    localFormData, 
-    setLocalFormData, 
-    isFormValid,
-    setIsFormValid, 
-    selectedDept, 
+  const {
+    localFormData,
+    setLocalFormData,
+    selectedDept,
     setSelectedDept,
     selectedProgram: availableProgramOptions,
     setSelectedProgram,
     submitForm
   } = useRegistrationStore();
-
-  const initialValues = localFormData;
-  
-  const handleNextClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    submitForm();
-    onNext(); // Call the passed callback from register-page.tsx
-  };
+  const { isFormValid, validateForm } = useFormValidation();
 
   const handleSubmit = (values: UserRegistrationData) => {
     setLocalFormData(values);
-    console.log("Submitted values:", values);
-    setIsFormValid(true); // not working 
+    validateForm(values);
+    if (isFormValid) {
+      submitForm();
+      onNext();
+    }
   };
 
   const handleDepartmentChange = (value: string, setFieldValue: (field: string, value: string) => void) => {
@@ -121,21 +105,18 @@ const InputInfo: React.FC<InputInfoProps> = ({ onNext }) => {
 
   return (
     <Formik
-      initialValues={initialValues}
+      initialValues={localFormData}
       enableReinitialize
       validationSchema={validationSchema}
       onSubmit={handleSubmit}
-      validateOnChange={true}
-      validateOnBlur={true}
     >
-      {({ setFieldValue, values }) => (
+      {({ setFieldValue, values, isValid }) => (
         <Form className="w-full flex flex-col relative items-center">
           <div className="text-center">
             <h1 className="text-tc font-poppins md:text-5xl lg:mt-2 lg:mb-10">Registration</h1>
           </div>
 
           <div className="w-full relative flex flex-col lg:flex-row lg:w-3/4 items-center justify-center mt-8 space-y-3 lg:space-x-2">
-            {/* left */}
             <div className="space-y-3 mx-8 lg:w-1/2 justify-center items-center">
               <Field
                 type="text"
@@ -166,12 +147,10 @@ const InputInfo: React.FC<InputInfoProps> = ({ onNext }) => {
                 name="suffix"
                 placeholder="Suffix (e.g. Jr.)"
                 className="w-full px-6 py-3 rounded-lg bg-sf focus:outline-secondary"
-
               />
               <ErrorMessage name="suffix" component="div" className="text-red-500 text-sm" />
             </div>
 
-            {/* right */}
             <div className="space-y-3 mx-8 lg:w-1/2 justify-center items-center">
               <Field
                 type="text"
@@ -204,20 +183,17 @@ const InputInfo: React.FC<InputInfoProps> = ({ onNext }) => {
             </div>
           </div>
 
-          {/* <button type="submit" className="hidden" onClick={submitForm}>Submit</button> */}
           <button
-                className={`font-poppins text-md text-background rounded-lg w-2/3 py-2 mt-10 shadow-md transition-all duration-500  ease-in-out lg:mt-20 lg:w-1/4
-                   ${
-                  isFormValid
-                    ? "bg-btnBg hover:bg-gradient-to-br hover:from-accent hover:to-btnBg transform hover:scale-105"
-                    : "bg-btnBg opacity-50 cursor-not-allowed"
-                }`}
-                onClick={handleNextClick}
-                disabled={!isFormValid}
-                type="button"
-              >
-                Next
-              </button>
+            className={`font-poppins text-md text-background rounded-lg w-2/3 py-2 mt-10 shadow-md transition-all duration-500  ease-in-out lg:mt-20 lg:w-1/4 ${
+              isFormValid
+                ? "bg-btnBg hover:bg-gradient-to-br hover:from-accent hover:to-btnBg transform hover:scale-105"
+                : "bg-btnBg opacity-50 cursor-not-allowed"
+            }`}
+            type="submit"
+            disabled={!isValid}
+          >
+            Next
+          </button>
         </Form>
       )}
     </Formik>

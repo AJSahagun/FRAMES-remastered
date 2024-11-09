@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import 'react-toastify/dist/ReactToastify.css';
 import { useRegistrationStore } from './stores/useRegistrationStore';
 import { usePaginationStore } from './stores/usePaginationStore';
+import { useImageStore } from './stores/useImgStore';
 import { UserService } from '../../services/user.service';
 import { UserRegistrationData } from '../../types/user.types';
 
@@ -12,6 +13,7 @@ interface CheckInfoProps {
 const CheckInfo: React.FC<CheckInfoProps> = () => {
   const { formData, resetForm } = useRegistrationStore();
   const { prevPage } = usePaginationStore();
+  const { imageUrl } = useImageStore();
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
@@ -39,7 +41,7 @@ const CheckInfo: React.FC<CheckInfoProps> = () => {
   };
 
   const filteredFormData = Object.entries(formData).filter(
-    ([key]) => key !== 'encoding' && key !== 'imageUrl'
+    ([key]) => key !== 'encoding',
   );
 
   return (
@@ -49,8 +51,8 @@ const CheckInfo: React.FC<CheckInfoProps> = () => {
       </div>
 
       <div className="flex items-center justify-center border-2 shadow-md border-tc rounded-2xl mt-8 h-40 w-2/5 mx-auto">
-      {formData.imageUrl ? (
-        <img src={formData.imageUrl} alt="Captured" />
+      {imageUrl ? (
+        <img src={imageUrl} alt="Captured" />
       ) : (
         <p>No image captured.</p>
       )}
@@ -65,10 +67,6 @@ const CheckInfo: React.FC<CheckInfoProps> = () => {
             </div>
           )
         ))}
-
-        
-        
-
       </div>
 
       {/* Buttons */}
