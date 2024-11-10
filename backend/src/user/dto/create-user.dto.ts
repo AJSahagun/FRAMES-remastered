@@ -5,16 +5,18 @@ export class CreateUserDto {
 
   @IsNotEmpty()
   firstName: string;
-
-  @IsOptional()
-  middleName: string=null;
   @IsNotEmpty()
   lastName: string;
   @IsNotEmpty()
   srCode: string;
-  @IsNotEmpty()
+
+  @IsOptional()
+  middleName: string;
+  @IsOptional()
+  suffix: string;
+  @IsOptional()
   department: string;
-  @IsNotEmpty()
+  @IsOptional()
   program: string;
 
   // @IsJSON()
