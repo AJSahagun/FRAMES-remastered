@@ -61,7 +61,6 @@ const Form: React.FC = () => {
 
   return (
     <>
-      <h1>Registration Form</h1>
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}

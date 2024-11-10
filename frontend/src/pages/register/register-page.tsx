@@ -74,21 +74,13 @@ export default function Register() {
           {currentPage === 3 && (
             <div className="w-full max-w-md">
               <CheckInfo formData={formData} />
-              {/* <div className="mt-4">
-                <button
-                  className="border-2 border-tc hover:bg-btnHover font-poppins text-tc rounded-lg px-6 py-2 transition-colors"
-                  onClick={prevPage}
-                >
-                  Back
-                </button>
-              </div> */}
             </div>
           )}
         </div>
       </div>
 
       <div className="lg:hidden font-poppins text-accent text-sm opacity-40 text-center py-6">
-        Foster Wheeler - Alangilan
+        Foster Wheeler Library - Alangilan
       </div>
     </div>
   );

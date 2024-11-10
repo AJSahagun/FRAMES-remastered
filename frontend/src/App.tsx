@@ -9,6 +9,7 @@ export default function App() {
   const { imagesLoaded, setImagesLoaded } = useImageStore(); // Zustand store for imagesLoaded
 
   const images = useMemo(() => [
+    "images/face-scan-1.jpg",
     "/images/library.jpg",
     "/images/library-2.jpg",
     "/images/library-3.jpg", 
@@ -60,7 +61,7 @@ export default function App() {
   }, [images, setImagesLoaded]);
 
   return (
-    <div className="relative w-full max-h-screen">
+    <div className="relative w-full max-h-screen overflow-y-hidden">
       {/* Navbar */}
       <div className="flex flex-row w-full justify-between items-center ">
         <div className="w-1/2 md:w-1/3">
@@ -143,7 +144,7 @@ export default function App() {
           </svg>
 
           {/* Image slider */}
-          <div className="relative w-full h-60 md:h-96 lg:flex lg:h-5/6 lg:mt-8">
+          <div className="relative w-full h-60 md:h-96 lg:flex lg:h-4/5 lg:mt-4 fade-in-up">
             {imagesLoaded && images.map((img, index) => (
               <div
                 key={index}
@@ -161,7 +162,7 @@ export default function App() {
             
           </div>
           {/* Foster Wheeler Tag */}
-          <div className="hidden lg:flex w-4/6 absolute bottom-14 right-0 mt-8 ml-10 font-poppins">
+          <div className="hidden lg:flex w-3/5 absolute right-0 -mt-6 ml-10 font-poppins fade-in-up">
             <div className="flex w-full ">
               <div className="flex w-full h-10 px-9 pr-1 bg-primary py-6 justify-center items-center  text-white shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)]">
                 <p className="text-lg font-poppins md:text-base align-middle tracking-wide">
@@ -193,42 +194,39 @@ export default function App() {
         <div className="flex items-start w-full max-w-xl px-8 mx-auto md:px-0 lg:px-8 lg:max-w-screen-xl">
 
           {/* White Rectangle */}
-          <div className="hidden lg:block absolute w-full h-full -left-20 bg-background" 
-            style={{ clipPath: 'polygon(0 0, 79% 0, 41% 100%, 0% 100%)',
+          <div className="hidden lg:block absolute w-full h-full -left-0 bg-background " 
+            style={{ clipPath: 'polygon(0 0, 70% 0, 45% 100%, 0% 100%)',
               zIndex: 1,
               }}>
           </div>
 
           {/* Text Content */}
-          <div className="flex flex-col justify-center mb-16 z-20 lg:mb-48 lg:mt-24 lg:pr-5 min-[430px]:px-2 ">
-            <h2 className="mb-5 text-3xl font-medium tracking-tight lg:tracking-normal font-poppins text-tc sm:text-6xl sm:leading-none lg:text-7xl">
-
-              {/* //TODO: heading text to be changed */ }
-              Access the{' '}
-              <br className="hidden md:block" />
-              Campus Library{' '}
-              <br className="hidden md:block" />
-              with {' '}
-              <span className="inline-block text-400 text-primary font-aldrich lg:text-7xl">
+          <div className="flex flex-col justify-center mb-16 z-20 lg:mb-48 lg:mt-24 lg:pr-5 min-[430px]:px-2 -ml-6 ">
+            <div className="mb-5 text-3xl font-medium tracking-tight lg:tracking-tight font-poppins text-tc sm:text-6xl sm:leading-none lg:text-8xl lg:-space-y-2 fade-in-up ">  
+              <h2>Access the</h2>
+              <h2>Campus Library</h2>
+              <h2>with {' '}
+              <span className="inline-block text-400 text-primary font-aldrich lg:text-8xl">
                 FRAMES
               </span>
-            </h2>
-            <p className="pr-5 mb-5 font-light font-noto_sans md:text-lg">
+              </h2>
+            </div>
+            <p className="pr-5 mb-5 font-light font-noto_sans md:text-lg fade-in-up">
               Face Recognition Access Monitoring Enhanced System [FRAMES] is a ...
             </p>
             <div className="flex items-center">
               <a href="/register">
-                <button className="inline-flex items-center justify-center h-12 px-6 mr-6 font-poppins font-medium tracking-wide text-white transition duration-300 rounded-md shadow-md bg-btnBg hover:brightness-110 hover:-translate-y-2 focus:shadow-outline focus:outline-none" >
+                <button className="inline-flex items-center justify-center h-12 px-6 mr-6 font-poppins font-medium tracking-wide text-white transition duration-300 rounded-md shadow-md bg-btnBg hover:brightness-110 hover:-translate-y-2 focus:shadow-outline focus:outline-none fade-in-up">
                   REGISTER NOW
                 </button>
 
               </a>
-              <button className="inline-flex items-center justify-center h-12 px-6 mr-6 font-poppins font-semibold tracking-wide bg-slate-200 text-accent bg-sf rounded-md shadow-md transition duration-500 hover:bg-slate-300 ">
+              <button className="inline-flex items-center justify-center h-12 px-6 mr-6 font-poppins font-semibold tracking-wide bg-slate-200 text-accent bg-sf rounded-md shadow-md transition duration-500 hover:bg-slate-300 fade-in-up">
                 Learn more
               </button>
             </div>
             <div className="flex">
-              <p className="mt-4 text-sm text-accent italic opacity-60 font-noto_sans xl:not-italic">
+              <p className="mt-4 text-sm text-accent italic opacity-60 font-noto_sans xl:not-italic fade-in-up">
                 Powered by Techtonic
               </p>
             </div>
@@ -237,23 +235,21 @@ export default function App() {
           
           {/* Second Slider Indicator */}
           <div className="justify-center items-center space-x-3 my-6 hidden">
-
-        
-          {images.map((_, index) => (
-            <span
-              key={index}
-              onClick={() => setActiveIndex(index)}
-              className={`${
-                index === activeIndex ? 'w-9 rounded-full opacity-70' : 'w-3 opacity-30'
-              } h-3 bg-secondary rounded-full transition-all ease-in-out duration-300 cursor-pointer`}
-            />
-          ))}
+            {images.map((_, index) => (
+              <span
+                key={index}
+                onClick={() => setActiveIndex(index)}
+                className={`${
+                  index === activeIndex ? 'w-9 rounded-full opacity-70' : 'w-3 opacity-30'
+                } h-3 bg-secondary rounded-full transition-all ease-in-out duration-300 cursor-pointer fade-in-up`}
+              />
+            ))}
           </div>
 
 
 
         </div>
-        <div className="flex justify-center items-center bottom-5 font-poppins text-accent text-sm opacity-40 lg:hidden">
+        <div className="flex justify-center items-center bottom-5 font-poppins text-accent text-sm opacity-40 lg:hidden fade-in-up">
           Foster Wheeler Library - Alangilan
         </div>
       </div>
