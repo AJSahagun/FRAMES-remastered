@@ -230,7 +230,6 @@ const RegisterFace: React.FC<RegisterFaceProps> = () => {
 
       if (detection) {
         setLocalFormData({ 
-          imageUrl: imageDataUrl,
           encoding: Array.from(detection.descriptor) 
         });
 
