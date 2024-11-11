@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState} from "react";
 import * as faceapi from "@vladmandic/face-api";
+import WebcamSelector from "../../components/WebcamSelector";
 import { useImageStore } from "./stores/useImgStore";
 import { useRegistrationStore } from "./stores/useRegistrationStore";
 import { FaRedo } from "react-icons/fa";
@@ -26,6 +27,8 @@ const RegisterFace: React.FC<RegisterFaceProps> = () => {
   const detectionIntervalRef = useRef<number>();
   const holdTimerRef = useRef<number>();
   const [isModelsLoaded, setIsModelsLoaded] = useState(false);
+  const [selectedDeviceId, setSelectedDeviceId] = useState<string>('');
+  const [isVideoReady, setIsVideoReady] = useState(false);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const { setImageUrl } = useImageStore();
   const { setLocalFormData } = useRegistrationStore();
@@ -77,24 +80,69 @@ const RegisterFace: React.FC<RegisterFaceProps> = () => {
     }
   }, [isModelsLoaded]);
 
-  const startWebcam = async () => {
+  useEffect(() => {
+    if (isVideoReady && isModelsLoaded && videoRef.current) {
+      startFaceDetection();
+    }
+    
+    return () => {
+      clearInterval(detectionIntervalRef.current);
+    };
+  }, [isVideoReady, isModelsLoaded]);
+
+  const startWebcam = async (deviceId?: string) => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: {} });
+      setIsVideoReady(false); // Reset video ready state
+      clearInterval(detectionIntervalRef.current); // Clear existing detection interval
+      
+      const constraints = {
+        video: deviceId ? { deviceId: { exact: deviceId } } : true
+      };
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      
+      // Stop previous stream if it exists
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+      }
+      
       streamRef.current = stream;
+      
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
+        
+        // Wait for video to be fully loaded
         videoRef.current.onloadedmetadata = () => {
           setVideoDimensions({
             width: videoRef.current?.videoWidth || 0,
             height: videoRef.current?.videoHeight || 0
           });
-          startFaceDetection();
+        };
+        
+        // Additional check for video readiness
+        videoRef.current.onloadeddata = () => {
+          setIsVideoReady(true);
         };
       }
     } catch (error) {
       console.error("Error accessing webcam: ", error);
       toast.error("Failed to access webcam. Please check your device permissions.");
     }
+  };
+
+  const handleDeviceSelect = async (deviceId: string) => {
+    setHoldProgress(0);
+    clearInterval(holdTimerRef.current);
+    clearInterval(detectionIntervalRef.current);
+    
+    if (canvasRef.current) {
+      const context = canvasRef.current.getContext('2d');
+      if (context) {
+        context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+      }
+    }
+    
+    setSelectedDeviceId(deviceId);
+    await startWebcam(deviceId);
   };
 
   const isFaceInGuide = (detection: DetectionBox): boolean => {
@@ -130,35 +178,61 @@ const RegisterFace: React.FC<RegisterFaceProps> = () => {
 
   const startFaceDetection = () => {
     if (!videoRef.current || !canvasRef.current) return;
+    
+    clearInterval(detectionIntervalRef.current); // Clear any existing interval
+    
     detectionIntervalRef.current = window.setInterval(async () => {
-      const detections = await faceapi.detectAllFaces(videoRef.current!, new faceapi.TinyFaceDetectorOptions());
+      // Check if video is still valid and ready
+      if (!videoRef.current || !isVideoReady || 
+          videoRef.current.readyState !== 4) {
+        return;
+      }
       
-      const canvas = canvasRef.current!;
-      const context = canvas.getContext('2d');
-      if (!context) return;
-
-      context.clearRect(0, 0, canvas.width, canvas.height);
-
-      if (detections.length === 1) {
-        const detection = detections[0].box;
-        const isAligned = isFaceInGuide(detection);
-
-        if (isAligned) {
-          if (!holdTimerRef.current) {
-            let progress = 0;
-            const startTime = Date.now();
-            holdTimerRef.current = window.setInterval(() => {
-              const elapsed = Date.now() - startTime;
-              progress = Math.min((elapsed / 3000) * 100, 100);
-              setHoldProgress(progress);
-              
-              if (progress >= 100) {
-                clearInterval(holdTimerRef.current);
-                holdTimerRef.current = undefined;
-                handleCapture();
-              }
-            }, 100);
+      try {
+        const detections = await faceapi.detectAllFaces(
+          videoRef.current,
+          new faceapi.TinyFaceDetectorOptions()
+        );
+        
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        
+        const context = canvas.getContext('2d');
+        if (!context) return;
+  
+        context.clearRect(0, 0, canvas.width, canvas.height);
+  
+        if (detections.length === 1) {
+          const detection = detections[0].box;
+          const isAligned = isFaceInGuide(detection);
+  
+          if (isAligned) {
+            if (!holdTimerRef.current) {
+              let progress = 0;
+              const startTime = Date.now();
+              holdTimerRef.current = window.setInterval(() => {
+                const elapsed = Date.now() - startTime;
+                progress = Math.min((elapsed / 3000) * 100, 100);
+                setHoldProgress(progress);
+                
+                if (progress >= 100) {
+                  clearInterval(holdTimerRef.current);
+                  holdTimerRef.current = undefined;
+                  handleCapture();
+                }
+              }, 100);
+            }
+          } else {
+            if (holdTimerRef.current) {
+              clearInterval(holdTimerRef.current);
+              holdTimerRef.current = undefined;
+              setHoldProgress(0);
+            }
           }
+  
+          // Draw detection box
+          context.strokeStyle = isAligned ? '#00FF00' : '#FF0000';
+          context.strokeRect(detection.x, detection.y, detection.width, detection.height);
         } else {
           if (holdTimerRef.current) {
             clearInterval(holdTimerRef.current);
@@ -166,16 +240,16 @@ const RegisterFace: React.FC<RegisterFaceProps> = () => {
             setHoldProgress(0);
           }
         }
-
-        // Draw detection box
-        context.strokeStyle = isAligned ? '#00FF00' : '#FF0000';
-        context.strokeRect(detection.x, detection.y, detection.width, detection.height);
-      } else {
-        if (holdTimerRef.current) {
-          clearInterval(holdTimerRef.current);
-          holdTimerRef.current = undefined;
-          setHoldProgress(0);
-        }
+      } catch (error) {
+        // If we get an error during detection, clear the interval and restart
+        console.error("Face detection error:", error);
+        clearInterval(detectionIntervalRef.current);
+        // Optional: attempt to restart detection after a short delay
+        setTimeout(() => {
+          if (isVideoReady && videoRef.current) {
+            startFaceDetection();
+          }
+        }, 1000);
       }
     }, 100);
   };
@@ -267,7 +341,13 @@ const RegisterFace: React.FC<RegisterFaceProps> = () => {
         md:mx-0 md:space-y-4 lg:flex-row lg:space-x-20 lg:w-screen lg:px-40 lg:mt-12">
         <div className="md:w-full md:flex md:flex-row-reverse md:items-start">
           <div className="md:w-1/2 mb-4 md:mb-0 md:ml-4 relative">
-            <div className="bg-gray-200 rounded-lg max-w-md max-h-4xl w-full overflow-hidden">
+            <div className="rounded-lg max-w-md max-h-4xl w-full overflow-hidden">
+            <div className="mb-4">
+              <WebcamSelector 
+                onDeviceSelect={handleDeviceSelect}
+                currentDeviceId={selectedDeviceId}
+              />
+            </div>
               <div className="relative w-full h-0 pb-[75%] md:pb-[56.25%] lg:w-[448px] lg:h-[336px] lg:pb-0">
                 {capturedImage ? (
                   <>
