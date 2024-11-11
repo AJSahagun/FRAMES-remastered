@@ -25,7 +25,8 @@ const RegisterFace: React.FC<RegisterFaceProps> = () => {
   const streamRef = useRef<MediaStream | null>(null);
   const detectionIntervalRef = useRef<number>();
   const holdTimerRef = useRef<number>();
-  const [isModelsLoaded, setIsModelsLoaded] = useState(false);
+  const [isDetectionModelLoaded, setIsDetectionModelLoaded] = useState(false);
+  const [isRecognitionModelsLoaded, setIsRecognitionModelsLoaded] = useState(false);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const { setImageUrl } = useImageStore();
   const { setLocalFormData } = useRegistrationStore();
@@ -46,12 +47,10 @@ const RegisterFace: React.FC<RegisterFaceProps> = () => {
       try {
         await Promise.all([
           faceapi.nets.tinyFaceDetector.loadFromUri("/models"),
-          faceapi.nets.faceLandmark68TinyNet.loadFromUri("/models"),
-          faceapi.nets.faceRecognitionNet.loadFromUri("/models")
         ]);
-        setIsModelsLoaded(true);
+        setIsDetectionModelLoaded(true);
       } catch (error) {
-        console.error("Error loading Face-API models: ", error);
+        console.error("Error loading Face-API detection model: ", error);
         toast.error("Failed to load face recognition models.");
       }
     };
@@ -72,10 +71,23 @@ const RegisterFace: React.FC<RegisterFaceProps> = () => {
   }, []);
 
   useEffect(() => {
-    if (isModelsLoaded && videoRef.current) {
+    if (isDetectionModelLoaded && videoRef.current) {
       startWebcam();
     }
-  }, [isModelsLoaded]);
+  }, [isDetectionModelLoaded]);
+
+  const loadRecognitionModels = async () => {
+    try {
+      await Promise.all([
+        faceapi.nets.faceLandmark68TinyNet.loadFromUri("/models"),
+        faceapi.nets.faceRecognitionNet.loadFromUri("/models")
+      ]);
+      setIsRecognitionModelsLoaded(true);
+    } catch (error) {
+      console.error("Error loading Face-API Landmark & Recognition models: ", error);
+      toast.error("Failed to load face recognition models.");
+    }
+  };
 
   const startWebcam = async () => {
     try {
@@ -181,7 +193,7 @@ const RegisterFace: React.FC<RegisterFaceProps> = () => {
   };
 
   const handleCapture = async () => {
-    if (!isModelsLoaded || !videoRef.current) return;
+    if (!isDetectionModelLoaded || !videoRef.current) return;
 
     setIsCapturing(true);
     clearInterval(detectionIntervalRef.current);
@@ -205,6 +217,10 @@ const RegisterFace: React.FC<RegisterFaceProps> = () => {
     setCapturedImage(imageDataUrl);
 
     try {
+      if (!isRecognitionModelsLoaded) {
+        loadRecognitionModels();
+      }
+
       const img = await faceapi.fetchImage(imageDataUrl);
       const useTinyModel = true;
       const detection = await faceapi
