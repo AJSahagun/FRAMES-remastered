@@ -7,9 +7,8 @@ interface UserFormData {
   suffix: string;
   srCode: string;
   department: string;
-  course: string;
+  program: string;
   encoding: number[];
-  imageUrl: string;
 }
 
 interface RegistrationState {
@@ -32,9 +31,8 @@ const initialFormData: UserFormData = {
   suffix: "",
   srCode: "",
   department: "",
-  course: "",
+  program: "",
   encoding: [],
-  imageUrl: ""
 };
 
 export const useRegistrationStore = create<RegistrationState>((set) => ({

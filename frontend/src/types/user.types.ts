@@ -5,7 +5,7 @@ export interface UserRegistrationData {
   suffix?: string;
   srCode: string;
   department: string;
-  course: string;
+  program: string;
   encoding: number[];
 }
 

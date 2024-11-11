@@ -63,10 +63,10 @@ const InputInfo: React.FC<InputInfoProps> = () => {
       Boolean(localFormData.lastName?.trim()) &&
       Boolean(localFormData.srCode?.trim()) &&
       Boolean(localFormData.department?.trim()) &&
-      Boolean(localFormData.course?.trim()) &&
+      Boolean(localFormData.program?.trim()) &&
       !srCodeError;
     return isValid;
-  }, [localFormData.firstName, localFormData.lastName, localFormData.srCode, localFormData.department, localFormData.course, srCodeError]);
+  }, [localFormData.firstName, localFormData.lastName, localFormData.srCode, localFormData.department, localFormData.program, srCodeError]);
 
   useEffect(() => {
     const isValid = validateForm();
@@ -75,11 +75,11 @@ const InputInfo: React.FC<InputInfoProps> = () => {
 
   const handleDepartmentChange = (value: string) => {
     setSelectedDept(value);
-    setLocalFormData({ department: value, course: "" });
+    setLocalFormData({ department: value, program: "" });
   };
 
   const handleCourseChange = (value: string) => {
-    setLocalFormData({ course: value });
+    setLocalFormData({ program: value });
   };
 
   const currentCourseOptions = localFormData.department
@@ -169,7 +169,7 @@ const InputInfo: React.FC<InputInfoProps> = () => {
           {/* Dropdown for Course */}
           <Dropdown
             options={currentCourseOptions}
-            value={localFormData.course}
+            value={localFormData.program}
             onChange={handleCourseChange}
             placeholder="Select Course"
             disabled={!localFormData.department}

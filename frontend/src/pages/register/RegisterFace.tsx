@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState} from "react";
 import * as faceapi from "@vladmandic/face-api";
+import { useImageStore } from "./stores/useImgStore";
 import { useRegistrationStore } from "./stores/useRegistrationStore";
 import { FaRedo } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
@@ -26,6 +27,7 @@ const RegisterFace: React.FC<RegisterFaceProps> = () => {
   const holdTimerRef = useRef<number>();
   const [isModelsLoaded, setIsModelsLoaded] = useState(false);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
+  const { setImageUrl } = useImageStore();
   const { setLocalFormData } = useRegistrationStore();
   const [isCapturing, setIsCapturing] = useState(false);
   const [videoDimensions, setVideoDimensions] = useState({ width: 0, height: 0 });
@@ -199,6 +201,7 @@ const RegisterFace: React.FC<RegisterFaceProps> = () => {
 
     captureContext.drawImage(video, 0, 0, captureCanvas.width, captureCanvas.height);
     const imageDataUrl = captureCanvas.toDataURL("image/png");
+    setImageUrl(imageDataUrl);
     setCapturedImage(imageDataUrl);
 
     try {
