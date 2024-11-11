@@ -1,7 +1,9 @@
 import React, { useEffect, useRef, useState} from "react";
 import * as faceapi from "@vladmandic/face-api";
+import WebcamSelector from "../../components/WebcamSelector";
+import { useImageStore } from "./stores/useImgStore";
 import { useRegistrationStore } from "./stores/useRegistrationStore";
-import { FaCamera, FaRedo } from "react-icons/fa";
+import { FaRedo } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { ClipLoader } from "react-spinners";
@@ -11,14 +13,28 @@ interface RegisterFaceProps {
   formData: UserRegistrationData;
 }
 
+interface DetectionBox {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
 const RegisterFace: React.FC<RegisterFaceProps> = () => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const detectionIntervalRef = useRef<number>();
+  const holdTimerRef = useRef<number>();
   const [isModelsLoaded, setIsModelsLoaded] = useState(false);
+  const [selectedDeviceId, setSelectedDeviceId] = useState<string>('');
+  const [isVideoReady, setIsVideoReady] = useState(false);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
+  const { setImageUrl } = useImageStore();
   const { setLocalFormData } = useRegistrationStore();
   const [isCapturing, setIsCapturing] = useState(false);
   const [videoDimensions, setVideoDimensions] = useState({ width: 0, height: 0 });
+  const [holdProgress, setHoldProgress] = useState(0);
   const parameters = [
     "Well lit environment",
     "No other faces present",
@@ -27,16 +43,15 @@ const RegisterFace: React.FC<RegisterFaceProps> = () => {
     "Hold still",
   ];
 
-  // Load Face-API models
+  // Load only necessary Face-API models
   useEffect(() => {
     const loadModels = async () => {
       try {
-        await faceapi.nets.ssdMobilenetv1.loadFromUri("/models");
-        await faceapi.nets.faceLandmark68Net.loadFromUri("/models");
-
-        // await faceapi.nets.tinyFaceDetector.loadFromUri("/models");
-        // await faceapi.nets.faceLandmark68TinyNet.loadFromUri("/models");
-        await faceapi.nets.faceRecognitionNet.loadFromUri("/models");
+        await Promise.all([
+          faceapi.nets.tinyFaceDetector.loadFromUri("/models"),
+          faceapi.nets.faceLandmark68TinyNet.loadFromUri("/models"),
+          faceapi.nets.faceRecognitionNet.loadFromUri("/models")
+        ]);
         setIsModelsLoaded(true);
       } catch (error) {
         console.error("Error loading Face-API models: ", error);
@@ -45,25 +60,67 @@ const RegisterFace: React.FC<RegisterFaceProps> = () => {
     };
 
     loadModels();
+    
+    // Cleanup function to stop the camera stream
+    const cleanup = () => {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+      }
+      clearInterval(detectionIntervalRef.current);
+      clearTimeout(holdTimerRef.current);
+    };
+
+    // Return the cleanup function
+    return cleanup;
   }, []);
 
-  // Access Webcam using MediaDevices API
   useEffect(() => {
     if (isModelsLoaded && videoRef.current) {
       startWebcam();
     }
   }, [isModelsLoaded]);
-  
-  const startWebcam = async () => {
+
+  useEffect(() => {
+    if (isVideoReady && isModelsLoaded && videoRef.current) {
+      startFaceDetection();
+    }
+    
+    return () => {
+      clearInterval(detectionIntervalRef.current);
+    };
+  }, [isVideoReady, isModelsLoaded]);
+
+  const startWebcam = async (deviceId?: string) => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: {} });
+      setIsVideoReady(false); // Reset video ready state
+      clearInterval(detectionIntervalRef.current); // Clear existing detection interval
+      
+      const constraints = {
+        video: deviceId ? { deviceId: { exact: deviceId } } : true
+      };
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      
+      // Stop previous stream if it exists
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+      }
+      
+      streamRef.current = stream;
+      
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
+        
+        // Wait for video to be fully loaded
         videoRef.current.onloadedmetadata = () => {
           setVideoDimensions({
             width: videoRef.current?.videoWidth || 0,
             height: videoRef.current?.videoHeight || 0
           });
+        };
+        
+        // Additional check for video readiness
+        videoRef.current.onloadeddata = () => {
+          setIsVideoReady(true);
         };
       }
     } catch (error) {
@@ -72,97 +129,189 @@ const RegisterFace: React.FC<RegisterFaceProps> = () => {
     }
   };
 
-  // Capture and process face detection + Generate face encodings
+  const handleDeviceSelect = async (deviceId: string) => {
+    setHoldProgress(0);
+    clearInterval(holdTimerRef.current);
+    clearInterval(detectionIntervalRef.current);
+    
+    if (canvasRef.current) {
+      const context = canvasRef.current.getContext('2d');
+      if (context) {
+        context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+      }
+    }
+    
+    setSelectedDeviceId(deviceId);
+    await startWebcam(deviceId);
+  };
+
+  const isFaceInGuide = (detection: DetectionBox): boolean => {
+    if (!videoRef.current) return false;
+
+    const videoWidth = videoRef.current.videoWidth;
+    const videoHeight = videoRef.current.videoHeight;
+    
+    // Calculate guide circle dimensions
+    const guideWidth = 192; // 12rem in pixels
+    const guideHeight = 256; // 16rem in pixels
+    
+    // Calculate guide position (center of video)
+    const guideX = (videoWidth - guideWidth) / 2;
+    const guideY = (videoHeight - guideHeight) / 2;
+
+    // Check if face detection box is mostly within the guide circle
+    const detectionCenterX = detection.x + (detection.width / 2);
+    const detectionCenterY = detection.y + (detection.height / 2);
+
+    // Calculate distance from center of detection to center of guide
+    const guideCenterX = guideX + (guideWidth / 2);
+    const guideCenterY = guideY + (guideHeight / 2);
+
+    const distance = Math.sqrt(
+      Math.pow(detectionCenterX - guideCenterX, 2) +
+      Math.pow(detectionCenterY - guideCenterY, 2)
+    );
+
+    // Check if detection center is within the guide circle
+    return distance < (Math.min(guideWidth, guideHeight) / 2);
+  };
+
+  const startFaceDetection = () => {
+    if (!videoRef.current || !canvasRef.current) return;
+    
+    clearInterval(detectionIntervalRef.current); // Clear any existing interval
+    
+    detectionIntervalRef.current = window.setInterval(async () => {
+      // Check if video is still valid and ready
+      if (!videoRef.current || !isVideoReady || 
+          videoRef.current.readyState !== 4) {
+        return;
+      }
+      
+      try {
+        const detections = await faceapi.detectAllFaces(
+          videoRef.current,
+          new faceapi.TinyFaceDetectorOptions()
+        );
+        
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        
+        const context = canvas.getContext('2d');
+        if (!context) return;
+  
+        context.clearRect(0, 0, canvas.width, canvas.height);
+  
+        if (detections.length === 1) {
+          const detection = detections[0].box;
+          const isAligned = isFaceInGuide(detection);
+  
+          if (isAligned) {
+            if (!holdTimerRef.current) {
+              let progress = 0;
+              const startTime = Date.now();
+              holdTimerRef.current = window.setInterval(() => {
+                const elapsed = Date.now() - startTime;
+                progress = Math.min((elapsed / 3000) * 100, 100);
+                setHoldProgress(progress);
+                
+                if (progress >= 100) {
+                  clearInterval(holdTimerRef.current);
+                  holdTimerRef.current = undefined;
+                  handleCapture();
+                }
+              }, 100);
+            }
+          } else {
+            if (holdTimerRef.current) {
+              clearInterval(holdTimerRef.current);
+              holdTimerRef.current = undefined;
+              setHoldProgress(0);
+            }
+          }
+  
+          // Draw detection box
+          context.strokeStyle = isAligned ? '#00FF00' : '#FF0000';
+          context.strokeRect(detection.x, detection.y, detection.width, detection.height);
+        } else {
+          if (holdTimerRef.current) {
+            clearInterval(holdTimerRef.current);
+            holdTimerRef.current = undefined;
+            setHoldProgress(0);
+          }
+        }
+      } catch (error) {
+        // If we get an error during detection, clear the interval and restart
+        console.error("Face detection error:", error);
+        clearInterval(detectionIntervalRef.current);
+        // Optional: attempt to restart detection after a short delay
+        setTimeout(() => {
+          if (isVideoReady && videoRef.current) {
+            startFaceDetection();
+          }
+        }, 1000);
+      }
+    }, 100);
+  };
+
   const handleCapture = async () => {
     if (!isModelsLoaded || !videoRef.current) return;
 
     setIsCapturing(true);
+    clearInterval(detectionIntervalRef.current);
+    clearInterval(holdTimerRef.current);
 
     const video = videoRef.current;
-
-    if (video.readyState !== 4) {
-      console.error("Video not ready for capture.");
-      toast.error("Video feed is not ready.");
-      setIsCapturing(false);
-      return;
-    }
-
-    const detections = await faceapi.detectAllFaces(videoRef.current);
-    // const detections = await faceapi.detectAllFaces(videoRef.current, new faceapi.TinyFaceDetectorOptions());
-    if (detections.length > 1) {
-      console.warn("Please make sure only one face is present.");
-      toast.warn("Please make sure only one face is present.");
-      setIsCapturing(false);
-      return;
-    }
-
     const captureCanvas = document.createElement("canvas");
     captureCanvas.width = video.videoWidth;
     captureCanvas.height = video.videoHeight;
     const captureContext = captureCanvas.getContext("2d");
-    if (captureContext === null) {
-      console.error("An error has occurred in getting context.");
-      toast.error("An error has occurred in getting context.");
+    
+    if (!captureContext) {
+      console.error("Failed to get canvas context");
       setIsCapturing(false);
       return;
     }
+
     captureContext.drawImage(video, 0, 0, captureCanvas.width, captureCanvas.height);
-
-    const imageData = captureContext.getImageData(0, 0, captureCanvas.width, captureCanvas.height);
-    let totalBrightness = 0;
-    for (let i = 0; i < imageData.data.length; i += 4) {
-      const r = imageData.data[i];
-      const g = imageData.data[i + 1];
-      const b = imageData.data[i + 2];
-      totalBrightness += (r + g + b) / 3;
-    }
-    const averageBrightness = totalBrightness / (captureCanvas.width * captureCanvas.height);
-    if (averageBrightness < 60) { // Threshold for darkness
-      console.warn("Please capture image on a well lit environment.");
-      toast.warn("Please capture image on a well lit environment.");
-      setIsCapturing(false);
-      return;
-    }
-
     const imageDataUrl = captureCanvas.toDataURL("image/png");
-    setLocalFormData({ imageUrl: imageDataUrl });
+    setImageUrl(imageDataUrl);
     setCapturedImage(imageDataUrl);
 
     try {
       const img = await faceapi.fetchImage(imageDataUrl);
-      const detections = await faceapi
-        .detectSingleFace(img)
-        .withFaceLandmarks()
+      const useTinyModel = true;
+      const detection = await faceapi
+        .detectSingleFace(img, new faceapi.TinyFaceDetectorOptions())
+        .withFaceLandmarks(useTinyModel)
         .withFaceDescriptor();
 
-      // const useTinyModel = true;
-      // const detections = await faceapi
-      //   .detectSingleFace(img, new faceapi.TinyFaceDetectorOptions())
-      //   .withFaceLandmarks(useTinyModel)
-      //   .withFaceDescriptor();
-
-      if (detections) {
-        setLocalFormData({ encoding: Array.from(detections.descriptor) });
+      if (detection) {
+        setLocalFormData({ 
+          encoding: Array.from(detection.descriptor) 
+        });
 
         if (canvasRef.current) {
           const canvas = canvasRef.current;
           const displaySize = { width: video.videoWidth, height: video.videoHeight };
           faceapi.matchDimensions(canvas, displaySize);
-          const resizedDetections = faceapi.resizeResults(detections, displaySize);
+          const resizedDetection = faceapi.resizeResults(detection, displaySize);
+          
           const context = canvas.getContext("2d");
           if (context) {
             context.clearRect(0, 0, canvas.width, canvas.height);
-            faceapi.draw.drawDetections(canvas, resizedDetections);
-            faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
+            faceapi.draw.drawDetections(canvas, resizedDetection);
+            faceapi.draw.drawFaceLandmarks(canvas, resizedDetection);
           }
         }
       } else {
-        console.warn("No face detected.");
-        toast.warn("No face detected. Please try again.");
+        toast.warn("No face detected in captured image. Please try again.");
+        handleReset();
       }
     } catch (error) {
       console.error("Error during face detection: ", error);
       toast.error("Face detection failed. Please try again.");
+      handleReset();
     }
 
     setIsCapturing(false);
@@ -171,6 +320,8 @@ const RegisterFace: React.FC<RegisterFaceProps> = () => {
   const handleReset = () => {
     setCapturedImage(null);
     setLocalFormData({ encoding: [] });
+    setHoldProgress(0);
+    
     if (canvasRef.current) {
       const context = canvasRef.current.getContext("2d");
       if (context) context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
@@ -190,8 +341,13 @@ const RegisterFace: React.FC<RegisterFaceProps> = () => {
         md:mx-0 md:space-y-4 lg:flex-row lg:space-x-20 lg:w-screen lg:px-40 lg:mt-12">
         <div className="md:w-full md:flex md:flex-row-reverse md:items-start">
           <div className="md:w-1/2 mb-4 md:mb-0 md:ml-4 relative">
-            <div className="bg-gray-200 rounded-lg max-w-md max-h-4xl w-full overflow-hidden">
-              {/* Webcam feed or Captured Image */}
+            <div className="rounded-lg max-w-md max-h-4xl w-full overflow-hidden">
+            <div className="mb-4">
+              <WebcamSelector 
+                onDeviceSelect={handleDeviceSelect}
+                currentDeviceId={selectedDeviceId}
+              />
+            </div>
               <div className="relative w-full h-0 pb-[75%] md:pb-[56.25%] lg:w-[448px] lg:h-[336px] lg:pb-0">
                 {capturedImage ? (
                   <>
@@ -214,12 +370,23 @@ const RegisterFace: React.FC<RegisterFaceProps> = () => {
                       muted
                       className="absolute top-0 left-0 w-full h-full object-cover rounded-lg"
                     />
-
-                    <div className="face-guide"></div>
+                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2
+                      w-32 h-40 sm:w-40 sm:h-48 md:w-48 md:h-56 lg:w-48 lg:h-64
+                      border-4 border-white border-opacity-70 rounded-full
+                      transition-all duration-300 ease-in-out" />
+                    {holdProgress > 0 && (
+                      <div className="absolute top-4 left-1/2 transform -translate-x-1/2 w-3/4">
+                        <div className="w-full bg-gray-200 rounded-full h-2.5">
+                          <div 
+                            className="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
+                            style={{ width: `${holdProgress}%` }}
+                          />
+                        </div>
+                      </div>
+                    )}
                   </>
                 )}
 
-                {/* Canvas Overlay */}
                 <canvas
                   ref={canvasRef}
                   className="absolute top-0 left-0 w-full h-full rounded-lg"
@@ -233,17 +400,8 @@ const RegisterFace: React.FC<RegisterFaceProps> = () => {
                 />
               </div>
 
-              {/* Capture and Reset Buttons */}
               <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-4">
-                {!capturedImage ? (
-                  <button
-                    onClick={handleCapture}
-                    disabled={isCapturing}
-                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full flex items-center justify-center"
-                  >
-                    <FaCamera className="size-3 md:size-2 lg:size-5 lg:m-1"/>
-                  </button>
-                ) : (
+                {capturedImage && (
                   <button
                     onClick={handleReset}
                     className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full flex items-center justify-center"
@@ -281,9 +439,9 @@ const RegisterFace: React.FC<RegisterFaceProps> = () => {
             </ul>
           </div>
         </div>
-          <p className="text-sm lg:text-base text-gray-600 mt-4 text-center">
-          Note: Please ensure the image is as clear as possible for optimal face recognition accuracy.
-          </p>
+        <p className="text-sm lg:text-base text-gray-600 mt-4 text-center">
+          Note: Please ensure your face is within the circle and hold still for 3 seconds.
+        </p>
       </div>
     </div>
   );
