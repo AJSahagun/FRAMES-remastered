@@ -29,7 +29,7 @@ export class UserService {
     const department= createUserDto.department
     const program= createUserDto.program
     const encoding= JSON.stringify(createUserDto.encoding)
-    const name= `${first_name} ${middle_name} ${last_name} ${suffix}`.trim()
+    const name= `${first_name} ${middle_name?middle_name+" ":""}${last_name} ${suffix}`.trim()
 
 
     const {error:saveError}= await this.saveUser(first_name, last_name, sr_code, middle_name, suffix, department, program);
