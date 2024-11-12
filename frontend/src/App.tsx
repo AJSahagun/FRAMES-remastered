@@ -220,7 +220,7 @@ export default function App() {
         <div className="p-4">
           <ul className="mt-4 space-y-3">
             <li><a href="/" className="block font-poppins text-lg text-center">Home</a></li>
-            <li><a href="/tutorial" className="block font-poppins text-lg text-center">Tutorial</a></li>
+            <li><a href="#" onClick={() => setShowGuideModal(true)} className="block font-poppins text-lg text-center">Tutorial</a></li>
             <li><a href="/techtonic" className="block font-poppins text-lg text-center">Techtonic</a></li>
           </ul>
         </div>
