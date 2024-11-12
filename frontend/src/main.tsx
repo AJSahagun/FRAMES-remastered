@@ -5,7 +5,7 @@ import { createBrowserRouter, RouterProvider} from 'react-router-dom';
 import './index.css'
 import App from './App';
 import Register from './pages/register/register-page';
-import RegistrationGuide from './pages/register/RegistrationGuide';
+// import Form from './components/RegistrationForm';
 
 const router = createBrowserRouter([
   {
@@ -16,10 +16,10 @@ const router = createBrowserRouter([
     path: 'register',
     element: <Register/>
   },
-  {
-    path: 'registrationguide',
-    element: <RegistrationGuide/>
-  }
+  // {
+  //   path: 'new-reg',
+  //   element: <Form/>
+  // }
 
 ])
 

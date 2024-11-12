@@ -1,12 +1,13 @@
 export interface UserRegistrationData {
   firstName: string;
-  middleName?: string;
+  middleName: string;
   lastName: string;
-  suffix?: string;
-  srCode: string;
+  suffix: string;
+  userCode: string;
   department: string;
   program: string;
   encoding: number[];
+  imageUrl: string; 
 }
 
 export interface ApiResponse<T> {
