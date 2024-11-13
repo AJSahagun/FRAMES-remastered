@@ -1,17 +1,17 @@
 import { CanActivate, ExecutionContext, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { Observable } from 'rxjs';
 import { Role } from '../config/role.enum';
-import { ROLES_KEY } from '../../core/decorators/roles/roles.decorator';
-import { ApiKeyService } from '../../core/services/api-key/api-key.service';
+import { ROLES_KEY } from '../decorators/roles/roles.decorator';
+import { ApiKeyService } from '../services/api-key/api-key.service';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
-  constructor(private readonly apiKeyService: ApiKeyService,
+  constructor(
+    private readonly apiKeyService: ApiKeyService,
     private readonly reflector:Reflector
   ) {}
 
-
+ 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const roles= this.reflector.get<Role[]>(ROLES_KEY, context.getHandler());
     const request= context.switchToHttp().getRequest()
@@ -23,10 +23,9 @@ export class RolesGuard implements CanActivate {
     const role= await this.apiKeyService.isApiKeyValid(apiKey)
 
     if(roles && roles.length > 0 && !roles.includes(role as Role)){
-      throw new UnauthorizedException('access denied')
+      throw new UnauthorizedException('Access is denied')
     }
     return true
-
   }
 
 }

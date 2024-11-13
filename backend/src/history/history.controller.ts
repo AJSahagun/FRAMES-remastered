@@ -3,7 +3,7 @@ import { HistoryService } from './history.service';
 import { CreateHistoryDto } from './dto/create-history.dto';
 import { Roles } from '../core/decorators/roles/roles.decorator';
 import { Role } from '../core/config/role.enum';
-import { RolesGuard } from '../core/roles/roles.guard';
+import { RolesGuard } from '../core/guards/roles.guard';
 
 @Controller('history')
 @UseGuards(RolesGuard)

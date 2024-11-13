@@ -5,7 +5,7 @@ import { Role } from '../core/config/role.enum';
 import { Roles } from '../core/decorators/roles/roles.decorator';
 import { CreateUserDto } from './dto/create-user.dto';
 import { CreateUserV2Dto } from './dto/create-user-v2.dto';
-import { RolesGuard } from '../core/roles/roles.guard';
+import { RolesGuard } from '../core/guards/roles.guard';
 import { handleError } from '../core/config/errors';
 
 @Controller('user')
