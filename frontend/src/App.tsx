@@ -82,7 +82,7 @@ export default function App() {
   };
 
   const handleExit = () => {
-    setShowGuideModal(false); 
+    window.location.href = '/';
   };
 
   const handleSkip = () => {
@@ -123,7 +123,7 @@ export default function App() {
 
       {showGuideModal && (
         <div className="min-h-screen flex items-center justify-center bg-background">
-          <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full h-[520px] flex flex-col justify-between relative">
+          <div className="bg-white m-8 p-8 rounded-lg shadow-lg max-w-md w-full h-[520px] flex flex-col justify-between relative">
             <button
               onClick={handleExit}
               className="absolute top-4 right-4 p-2 bg-gray-200 rounded-full hover:bg-gray-300 transition-colors duration-300"
