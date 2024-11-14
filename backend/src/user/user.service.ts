@@ -106,6 +106,18 @@ export class UserService {
     return await this.sql(`SELECT * FROM users`);
   }
 
+  async findOne(school_id:string): Promise<any>{
+    try {
+      const user = await this.sql(
+        `select * from users where school_id=$1`,[school_id],
+      );
+      if (user.length==0) return {error:404}
+      return user;
+    } catch (error) {
+      return {error}
+    }
+  }
+
   @OnEvent('syncEncodings')
   async findAllEncodings(latestId: number, callback: (result: any) => void) {
     try {

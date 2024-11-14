@@ -23,9 +23,9 @@ npm run start:dev
 ## API Reference
 You can use either local and prod api endpoints:
 
-For local: `API_URL: http://localhost:3001/api/`
+For local: `API_URL: http://localhost:3001/v-/api/`
 
-For prod: `API_URL: https://frames-nest.onrender.com/api/`
+For prod: `API_URL: https://frames-nest.onrender.com/v-/api/`
 
 #### Register an account with encodings
 
