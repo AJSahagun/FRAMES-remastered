@@ -3,6 +3,7 @@ import { useSliderStore } from './stores/useSliderStore';
 import { useImageStore } from './stores/useImageStore';
 import { useEffect, useMemo, useState } from 'react';
 import { FaTimes } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 
 export default function App() {
   const { isOpen, toggleSidebar } = useSidebarStore(); 
@@ -10,6 +11,7 @@ export default function App() {
   const { imagesLoaded, setImagesLoaded } = useImageStore();
   const [showGuideModal, setShowGuideModal] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
+  const navigate = useNavigate();
 
   const images = useMemo(() => [
     "images/face-scan-1.jpg",
@@ -86,11 +88,11 @@ export default function App() {
   };
 
   const handleSkip = () => {
-    window.location.href = '/register'; 
+    navigate('/register');
   };
 
   const handleRegister = () => {
-    window.location.href = '/register';
+    navigate('/register');
   };
 
   return (
@@ -104,7 +106,7 @@ export default function App() {
         </div>
         <div className="hidden w-2/3 md:flex flex-row justify-end items-center space-x-14 mt-8 mr-24 lg:ml-36 xl:mt-1 text-tc">
           <a href="/" className="w-auto"><p className="font-poppins">Home</p></a>
-          <a href="#" onClick={() => setShowGuideModal(true)} className="w-auto"><p className="font-poppins">Tutorial</p></a>
+          <a href="#tutorial" onClick={() => setShowGuideModal(true)} className="w-auto"><p className="font-poppins">Tutorial</p></a>
           <a href="/techtonic" className="w-auto"><p className="font-poppins" >Techtonic</p></a>
           <a href="/register" className="w-32">
             <button className="w-full bg-gradient-to-br from-accent to-btnBg text-background text-sm py-3 rounded-md font-poppins font-extralight shadow-lg hover:brightness-150 duration-300">
@@ -220,7 +222,7 @@ export default function App() {
         <div className="p-4">
           <ul className="mt-4 space-y-3">
             <li><a href="/" className="block font-poppins text-lg text-center">Home</a></li>
-            <li><a href="#" onClick={() => setShowGuideModal(true)} className="block font-poppins text-lg text-center">Tutorial</a></li>
+            <li><a href="#tutorial" onClick={() => setShowGuideModal(true)} className="block font-poppins text-lg text-center">Tutorial</a></li>
             <li><a href="/techtonic" className="block font-poppins text-lg text-center">Techtonic</a></li>
           </ul>
         </div>
