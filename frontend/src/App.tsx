@@ -3,7 +3,6 @@ import { useSliderStore } from './stores/useSliderStore';
 import { useImageStore } from './stores/useImageStore';
 import { useEffect, useMemo, useState } from 'react';
 import { FaTimes } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
 
 export default function App() {
   const { isOpen, toggleSidebar } = useSidebarStore(); 
@@ -11,7 +10,6 @@ export default function App() {
   const { imagesLoaded, setImagesLoaded } = useImageStore();
   const [showGuideModal, setShowGuideModal] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
-  const navigate = useNavigate();
 
   const images = useMemo(() => [
     "images/face-scan-1.jpg",
@@ -88,11 +86,11 @@ export default function App() {
   };
 
   const handleSkip = () => {
-    navigate('/register');
+    window.location.href = '/register';
   };
 
   const handleRegister = () => {
-    navigate('/register');
+    window.location.href = '/register';
   };
 
   return (
