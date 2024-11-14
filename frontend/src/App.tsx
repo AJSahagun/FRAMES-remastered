@@ -66,7 +66,7 @@ export default function App() {
       <div className="flex flex-row w-full justify-between items-center ">
         <div className="w-1/2 md:w-1/3">
         <a href="/">
-          <img className="mt-6 ml-6 md:w-1/2 lg:w-1/2 lg:ml-6 xl:w-1/3 xl:ml-12" src="/logos/FRAMES_title-logo.png" alt="FRAMES logo"  />
+          <img className="mt-6 ml-6 md:w-1/2 lg:w-2/3 lg:ml-10 lg:mt-4 xl:w-1/3 xl:ml-12" src="/logos/FRAMES_title-logo.png" alt="FRAMES logo"  />
         </a>
         </div>
         <div className="hidden w-2/3 md:flex flex-row justify-end items-center space-x-14 mt-8 mr-24 lg:ml-36 xl:mt-1 text-tc">
@@ -201,29 +201,37 @@ export default function App() {
           </div>
 
           {/* Text Content */}
-          <div className="flex flex-col justify-center mb-16 z-20 lg:mb-48 lg:mt-24 lg:pr-5 min-[430px]:px-2 -ml-6 ">
-            <div className="mb-5 text-3xl font-medium tracking-tight lg:tracking-tight font-poppins text-tc sm:text-6xl sm:leading-none lg:text-8xl lg:-space-y-2 fade-in-up ">  
+          <div className="relative justify-center mb-16 z-20 ml-2 md:ml-0 lg:mb-48 lg:mt-10 xl:mt-24 lg:pr-5 lg:ml-8 min-[430px]:px-2 xl:-ml-6 lg:mr-32">
+            <div className="mb-5 text-3xl font-medium tracking-tight lg:tracking-tight font-poppins text-tc min-[375px]:text-4xl
+            sm:text-6xl sm:leading-none md:text-7xl lg:-space-y-2 xl:text-8xl fade-in-up ">  
               <h2>Access the</h2>
               <h2>Campus Library</h2>
               <h2>with {' '}
-              <span className="inline-block text-400 text-primary font-aldrich lg:text-8xl">
+              <span className="inline-block text-400 text-primary font-aldrich lg:text-6xl xl:text-8xl">
                 FRAMES
               </span>
               </h2>
             </div>
-            <p className="pr-5 mb-5 font-light font-noto_sans md:text-lg fade-in-up">
-              Face Recognition Access Monitoring Enhanced System [FRAMES] is a ...
-            </p>
-            <div className="flex items-center">
-              <a href="/register">
-                <button className="inline-flex items-center justify-center h-12 px-6 mr-6 font-poppins font-medium tracking-wide text-white transition duration-300 rounded-md shadow-md bg-btnBg hover:brightness-110 hover:-translate-y-2 focus:shadow-outline focus:outline-none fade-in-up">
+            <div className="relative w-full">
+              <p className="pr-5 mb-5 font-light font-noto_sans md:text-lg lg:mx-0 fade-in-up">
+                Face Recognition Access Monitoring Enhanced System [FRAMES] is a ...
+              </p>
+
+            </div>
+            <div className="flex flex-col w-full md:flex-row mx-auto md:mx-4 space-y-3 md:space-y-0 pr-40 lg:mx-0">
+              <a href="/register" className='relative w-full lg:w-1/2 lg:mr-6'>
+                <button className="inline-flex items-center justify-center h-12 font-poppins font-medium tracking-wide px-8 w-full
+                text-white transition duration-300 rounded-md shadow-md bg-btnBg hover:brightness-110 hover:-translate-y-2 focus:shadow-outline focus:outline-none fade-in-up">
                   REGISTER NOW
                 </button>
 
               </a>
-              <button className="inline-flex items-center justify-center h-12 px-6 mr-6 font-poppins font-semibold tracking-wide bg-slate-200 text-accent bg-sf rounded-md shadow-md transition duration-500 hover:bg-slate-300 fade-in-up">
-                Learn more
-              </button>
+              <a href="" className='relative w-full lg:w-1/2 lg:mr-10'>
+                <button className="inline-flex items-center justify-center h-12   font-poppins font-semibold tracking-wide w-full 
+                bg-slate-200 text-accent bg-sf rounded-md shadow-md transition duration-500 hover:bg-slate-300 fade-in-up">
+                  Learn more
+                </button>
+              </a>
             </div>
             <div className="flex">
               <p className="mt-4 text-sm text-accent italic opacity-60 font-noto_sans xl:not-italic fade-in-up">

@@ -68,7 +68,7 @@ export const programOptions: Record<string, { value: string; label: string }[]> 
     { value: "MSTE", label: "MS in Transportation Engineering" },
     { value: "MSMSE", label: "MS Material Science and Engineering" },
     { value: "MUPD", label: "Master in Urban Planning and Design" },
-    { value: "PhDEE", label: "Doctor of Philosophy in Electronics Engineering" },
+    { value: "PhDECE", label: "Doctor of Philosophy in Electronics Engineering" },
     { value: "PhDEM", label: "Doctor of Philosophy in Engineering Management" },
     { value: "PhDEE", label: "Doctor of Philosophy in Engineering Education" }
   ],
