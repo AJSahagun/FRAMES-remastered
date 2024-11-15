@@ -214,6 +214,7 @@ const FaceRecognition: React.FC<FaceRecognitionProps> = ({ onSuccess }) => {
       if (detection) {
         const faceDescriptor = Array.from(detection.descriptor);
         onSuccess(faceDescriptor);
+        console.log(faceDescriptor);
       } else {
         toast.warn("No face detected. Please try again.");
       }
@@ -227,7 +228,7 @@ const FaceRecognition: React.FC<FaceRecognitionProps> = ({ onSuccess }) => {
   return (
     <div className="w-full">
       <ToastContainer />
-      <div className="relative w-full h-0 pb-[75%] md:pb-[56.25%] lg:w-[640px] lg:h-[480px] lg:pb-0 border-4 border-dashed border-primary rounded-lg bg-gray-300">
+      <div className="relative w-full h-0 pb-[75%] md:pb-[56.25%] lg:w-[400px] lg:h-[300px] xl:w-[640px] xl:h-[480px] lg:pb-0 border-4 border-dashed border-primary rounded-lg bg-gray-300">
         <video
           ref={videoRef}
           autoPlay
@@ -236,7 +237,7 @@ const FaceRecognition: React.FC<FaceRecognitionProps> = ({ onSuccess }) => {
         />
         
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2
-          w-48 h-64 sm:w-56 sm:h-72 md:w-64 md:h-80 lg:w-72 lg:h-96
+          lg:w-48 lg:h-64 xl:w-72 xl:h-96
           border-4 border-white border-opacity-70 rounded-full
           transition-all duration-300 ease-in-out" 
         />

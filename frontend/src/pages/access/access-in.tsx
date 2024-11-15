@@ -36,13 +36,14 @@ export default function Access_IN() {
 
   const handleFaceRecognition = async (faceDescriptor: number[]) => {
     try {
-      // Here you would typically:
-      // 1. Send the face descriptor to your backend
-      // 2. Compare it with stored face descriptors
-      // 3. Get the matching user code
-      // 4. Process the check-in
+      // Process for Access in:
+      // 1. Get request of face encodings from local db using 'school_id' (Sr-Code)
+      // 2. Compare it with detected face descriptors
+      // 3. If not match end, else get user name and display success
+      // 4. Send post request in history (Local db) and update occupancy count
+      // 5. Save face encodings and sr code in local db occupants table for check out later
       
-      // Example API call (you'll need to implement this):
+      // Sample API call (Implement this using axios)
       const response = await fetch('/api/face-recognition', {
         method: 'POST',
         headers: {
