@@ -38,7 +38,8 @@ export class UserGateway {
   }
 
   @OnEvent('onRegister')
-  handleUserCreated(idAi:number, name:string, schoolId:string, encoding:string){
-    this.server.emit('onMessage', {idAi, name, schoolId, encoding});
+  handleUserCreated(payload: { idAi: number, name: string, school_id: string, encoding: number[] }){
+    const { idAi, name, school_id, encoding } = payload;
+    this.server.emit('onMessage', {idAi, name, school_id, encoding});
   }
 }
