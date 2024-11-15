@@ -1,19 +1,10 @@
 import { useContext, useEffect, useState } from "react";
-import { WebSocketContext } from "../context/WebSocketContext";
+import { WebSocketContext } from "../contexts/WebSocketContext";
+import { useEncodingsStore } from "../../../stores/useEncodingStore";
 import { useLiveQuery } from "dexie-react-hooks";
-import { useEncodingsStore } from "../EncodingStore";
-import { db } from "../db";
+import { db } from "../../../config/db";
+import { EncodingResponse } from "../../../types/db.types";
 
-  type ResponseType = {
-    message: string;
-    newEncoding: EncodingType;
-  };
-  type EncodingType = {
-    idAi: number;
-    name: string;
-    encoding: number[];
-    schoolId: string;
-  };
 
 export const useSync = () => {
   const socket = useContext(WebSocketContext);
@@ -21,7 +12,7 @@ export const useSync = () => {
   const encodings = useLiveQuery(() => db.encodings.toArray());
   const [isConnected, setIsConnected] = useState(socket.connected);
 
-  const onSync = (data: EncodingType[]) => {
+  const onSync = (data: EncodingResponse[]) => {
     data.map((encoding) =>
       addEncoding(
         encoding.idAi,
@@ -55,7 +46,6 @@ export const useSync = () => {
       console.log("Failed to fetch latest encoding");
     }
     console.log("Connected");
-    console.log(encodings)
   };
   const onDisconnect = () => {
     setIsConnected(false);
@@ -64,24 +54,18 @@ export const useSync = () => {
   const onMessage = (data: any) => {
     encodingStore.setEncodings(data);
     addEncoding(data.id_ai, data.name, data.school_id, data.encoding);
-    console.log(data);
+    console.log("new encoding: "+data);
   };
-  const onDeleteStale=(idAi:number[])=>{
-    console.log("need to magremove the stale")
-    console.log(idAi)
-  }
 
   useEffect(() => {
     socket.on("connect", onConnect);
     socket.on("onMessage", onMessage); // server to client after registration
-    socket.on("onDeleteStale", onDeleteStale); // delete stale records to localdb
     socket.on("onSync", onSync);
     socket.on("disconnect", onDisconnect);
     return () => {
       console.log("Unregistering");
       socket.off("connect", onConnect);
       socket.off("onMessage", onMessage);
-      socket.off("onDeleteStale", onDeleteStale);
       socket.off("onSync", onSync);
       socket.off("disconnect", onDisconnect);
     };

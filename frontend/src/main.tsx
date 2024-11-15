@@ -7,6 +7,7 @@ import App from './App';
 import Register from './pages/register/register-page';
 import Access_IN from './pages/access/access-in';
 import Access_OUT from './pages/access/access-out';
+import Access from './pages/access/Access';
 // import Form from './components/RegistrationForm';
 
 const router = createBrowserRouter([
@@ -17,6 +18,10 @@ const router = createBrowserRouter([
   {
     path: 'register',
     element: <Register/>
+  },
+  {
+    path: '/access',
+    element: <Access/>
   },
   {
     path: '/access/in',

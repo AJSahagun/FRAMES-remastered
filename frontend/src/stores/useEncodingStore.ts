@@ -1,8 +1,7 @@
 import { create } from "zustand";
-import { EncodingType } from "./types/EncodingType";
 
-type EncodingStore = EncodingType & {
-  setEncodings: (encoding: EncodingType) => void;
+type EncodingStore = any & {
+  setEncodings: (encoding: any) => void;
   resetEncodings: () => void;
 };
 
@@ -11,7 +10,7 @@ export const useEncodingsStore = create<EncodingStore>()((set) => ({
   schoolId: "",
   encoding: "",
 
-  setEncodings: (encoding:EncodingType) => {
+  setEncodings: (encoding:any) => {
     set({
       name: encoding.name,
       schoolId: encoding.schoolId,

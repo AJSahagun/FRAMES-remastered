@@ -7,15 +7,22 @@ type Encodings ={
   encoding: number[];
 }
 
+type Occupants ={
+  id: number;
+  name: string;
+  schoolId: string;
+  timeIn: string;
+}
+
 const db = new Dexie('frames') as Dexie & {
-  encodings: EntityTable<
-    Encodings
-  >;
+  encodings: EntityTable<Encodings>;
+  occupants: EntityTable<Occupants>;
 };
 
 // Schema declaration:
 db.version(1).stores({
-  encodings: '++id, name, schoolId, encoding' // primary key "id" (for the runtime!)
+  encodings: '++id, name, schoolId, encoding',
+  occupants: '++id, name, schoolId, timeIn'
 });
 
 export type { Encodings };

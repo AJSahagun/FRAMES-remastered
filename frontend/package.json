@@ -17,6 +17,8 @@
     "@next/font": "^14.2.9",
     "@vladmandic/face-api": "^1.7.14",
     "axios": "^1.7.7",
+    "dexie": "^4.0.9",
+    "dexie-react-hooks": "^1.1.7",
     "formik": "^2.4.6",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -25,6 +27,7 @@
     "react-select": "^5.8.1",
     "react-spinners": "^0.14.1",
     "react-toastify": "^10.0.5",
+    "socket.io-client": "^4.8.1",
     "yup": "^1.4.0",
     "zustand": "^4.5.5"
   },
