@@ -84,7 +84,7 @@ describe('UserService', () => {
       const expectedName = `${mockCreateUserDto.firstName} ${mockCreateUserDto.middleName} ${mockCreateUserDto.lastName} ${mockCreateUserDto.suffix}`.trim();
       expect(service.syncEncoding).toHaveBeenCalledWith(
         expectedName,
-        JSON.stringify(mockCreateUserDto.encoding),
+        mockCreateUserDto.encoding,
         mockCreateUserDto.srCode,
       );
     });
@@ -123,7 +123,7 @@ describe('UserService', () => {
       const expectedName = 'firstname lastname';
       expect(service.syncEncoding).toHaveBeenCalledWith(
         expectedName,
-        JSON.stringify(userWithoutOptionals.encoding),
+        userWithoutOptionals.encoding,
         userWithoutOptionals.srCode,
       );
     });
