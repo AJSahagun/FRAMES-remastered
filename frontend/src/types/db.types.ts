@@ -5,6 +5,7 @@ type Encodings = {
 };
 
 type Occupants = {
+  id: number;
   name: string;
   schoolId: string;
   timeIn: string;
