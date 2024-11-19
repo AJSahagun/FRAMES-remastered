@@ -61,7 +61,7 @@ export default function App() {
   }, [images, setImagesLoaded]);
 
   return (
-    <div className="relative w-full max-h-screen overflow-y-hidden">
+    <div className="relative w-full max-h-screen lg:overflow-y-hidden">
       {/* Navbar */}
       <div className="flex flex-row w-full justify-between items-center ">
         <div className="w-1/2 md:w-1/3">
