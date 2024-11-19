@@ -33,71 +33,72 @@ export default function Access_OUT() {
 	  }, []); // Empty dependency array, meaning this effect runs only once when the component mounts
 
 	const date = new Date().toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'short', });
+	const currentTime = new Date().toLocaleTimeString();
 
 	const handleFaceRecognition = async (faceDescriptor: number[]) => {
-    try {
-      // Process for Access out:
-      // 1. Search for similar face descriptors in occupants table
-      // 2. If none: return, else patch request time_out
-			// 3. Drop row in occupants table
-      
-      // Sample API call (Implement this using axios)
-      const response = await fetch('/api/face-recognition', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ faceDescriptor }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Face recognition failed');
-      }
-
-	  const data = {
-        "id": 6,
-        "name": "Bini",
-        "schoolId": "80-10190",
-       };
-      
-      // Check if the occupant is found
-      if (data && data.id) {
-        // 1. Successful recognition: Show success toast
-        toast.success(`Goodbye ${data.name}!`);
-
-        // 2. Delete the occupant from IndexedDB using their ID
-		await db.occupants
-		.where('id')
-		.equals(data.id)
-		.delete();  
-
-        // 3. Update the occupant count after deletion
-        const updatedCount = await db.occupants.count(); // Get the new occupant count
-        setOccupantCount(updatedCount);
-
-		// const response = await fetch('/api/v2/history', {
-		// 	method: 'POST',
-		// 	headers: {
-		// 	  'Content-Type': 'application/json',
-		// 	},
-		// 	body: JSON.stringify({ faceDescriptor }),
-		//   });
+		try {
+		  // 1. Search for the occupant based on the faceDescriptor (for example, a database lookup)
+		  const response = await fetch('/api/face-recognition', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ faceDescriptor }),
+		  });
 	
-		//   if (!response.ok) {
-		// 	throw new Error('Face recognition failed');
-		//   }
-
-        // Optionally, show a toast with the updated count (or just update the state)
-        toast.info(`Remaining Occupants: ${updatedCount}`);
-      } else {
-        toast.error('No matching occupant found.');
-      }
-    } catch (error) {
-      console.error('Face recognition error:', error);
-      toast.error('Face recognition failed. Please try again or use your code.');
-    }
-  };
-
+		  if (!response.ok) {
+			throw new Error('Face recognition failed');
+		  }
+	
+		  const data = await response.json();  // Assume the API returns the matched occupant data
+	
+		  // 2. Check if an occupant was found (this step assumes your response returns the occupant data)
+		  if (data && data.id) {
+			const { id, name, schoolId, timeIn } = data;
+	
+			// 3. Set the timeOut to the current time
+			const timeOut = currentTime;
+			// 4. Store schoolId, timeIn, and timeOut in variables
+			const historyData = {
+			  schoolId,
+			  timeIn,
+			  timeOut,
+			  name,
+			  date: new Date().toLocaleDateString(),
+			};
+	
+			// 5. Call the /api/v2/history API to push the data to the history table
+			const historyResponse = await fetch('/api/v2/history', {
+			  method: 'POST',
+			  headers: {
+				'Content-Type': 'application/json',
+			  },
+			  body: JSON.stringify(historyData),
+			});
+	
+			if (!historyResponse.ok) {
+			  throw new Error('Failed to record history');
+			}
+	
+			// 6. Successfully recorded history; now delete the occupant from the IndexedDB table
+			await db.occupants.where('id').equals(id).delete();
+	
+			// 7. Update the occupant count after deletion
+			const updatedCount = await db.occupants.count(); // Get the new occupant count
+			setOccupantCount(updatedCount);
+	
+			// 8. Show success toasts for checkout
+			toast.success(`Goodbye ${name}!`);
+			toast.info(`Remaining Occupants: ${updatedCount}`);
+	
+		  } else {
+			// 9. No matching occupant found
+			toast.error('No matching occupant found.');
+		  }
+		} catch (error) {
+		  console.error('Face recognition error:', error);
+		  toast.error('Face recognition failed. Please try again or use your code.');
+		}
+	  };
+	
 
 	return (
 		<div className="flex flex-col">
