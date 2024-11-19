@@ -34,9 +34,6 @@
   
 }}
 
-/* fonts */
-
-
 
 body {
   /* margin: 0;
@@ -53,6 +50,35 @@ h1 {
   font-size: 2em;
   font-weight: 600;
   word-spacing: 3%;
+}
+
+/* app */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in-up {
+  animation: fadeInUp 1s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.fade-in {
+  animation: fadeIn 1s ease-out;
 }
 
 
