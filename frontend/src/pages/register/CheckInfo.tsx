@@ -23,6 +23,7 @@ const CheckInfo: React.FC<CheckInfoProps> = () => {
     localStorage.removeItem('formData');
   };
 
+  // TODO: something is wrong with the form data, it's not being passed to the handleSubmit function
   const handleSubmit = async (formData: UserRegistrationData) => {
     console.log('Form submitted');
     try {

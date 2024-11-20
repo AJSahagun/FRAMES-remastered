@@ -15,9 +15,11 @@ export const srCodeRegex = /^(2\d-\d{5}$)/;
 
 export const validationSchema = Yup.object({
   firstName: Yup.string().required('First Name is required').min(3, 'First Name must be at least 3 characters').matches(/^[A-Za-z ]+$/, 'First Name should not contain numbers'),
-  middleName: Yup.string().required('Middle Name is required').min(3, 'Middle Name must be at least 3 characters').matches(/^[A-Za-z ]+$/, 'Middle Name should not contain numbers'),
+  middleName: Yup.string().required('Middle Name is required').min(3, 'Middle Name must be at least 3 characters').matches(/^[A-Za-z ]+$/, 'Middle Name should not contain numbers')
+  .nullable(),
   lastName: Yup.string().required('Last Name is required').min(3, 'Last Name must be at least 3 characters').matches(/^[A-Za-z ]+$/, 'Last Name should not contain numbers'),
-  suffix: Yup.string().matches(/^[A-Za-z]*$/, 'Suffix should not contain numbers'),
+  suffix: Yup.string().matches(/^[A-Za-z ]*$/, 'Suffix should not contain numbers')
+  .nullable(),
   userCode: Yup.string()
     .required('This field is required')
     .matches(userCodeRegex, 'Example format: "20-12345" or "P-12345"')
