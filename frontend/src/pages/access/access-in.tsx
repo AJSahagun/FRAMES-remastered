@@ -29,30 +29,38 @@ export default function Access_IN() {
   const [occupantCount, setOccupantCount] = useState<number>(0); // State to hold the count of occupants
   const [isConnected, encodings] = useSync()
 
+  // Function to fetch the count of occupants from IndexedDB
+  const fetchOccupantCount = async () => {
+    try {
+      const allOccupants = await db.occupants.toArray();
+      const checkedOutOccupants = allOccupants.filter(occupant => occupant.timeOut);
+      const currentOccupantCount = allOccupants.length - checkedOutOccupants.length; 
+      setOccupantCount(currentOccupantCount);
+    } catch (error) {
+      console.error('Error fetching occupant count:', error); 
+    }
+  };
+
   useEffect(() => {
     // 1. Timer that updates the time every second
     const timer = setInterval(() => {
       setTime(new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }));
     }, 1000);
   
-    // 2. Function to fetch the count of occupants from IndexedDB
-    const fetchOccupantCount = async () => {
-      try {
-        const count = await db.occupants.count(); // Get count from IndexedDB
-        setOccupantCount(count); // Update state with the count
-      } catch (error) {
-        console.error('Error fetching occupant count:', error); // Log any error
-      }
+    // 2. Fetch the initial occupant count and poll every 1 second for updates
+    fetchOccupantCount(); 
+    const interval = setInterval(() => {
+      fetchOccupantCount(); 
+    }, 1000); 
+  
+    // 3. Cleanup function to clear both the timer and the polling interval when the component unmounts
+    return () => {
+      clearInterval(timer); 
+      clearInterval(interval); 
     };
-  
-    fetchOccupantCount(); // Fetch occupant count when the component mounts
-  
-    // 3. Cleanup function to clear the timer when the component unmounts
-    return () => clearInterval(timer);
-  }, []); // Empty dependency array, meaning this effect runs only once when the component mounts
-  
+  }, []); 
 
-  const date = new Date().toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'short', });
+  const date = new Date().toISOString()
   const currentTime = new Date().toLocaleString();
 
   const handleFaceRecognition = async (faceDescriptor: number[]) => {
@@ -82,7 +90,7 @@ export default function Access_IN() {
         name: data.name, 
         schoolId: data.schoolId, 
         timeIn: currentTime,
-        timeOut: "",
+        timeOut: null,
       });
       
       // You might want to update the occupancy count here

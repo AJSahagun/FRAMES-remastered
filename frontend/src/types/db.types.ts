@@ -9,16 +9,26 @@ type Occupants = {
   name: string;
   schoolId: string;
   timeIn: string;
+  timeOut: string | null;  
 };
 
 type ResponseType = {
   message: string;
   newEncoding: EncodingResponse;
 };
+
 type EncodingResponse = {
   idAi: number;
   name: string;
-  encoding: number[];
+  encoding: number[];  
   schoolId: string;
 };
+
 export type { Encodings, Occupants, ResponseType, EncodingResponse };
+
+export interface ApiResponse<T> {
+  data: T;
+  message: string;
+  status: number;
+  success: boolean;
+}

@@ -12,7 +12,7 @@ type Occupants ={
   name: string;
   schoolId: string;
   timeIn: string;
-  timeOut: string;
+  timeOut: string | null;
 }
 
 const db = new Dexie('frames') as Dexie & {
