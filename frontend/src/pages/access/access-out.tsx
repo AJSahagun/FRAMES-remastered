@@ -4,8 +4,6 @@ import { useEffect, useState } from 'react';
 import FaceRecognition from '../../components/FaceRecognition';
 import { toast } from 'react-toastify';
 import { db } from '../../config/db';
-import { HistoryService } from '../../services/historyService';
-import { Occupants } from '../../types/db.types';
 import { useBulkRequest } from './hooks/useBulkRequest';
 import { findBestMatch } from '../../services/faceMatchService';
 
@@ -46,7 +44,6 @@ export default function Access_OUT() {
   }, [latestRequestTime]); 
 
   const date = new Date().toISOString();
-  const currentTime = new Date().toLocaleTimeString();
 
   const handleFaceRecognition = async (faceDescriptor: number[]) => {
     const match = await findBestMatch(faceDescriptor);
