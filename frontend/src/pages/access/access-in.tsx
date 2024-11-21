@@ -61,6 +61,14 @@ export default function Access_IN() {
     };
   }, []); 
 
+  useEffect(() => {
+    if (isConnected) {
+      toast.success('Connected to the server');
+    } else {
+      toast.error('Disconnected from the server');
+    }
+  }, [isConnected]); 
+
   const date = new Date().toISOString()
 
   const handleFaceRecognition = async (faceDescriptor: number[]) => {
@@ -141,15 +149,24 @@ export default function Access_IN() {
                 <FaceRecognition onSuccess={handleFaceRecognition} isCheckIn={true} />
               </div>
               {/* clock */}
-              <div className="w-max ml-24 mt-6">
-                <p className="font-poppins text-6xl font-[500] gradient-text tracking-wide">
-                  {time}
-                </p>
-                <p className="font-poppins text-xl -mt-2 font-medium gradient-text tracking-wide">
-                  {date}
-                </p>
+              <div className="flex justify-between w-full ml-24 mt-6">
+                <div>
+                  <p className="font-poppins text-6xl font-[500] gradient-text tracking-wide">
+                    {time}
+                  </p>
+                  <p className="font-poppins text-xl -mt-2 font-medium gradient-text tracking-wide">
+                    {date}
+                  </p>
+                </div>
+                <div className="flex items-start mt-1 mr-8">
+                  <div className={`flex items-center space-x-2 ${isConnected ? 'text-green-500' : 'text-primary'}`}>
+                    <span className="font-poppins text-xl">{isConnected ? 'Online' : 'Offline'}</span>
+                    <div className={`w-4 h-4 rounded-full ${isConnected ? 'bg-green-500' : 'bg-btnBg'}`} />
+                  </div>
+                </div>
               </div>
             </div>
+
 
             {/* right */}
 						<div className="w-1/2">
@@ -176,15 +193,8 @@ export default function Access_IN() {
 								</p>
 								<h2 className="font-noto_sans font-semibold text-5xl text-accent">OCCUPANTS</h2>
 							</div>
-              <div>
-                {isConnected ? <h1>Connected</h1> : <h1>Disconnected</h1>}
-              </div>
-
 						</div>
-
-					</div>
-
-
+					</div>      
 				</div>
 			</Form>
 		</Formik>

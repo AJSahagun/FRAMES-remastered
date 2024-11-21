@@ -6,11 +6,13 @@ import { toast } from 'react-toastify';
 import { db } from '../../config/db';
 import { useBulkRequest } from './hooks/useBulkRequest';
 import { findBestMatch } from '../../services/faceMatchService';
+import { useSync } from './hooks/useSync';
 
 export default function Access_OUT() {
   const [time, setTime] = useState(new Date().toLocaleTimeString());
   const [occupantCount, setOccupantCount] = useState<number>(0); 
   const [rows, latestRequestTime]= useBulkRequest();
+  const [isConnected] = useSync()
 
   const fetchOccupantCount = async () => {
     try {
@@ -42,6 +44,14 @@ export default function Access_OUT() {
       clearInterval(interval); 
     };
   }, [latestRequestTime]); 
+
+  useEffect(() => {
+    if (isConnected) {
+      toast.success('Connected to the server');
+    } else {
+      toast.error('Disconnected from the server');
+    }
+  }, [isConnected]); 
 
   const date = new Date().toISOString();
 
@@ -97,15 +107,23 @@ export default function Access_OUT() {
             <FaceRecognition onSuccess={handleFaceRecognition} isCheckIn={false} />
           </div>
           {/* clock */}
-          <div className="w-max ml-24 mt-6">
-            <p className="font-poppins text-6xl font-[500] gradient-text tracking-wide">
-              {time}
-            </p>
-            <p className="font-poppins text-xl -mt-2 font-medium gradient-text tracking-wide">
-              {date}
-            </p>
+          <div className="flex justify-between w-full ml-24 mt-6">
+            <div>
+              <p className="font-poppins text-6xl font-[500] gradient-text tracking-wide">
+                {time}
+              </p>
+              <p className="font-poppins text-xl -mt-2 font-medium gradient-text tracking-wide">
+                {date}
+              </p>
+            </div>
+              <div className="flex items-start mt-1 mr-8">
+                <div className={`flex items-center space-x-2 ${isConnected ? 'text-green-500' : 'text-primary'}`}>
+                  <span className="font-poppins text-xl">{isConnected ? 'Online' : 'Offline'}</span>
+                  <div className={`w-4 h-4 rounded-full ${isConnected ? 'bg-green-500' : 'bg-btnBg'}`} />
+                  </div>
+                </div>
+              </div>
           </div>
-        </div>
 
         {/* right */}
         <div className="w-1/2 flex flex-col justify-center">
