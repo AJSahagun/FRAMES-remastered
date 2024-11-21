@@ -80,8 +80,8 @@ const TermsOfService = ({ isOpen, onAgree, onDisagree }: TermsOfServiceProps) =>
         const termsData = await termsService.getTermsOfService();
         setTerms(termsData);
       } catch (error) {
-        console.error('Failed to fetch terms from API:', error);
-        toast.error('Using offline terms of service');
+        console.warn('Failed to fetch terms from API:', error);
+        toast.warning('Using offline terms of service');
         setTerms(fallbackTerms);
       } finally {
         setIsLoading(false);

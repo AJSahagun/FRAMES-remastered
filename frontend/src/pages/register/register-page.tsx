@@ -1,4 +1,4 @@
-// register-page.tsx
+import { useState } from 'react';
 import { useRegistrationStore } from "./stores/useRegistrationStore";
 import { usePaginationStore } from "./stores/usePaginationStore";
 import Pagination from "../../components/Pagination";
@@ -8,10 +8,23 @@ import FosterWeelerTag from '../../components/FosterWheelerTag';
 
 import InputInfo from "./InputInfo";
 import { useFormStore } from "./stores/useFormStore";
+import RegistrationGuide from "../../components/RegistrationGuide";
 
 export default function Register() {
   const { currentPage, nextPage, prevPage } = usePaginationStore();
   const { formData, localFormData, submitForm } = useRegistrationStore();
+
+  const [showGuide, setShowGuide] = useState(true);
+  
+  const handleGuideClose = () => {
+    setShowGuide(false);
+    // Placeholder if added logic for close
+  };
+  
+  const handleGuideProceed = () => {
+    setShowGuide(false);
+    // Placeholder if added logic for proceed
+  };
   const { isFormValid } = useFormStore();
 
   const handleNextClick = () => {
@@ -25,6 +38,11 @@ export default function Register() {
 
   return (
     <div className="relative w-full min-h-screen flex flex-col justify-between bg-background">
+      <RegistrationGuide 
+        isOpen={showGuide}
+        onClose={handleGuideClose}
+        onProceed={handleGuideProceed}
+      />
       <FosterWeelerTag />
 
       <div className="flex flex-col items-center lg:items-start">

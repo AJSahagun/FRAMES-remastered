@@ -25,6 +25,7 @@ const CheckInfo: React.FC<CheckInfoProps> = () => {
     localStorage.removeItem('formData');
   };
 
+  // TODO: something is wrong with the form data, it's not being passed to the handleSubmit function
   const handleSubmit = async (formData: UserRegistrationData) => {
     console.log('Form submitted');
     try {
@@ -33,6 +34,12 @@ const CheckInfo: React.FC<CheckInfoProps> = () => {
       console.log('Registration successful:', response);
       toast.success('Your information has been submitted successfully.');
       resetForm();
+      clearLocalStorage();
+      if (!localStorage.getItem('formData')) {
+        console.log('Form data cleared from localStorage');
+      } else {
+        console.error('Failed to clear form data from localStorage');
+      }
       clearLocalStorage();
       if (!localStorage.getItem('formData')) {
         console.log('Form data cleared from localStorage');
@@ -68,7 +75,6 @@ const CheckInfo: React.FC<CheckInfoProps> = () => {
     } else {
       toast.error('Please fill in all fields before submitting.');
     }
-    
   };
   
 
@@ -103,7 +109,7 @@ const CheckInfo: React.FC<CheckInfoProps> = () => {
   return (
     <div className="w-full relative justify-center items-center">
       <div className="text-center">
-        <h1 className="text-tc font-poppins md:text-5xl lg:mt-2">Confirmation</h1>
+      <h1 className="text-tc font-poppins md:text-5xl lg:mt-2">Confirmation</h1>
       </div>
       <ToastContainer position="top-center"/>
 
@@ -117,7 +123,7 @@ const CheckInfo: React.FC<CheckInfoProps> = () => {
 
       <div className="space-y-3 flex flex-col justify-center items-center w-full lg:space-y-4">
         {(filteredFormData).map(([key, value]) => (
-            key=='imageUrl'? null :(
+          key=='imageUrl'? null :(
             value !== '' && (
               <div key={key} className="flex flex-col mt-4 mx-12 w-4/5 lg:flex-row lg:w-full lg:mt-7">
                 <span className="font-semibold text-tc w-full">{key.charAt(0).toUpperCase() + key.slice(1)}</span>
@@ -176,7 +182,7 @@ const CheckInfo: React.FC<CheckInfoProps> = () => {
         <div className="fixed inset-0 flex items-center justify-center bg-card bg-opacity-50">
           <div className="bg-white px-8 py-6 rounded-lg shadow-md">
             <h3 className="text-lg font-bold mb-2 text-tc">Are you sure all the information you provided are correct?</h3>
-            <div className="flex justify-end space-x-4"> 
+            <div className="flex justify-end space-x-4">
               <button
                 onClick={() => setShowConfirmDialog(false)}
                 className="px-4 py-2 bg-gray-200 text-tc rounded hover:bg-gray-300 transition-colors"
