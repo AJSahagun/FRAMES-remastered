@@ -36,18 +36,14 @@ const CheckInfo: React.FC<CheckInfoProps> = () => {
     } else if (userCodeFormat2.test(formData.userCode)) {
       // For 'P-ddddd' format, 'department' and 'program' are optional
     } else {
-      // If userCode doesn't match any format, it's invalid
       return false;
     }
   
-    // Check required fields
     const requiredFields = ['firstName', 'middleName', 'lastName', 'userCode', 'encoding'];
     for (const field of requiredFields) {
       if (!formData[field as keyof UserRegistrationData]) return false;
     }
-  
-    // If all validations pass, return true
-    return true;
+    return true; // All checks passed
   };  
 
   const handleSubmit = async (formData: UserRegistrationData) => {
