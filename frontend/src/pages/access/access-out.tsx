@@ -45,14 +45,6 @@ export default function Access_OUT() {
     };
   }, [latestRequestTime]); 
 
-  useEffect(() => {
-    if (isConnected) {
-      toast.success('Connected to the server');
-    } else {
-      toast.error('Disconnected from the server');
-    }
-  }, [isConnected]); 
-
   const date = new Date().toISOString();
 
   const handleFaceRecognition = async (faceDescriptor: number[]) => {
