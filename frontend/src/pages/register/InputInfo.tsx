@@ -1,5 +1,4 @@
-// InputInfo.tsx
-import React,{ useEffect } from "react";
+import React from "react";
 import { useRegistrationStore } from "./stores/useRegistrationStore";
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import Dropdown from "../../components/Dropdown";
@@ -28,10 +27,6 @@ const InputInfo: React.FC<InputInfoProps> = ({ onNext }) => {
   } = useRegistrationStore();
   const { isFormValid, validateForm } = useFormStore();
 
-  useEffect(() => {
-    validateForm(localFormData);
-  }, [localFormData, validateForm]);
-
   const handleSubmit = (values: UserRegistrationData) => {
     setLocalFormData(values);
     validateForm(values);
@@ -45,20 +40,18 @@ const InputInfo: React.FC<InputInfoProps> = ({ onNext }) => {
     option: DropdownOption,
     setFieldValue: (field: string, value: string) => void
   ) => {
-    setSelectedDept(option.value); // Store selected department by value
-    setFieldValue('department', option.value); // Set form field to value
-    setFieldValue('program', ''); // Reset program selection
-    setSelectedProgram(programOptions[option.value] || []); // Update available programs
+    setSelectedDept(option.value);
+    setFieldValue('department', option.value);
+    setFieldValue('program', '');
+    setSelectedProgram(programOptions[option.value] || []);
   };
   
   const handleProgramChange = (
     option: DropdownOption,
     setFieldValue: (field: string, value: string) => void
   ) => {
-    setFieldValue('program', option.value); // Store selected program by value
+    setFieldValue('program', option.value);
   };
-  
-  
 
   return (
     <Formik
@@ -66,8 +59,13 @@ const InputInfo: React.FC<InputInfoProps> = ({ onNext }) => {
       enableReinitialize
       validationSchema={validationSchema}
       onSubmit={handleSubmit}
+      validate={(values) => {
+        // Trigger form validation in store immediately
+        validateForm(values);
+        return {}; // Return empty object to avoid Formik validation warning
+      }}
     >
-      {({ setFieldValue, values, isValid }) => (
+      {({ setFieldValue, values }) => (
         <Form className="w-full flex flex-col relative items-center">
           <div className="text-center">
             <h1 className="text-tc font-poppins md:text-5xl lg:mt-2 lg:mb-10">Registration</h1>
@@ -150,7 +148,7 @@ const InputInfo: React.FC<InputInfoProps> = ({ onNext }) => {
                 : "bg-btnBg opacity-50 cursor-not-allowed"
             }`}
             type="submit"
-            disabled={!isValid}
+            disabled={!isFormValid}
           >
             Next
           </button>
