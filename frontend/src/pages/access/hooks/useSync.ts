@@ -32,6 +32,7 @@ export const useSync = () => {
   }
   const onConnect = async () => {
     setIsConnected(true);
+    console.clear();
     try {
       const recentEncoding = await db.encodings
         .toCollection()

@@ -6,10 +6,13 @@ import { toast } from 'react-toastify';
 import { db } from '../../config/db';
 import { HistoryService } from '../../services/historyService';
 import { Occupants } from '../../types/db.types';
+import { useBulkRequest } from './hooks/useBulkRequest';
+import { findBestMatch } from '../../services/faceMatchService';
 
 export default function Access_OUT() {
   const [time, setTime] = useState(new Date().toLocaleTimeString());
   const [occupantCount, setOccupantCount] = useState<number>(0); 
+  const [rows, latestRequestTime]= useBulkRequest();
 
   const fetchOccupantCount = async () => {
     try {
@@ -33,69 +36,41 @@ export default function Access_OUT() {
     const interval = setInterval(() => {
       fetchOccupantCount(); 
     }, 1000); 
+    console.log(rows+": "+latestRequestTime)
   
     // 3. Cleanup function to clear both the timer and the polling interval when the component unmounts
     return () => {
       clearInterval(timer); 
       clearInterval(interval); 
     };
-  }, []); 
+  }, [latestRequestTime]); 
 
   const date = new Date().toISOString();
   const currentTime = new Date().toLocaleTimeString();
 
   const handleFaceRecognition = async (faceDescriptor: number[]) => {
+    const match = await findBestMatch(faceDescriptor);
     try {
-      // 1. Search for the occupant based on the faceDescriptor (for example, a database lookup)
-      const response = await fetch('/api/face-recognition', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ faceDescriptor }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Face recognition failed');
-      }
-
-      const data = await response.json();  // Assume the API returns the matched occupant data
-
-      // 2. Check if an occupant was found (this step assumes your response returns the occupant data)
-      if (data && data.id) {
-        const { id, name, schoolId, timeIn } = data;
-
-        // 3. Set the timeOut to the current time
-        const timeOut = currentTime;
-
-        // 4. Store schoolId, timeIn, and timeOut in variables
-        const historyData: Occupants = {
-          id,
-          name,
-          schoolId,
-          timeIn,
-          timeOut,
-        };
-
-        // 5. Call the /api/v2/history API to push the data to the history table
-        const historyResponse = await HistoryService.recordHistory(historyData);
-        if (!historyResponse.success) {
-          throw new Error('Failed to record history');
+      if(match){
+        const data = await db.occupants
+          .where("schoolId")
+          .equals(match?.schoolId)
+          .filter((record) => record.timeOut === null)
+          .first();
+        // 2. Check if an occupant was found (this step assumes your response returns the occupant data)
+        if (data && data.timeOut ==null) {
+          await db.occupants.update(data, { timeOut: date });
+            // 7. Call fetchOccupantCount to update the count after checkout
+            fetchOccupantCount();
+            // 8. Show success toasts for checkout
+            toast.success(`Goodbye ${data.name}!`);
+        } else {
+          // 9. No matching occupant found
+          toast.error('Entry already recorded');
         }
-
-        // 6. Successfully recorded history; now update the occupant's timeOut in the IndexedDB table
-        const updatedOccupant: Occupants = {
-          ...data, // Keep the existing occupant data
-          timeOut: currentTime,
-        };
-        await db.occupants.put(updatedOccupant);
-
-        // 7. Call fetchOccupantCount to update the count after checkout
-        fetchOccupantCount();
-
-        // 8. Show success toasts for checkout
-        toast.success(`Goodbye ${name}!`);
-      } else {
-        // 9. No matching occupant found
-        toast.error('No matching occupant found.');
+      }
+      else{
+        toast.error('No matching occupant');
       }
     } catch (error) {
       console.error('Face recognition error:', error);

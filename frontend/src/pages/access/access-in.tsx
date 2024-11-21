@@ -7,6 +7,7 @@ import FaceRecognition from '../../components/FaceRecognition';
 import { toast } from 'react-toastify';
 import { db } from '../../config/db';
 import { useSync } from './hooks/useSync';
+import { findBestMatch } from '../../services/faceMatchService';
 
 const userCodeRegex = /^(2\d-\d{5}$|P-\d{5})$/;
 
@@ -27,7 +28,7 @@ const validationSchema = Yup.object({
 export default function Access_IN() {
   const [time, setTime] = useState(new Date().toLocaleTimeString());
   const [occupantCount, setOccupantCount] = useState<number>(0); // State to hold the count of occupants
-  const [isConnected, encodings] = useSync()
+  const [isConnected] = useSync()
 
   // Function to fetch the count of occupants from IndexedDB
   const fetchOccupantCount = async () => {
@@ -61,7 +62,6 @@ export default function Access_IN() {
   }, []); 
 
   const date = new Date().toISOString()
-  const currentTime = new Date().toLocaleString();
 
   const handleFaceRecognition = async (faceDescriptor: number[]) => {
     try {
@@ -73,30 +73,39 @@ export default function Access_IN() {
       // 5. Save face encodings and sr code in local db occupants table for check out later
       
       // Sample API call (Implement this using axios)
+      const data = await findBestMatch(faceDescriptor);
+      
+      if(data){
+        //  checks if user already has history
+        const user = await db.occupants
+        .where("schoolId")
+        .equals(data.schoolId)
+        .filter((user) => user.timeOut === null)
+        .first();
 
-      const data = {
-        "id": 6,
-        "name": "Bini",
-        "schoolId": "80-10190",
-       };
-      console.log(data)
-      
-      // Handle successful check-in
-      toast.success(`Welcome ${data.name}!`);
-
-      // Add the occupant to the database (IndexedDB)
-      await db.occupants.add({
-        id: data.id,      
-        name: data.name, 
-        schoolId: data.schoolId, 
-        timeIn: currentTime,
-        timeOut: null,
-      });
-      
-      // You might want to update the occupancy count here
-      const updatedCount = await db.occupants.count();
-      setOccupantCount(updatedCount);
-      
+        if(user){
+          toast.warning(`Already encoded`);
+        }
+        else{
+          // Add the occupant to the occupants table
+          await db.occupants.add({
+            name: data.name, 
+            schoolId: data.schoolId, 
+            timeIn: date,
+            timeOut: null,
+          });
+          
+          // count all occupants without timeOut
+          const updatedCount = await db.occupants
+            .filter(user => user.timeOut == null)
+            .count();
+          setOccupantCount(updatedCount);
+          toast.success(`Welcome ${data.name}!`);
+        }
+      }
+      else{
+        toast.error('No face match detected, register first');
+      }
     } catch (error) {
       console.error('Face recognition error:', error);
       toast.error('Face recognition failed. Please try again or use your code.');

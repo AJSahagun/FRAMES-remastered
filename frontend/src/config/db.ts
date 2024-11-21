@@ -8,7 +8,7 @@ type Encodings ={
 }
 
 type Occupants ={
-  id: number;
+  id?: number;
   name: string;
   schoolId: string;
   timeIn: string;
