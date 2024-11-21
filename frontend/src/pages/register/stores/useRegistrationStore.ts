@@ -14,6 +14,7 @@ interface RegistrationState {
   userCodeError: string;
   setUserCodeError: (error: string) => void;
   submitForm: () => void;
+  setIsEditing: (isEditing: boolean) => void;
   resetForm: () => void;
 }
 

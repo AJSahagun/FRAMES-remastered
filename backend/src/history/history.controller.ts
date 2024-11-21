@@ -1,10 +1,9 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Version } from '@nestjs/common';
 import { HistoryService } from './history.service';
 import { CreateHistoryDto } from './dto/create-history.dto';
-import { UpdateHistoryDto } from './dto/update-history.dto';
-import { Roles } from '../decorators/roles/roles.decorator';
-import { Role } from '../config/role.enum';
-import { RolesGuard } from '../guards/roles/roles.guard';
+import { Roles } from '../core/decorators/roles/roles.decorator';
+import { Role } from '../core/config/role.enum';
+import { RolesGuard } from '../core/guards/roles.guard';
 
 @Controller('history')
 @UseGuards(RolesGuard)

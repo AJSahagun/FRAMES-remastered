@@ -1,4 +1,5 @@
-import React from "react";
+// InputInfo.tsx
+import React, { useEffect, useCallback } from "react";
 import { useRegistrationStore } from "./stores/useRegistrationStore";
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import Dropdown from "../../components/Dropdown";

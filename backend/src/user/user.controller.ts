@@ -1,11 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ValidationPipe, SetMetadata, UseGuards, Version } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ValidationPipe, SetMetadata, UseGuards, Version, HttpException, HttpStatus } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { Role } from '../config/role.enum';
-import { Roles } from '../decorators/roles/roles.decorator';
-import { RolesGuard } from '../guards/roles/roles.guard';
+import { Role } from '../core/config/role.enum';
+import { Roles } from '../core/decorators/roles/roles.decorator';
 import { CreateUserDto } from './dto/create-user.dto';
 import { CreateUserV2Dto } from './dto/create-user-v2.dto';
+import { RolesGuard } from '../core/guards/roles.guard';
+import { handleError } from '../core/config/errors';
 
 @Controller('user')
 @UseGuards(RolesGuard)
@@ -14,14 +15,20 @@ export class UserController {
 
   @Version('1')
   @Post()
-  create(@Body(ValidationPipe) createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
+  async create(@Body(ValidationPipe) createUserDto: CreateUserDto) {
+    const error = await this.userService.create(createUserDto);
+    if (error) handleError(error);
+
+    throw new HttpException('Success', HttpStatus.ACCEPTED)
   }
 
   @Version('2')
   @Post()
-  createV2(@Body(ValidationPipe) createUserDto: CreateUserV2Dto) {
-    return this.userService.createV2(createUserDto);
+  async createV2(@Body(ValidationPipe) createUserDto: CreateUserV2Dto) {
+    const error = await this.userService.createV2(createUserDto);
+    if (error) handleError(error);
+    
+    throw new HttpException('Success', HttpStatus.ACCEPTED)
   }
 
   @Get()
@@ -30,18 +37,4 @@ export class UserController {
     return this.userService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(+id, updateUserDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userService.remove(+id);
-  }
 }

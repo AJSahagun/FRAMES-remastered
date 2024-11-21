@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { DatabaseModule } from '../database/database.module';
-import { ApiKeyService } from '../services/api-key/api-key.service';
+import { DatabaseModule } from '../core/database/database.module';
+import { ApiKeyService } from '../core/services/api-key/api-key.service';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
