@@ -19,13 +19,37 @@ const CheckInfo: React.FC<CheckInfoProps> = () => {
   const { imageUrl } = useImageStore();
   const [hasAgreedToTerms, setHasAgreedToTerms] = useState(false);
   const [isTermsModalOpen, setIsTermsModalOpen] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
 
   const clearLocalStorage = () => {
     localStorage.removeItem('formData');
   };
 
-  // TODO: something is wrong with the form data, it's not being passed to the handleSubmit function
+  const validateFormData = (formData: UserRegistrationData): boolean => {
+    const userCodeFormat1 = /^\d{2}-\d{5}$/; // Format: 'dd-ddddd'
+    const userCodeFormat2 = /^P-\d{5}$/;    // Format: 'P-ddddd'
+  
+    if (userCodeFormat1.test(formData.userCode)) {
+      // For 'dd-ddddd' format, 'department' and 'program' must be non-empty
+      if (!formData.department || !formData.program) return false;
+    } else if (userCodeFormat2.test(formData.userCode)) {
+      // For 'P-ddddd' format, 'department' and 'program' are optional
+    } else {
+      // If userCode doesn't match any format, it's invalid
+      return false;
+    }
+  
+    // Check required fields
+    const requiredFields = ['firstName', 'middleName', 'lastName', 'userCode', 'encoding'];
+    for (const field of requiredFields) {
+      if (!formData[field as keyof UserRegistrationData]) return false;
+    }
+  
+    // If all validations pass, return true
+    return true;
+  };  
+
   const handleSubmit = async (formData: UserRegistrationData) => {
     console.log('Form submitted');
     try {
@@ -55,26 +79,12 @@ const CheckInfo: React.FC<CheckInfoProps> = () => {
   const handleConfirmSubmit = () => {
     console.log("handleConfirmSubmit called with formData:", formData);
   
-    const userCodeFormat = /^2\d-\d{5}$/;
-  
-    // Check all required fields, including conditional ones for userCode format
-    const isValid = Object.entries(formData).every(([key, value]) => {
-      if (key === 'suffix' || key === 'imageUrl') return true; // 'suffix' can be empty
-  
-      // 'department' and 'program' are required if userCode matches the format
-      if ((key === 'department' || key === 'program') && userCodeFormat.test(formData.userCode)) {
-        return value != null && value !== '';
-      }
-  
-      // Check other fields to ensure they're not empty or undefined
-      return value != null && value !== '';
-    });
-  
-    if (isValid) {
-      handleSubmit(formData); // Triggers toast.success if successful
+    if (validateFormData(formData)) {
+      handleSubmit(formData);
     } else {
       toast.error('Please fill in all fields before submitting.');
     }
+    setShowConfirmDialog(false);
   };
   
 
@@ -104,8 +114,6 @@ const CheckInfo: React.FC<CheckInfoProps> = () => {
     setIsTermsModalOpen(false);
   };
   
-  
-
   return (
     <div className="w-full relative justify-center items-center">
       <div className="text-center">
@@ -132,15 +140,6 @@ const CheckInfo: React.FC<CheckInfoProps> = () => {
                 </span>
               </div>
             )
-            // <div key={key} className="flex flex-col mt-4 mx-12 w-4/5 lg:flex-row lg:w-full lg:mt-7">
-
-            //   <span className="font-semibold text-tc w-full">{key.charAt(0).toUpperCase() + key.slice(1)}</span>
-            //   {value !== '' && (
-            //     <span className="w-full px-6 py-2 rounded-lg bg-sf">
-            //       {key === 'department' ? departmentLabelMap[value] : key === 'program' ? programLabelMap[value] : typeof value === 'string' ? (value as string).toUpperCase() : value}
-            //     </span>
-            //   )}
-            // </div>
           )
         ))}
       </div>
@@ -170,7 +169,7 @@ const CheckInfo: React.FC<CheckInfoProps> = () => {
           Back
         </button>
         <button
-          onClick={handleConfirmSubmit}
+          onClick={() => setShowConfirmDialog(true)}
           className={`bg-btnBg font-poppins text-background rounded-lg w-5/12 py-2 shadow-md transition-all duration-500 ease-in-out hover:bg-gradient-to-br hover:from-accent hover:to-btnBg transform hover:scale-105 ${!hasAgreedToTerms ? 'disabled opacity-50 cursor-not-allowed' : ''}`}
           disabled={!hasAgreedToTerms}
         >
@@ -178,7 +177,7 @@ const CheckInfo: React.FC<CheckInfoProps> = () => {
         </button>
       </div>
 
-      {/* {showConfirmDialog && (
+      {showConfirmDialog && (
         <div className="fixed inset-0 flex items-center justify-center bg-card bg-opacity-50">
           <div className="bg-white px-8 py-6 rounded-lg shadow-md">
             <h3 className="text-lg font-bold mb-2 text-tc">Are you sure all the information you provided are correct?</h3>
@@ -198,7 +197,7 @@ const CheckInfo: React.FC<CheckInfoProps> = () => {
             </div>
           </div>
         </div>
-      )} */}
+      )}
 
       <TermsOfService 
         isOpen={isTermsModalOpen}
