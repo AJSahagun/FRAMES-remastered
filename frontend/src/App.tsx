@@ -6,7 +6,7 @@ import { useEffect, useMemo } from 'react';
 export default function App() {
   const { isOpen, toggleSidebar } = useSidebarStore(); 
   const { activeIndex, setActiveIndex } = useSliderStore();
-  const { imagesLoaded, setImagesLoaded } = useImageStore(); // Zustand store for imagesLoaded
+  const { imagesLoaded, setImagesLoaded } = useImageStore();
 
   const images = useMemo(() => [
     "images/face-scan-1.jpg",
@@ -51,7 +51,7 @@ export default function App() {
 
       try {
         await Promise.all(imagePromises);
-        setImagesLoaded(true); // Use Zustand store
+        setImagesLoaded(true);
       } catch (error) {
         console.error("Failed to load images", error);
       }
@@ -70,30 +70,24 @@ export default function App() {
         </a>
         </div>
         <div className="hidden w-2/3 md:flex flex-row justify-end items-center space-x-14 mt-8 mr-24 lg:ml-36 xl:mt-1 text-tc">
-        <a href="/" className="w-auto"><p className="font-poppins">Home</p></a>
-        <a href="/tutorial" className="w-auto"><p className="font-poppins">Tutorial</p></a>
-        <a href="/techtonic" className="w-auto"><p className="font-poppins" >Techtonic</p></a>
-        <a href="/register" className="w-32">
-          <button className="w-full bg-gradient-to-br from-accent to-btnBg text-background text-sm py-3 rounded-md font-poppins font-extralight shadow-lg hover:brightness-150 duration-300">
-            Register
-          </button></a>
+          <a href="/" className="w-auto"><p className="font-poppins">Home</p></a>
+          <a href="/learnmore" className="w-auto"><p className="font-poppins">About</p></a>
+          <a href="/techtonic" className="w-auto"><p className="font-poppins" >Techtonic</p></a>
+          <a href="/register" className="w-32">
+            <button className="w-full bg-gradient-to-br from-accent to-btnBg text-background text-sm py-3 rounded-md font-poppins font-extralight shadow-lg hover:brightness-150 duration-300">
+              Register
+            </button>
+          </a>
         </div>
         <div className="w-1/2 flex justify-end md:hidden">
           <button className="p-2 px-4" onClick={toggleSidebar}>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth="1.5"
-              stroke="currentColor"
-              className="w-6 h-6"
-            >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
               <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
             </svg>
           </button>
         </div>
       </div>
-
+      
       {/* Sidebar */}
       <div
         className={`fixed top-0 right-0 w-64 h-full bg-white text-tc shadow-lg transform 
@@ -101,14 +95,7 @@ export default function App() {
       >
         <div className="flex justify-end p-4">
           <button onClick={toggleSidebar}>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth="1.5"
-              stroke="currentColor"
-              className="w-6 h-6"
-            >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
@@ -117,7 +104,7 @@ export default function App() {
         <div className="p-4">
           <ul className="mt-4 space-y-3">
             <li><a href="/" className="block font-poppins text-lg text-center">Home</a></li>
-            <li><a href="/tutorial" className="block font-poppins text-lg text-center">Tutorial</a></li>
+            <li><a href="/learnmore" className="block font-poppins text-lg text-center">About</a></li>
             <li><a href="/techtonic" className="block font-poppins text-lg text-center">Techtonic</a></li>
           </ul>
         </div>
@@ -171,23 +158,21 @@ export default function App() {
               </div>
               <div className="">
                 <img className="absolute w-24 -left-4 -top-4 " src="/logos/batstateu-logo.png" alt="Logo" />
-
               </div>
             </div>
           </div>
 
           {/* Slider Indicators */}
           <div className="flex justify-center items-center space-x-3 my-6 lg:hidden">
-        
-          {images.map((_, index) => (
-            <span
-              key={index}
-              onClick={() => setActiveIndex(index)}
-              className={`${
-                index === activeIndex ? 'w-9 rounded-full opacity-70' : 'w-3 opacity-30'
-              } h-3 bg-secondary rounded-full transition-all ease-in-out duration-300 cursor-pointer`}
-            />
-          ))}
+            {images.map((_, index) => (
+              <span
+                key={index}
+                onClick={() => setActiveIndex(index)}
+                className={`${
+                  index === activeIndex ? 'w-9 rounded-full opacity-70' : 'w-3 opacity-30'
+                } h-3 bg-secondary rounded-full transition-all ease-in-out duration-300 cursor-pointer`}
+              />
+            ))}
           </div>
 
         </div>
@@ -224,9 +209,8 @@ export default function App() {
                 text-white transition duration-300 rounded-md shadow-md bg-btnBg hover:brightness-110 hover:-translate-y-2 focus:shadow-outline focus:outline-none fade-in-up">
                   REGISTER NOW
                 </button>
-
               </a>
-              <a href="" className='relative w-full lg:w-1/2 lg:mr-10'>
+              <a href="/learnmore" className='relative w-full lg:w-1/2 lg:mr-10'>
                 <button className="inline-flex items-center justify-center h-12   font-poppins font-semibold tracking-wide w-full 
                 bg-slate-200 text-accent bg-sf rounded-md shadow-md transition duration-500 hover:bg-slate-300 fade-in-up">
                   Learn more
@@ -261,8 +245,6 @@ export default function App() {
           Foster Wheeler Library - Alangilan
         </div>
       </div>
-
-      
     </div>
   );
 }

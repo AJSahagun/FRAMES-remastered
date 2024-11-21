@@ -1,4 +1,4 @@
-// import { useState } from 'react';
+import { useState } from 'react';
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { useRegistrationStore } from './stores/useRegistrationStore';
@@ -7,6 +7,7 @@ import { useImageStore } from './stores/useImgStore';
 import { UserService } from '../../services/user.service';
 import { UserRegistrationData } from '../../types/user.types';
 import { departmentOptions, programOptions } from '../../types/deptandprog.types';
+import TermsOfService from '../../components/TermsOfService';
 
 interface CheckInfoProps {
   formData: UserRegistrationData;
@@ -16,8 +17,9 @@ const CheckInfo: React.FC<CheckInfoProps> = () => {
   const { formData, resetForm } = useRegistrationStore();
   const { prevPage } = usePaginationStore();
   const { imageUrl } = useImageStore();
-  
-  // const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [hasAgreedToTerms, setHasAgreedToTerms] = useState(false);
+  const [isTermsModalOpen, setIsTermsModalOpen] = useState(false);
+
 
   const clearLocalStorage = () => {
     localStorage.removeItem('formData');
@@ -32,6 +34,12 @@ const CheckInfo: React.FC<CheckInfoProps> = () => {
       console.log('Registration successful:', response);
       toast.success('Your information has been submitted successfully.');
       resetForm();
+      clearLocalStorage();
+      if (!localStorage.getItem('formData')) {
+        console.log('Form data cleared from localStorage');
+      } else {
+        console.error('Failed to clear form data from localStorage');
+      }
       clearLocalStorage();
       if (!localStorage.getItem('formData')) {
         console.log('Form data cleared from localStorage');
@@ -69,21 +77,34 @@ const CheckInfo: React.FC<CheckInfoProps> = () => {
     }
   };
   
-  
 
   const filteredFormData = Object.entries(formData).filter(
     ([key]) => (key !== 'encoding' && key !== 'imageUrl') ,
   );
 
+
   const departmentLabelMap = departmentOptions.reduce((acc, option) => {
     acc[option.value] = option.label;
     return acc;
   }, {} as Record<string, string>);
-  
+
   const programLabelMap = Object.values(programOptions).flat().reduce((acc, option) => {
     acc[option.value] = option.label;
     return acc;
   }, {} as Record<string, string>);
+  
+
+  const handleAgree = () => {
+    setHasAgreedToTerms(true);
+    setIsTermsModalOpen(false);
+  };
+  
+  const handleDisagree = () => {
+    setHasAgreedToTerms(false);
+    setIsTermsModalOpen(false);
+  };
+  
+  
 
   return (
     <div className="w-full relative justify-center items-center">
@@ -93,11 +114,11 @@ const CheckInfo: React.FC<CheckInfoProps> = () => {
       <ToastContainer position="top-center"/>
 
       <div className="flex items-center justify-center border-2 shadow-md border-tc rounded-2xl mt-8 h-40 w-2/5 mx-auto">
-      {imageUrl ? (
-        <img src={imageUrl} alt="Captured" />
-      ) : (
-        <p>No image captured.</p>
-      )}
+        {imageUrl ? (
+          <img src={imageUrl} alt="Captured" />
+        ) : (
+          <p>No image captured.</p>
+        )}
       </div>
 
       <div className="space-y-3 flex flex-col justify-center items-center w-full lg:space-y-4">
@@ -124,7 +145,23 @@ const CheckInfo: React.FC<CheckInfoProps> = () => {
         ))}
       </div>
 
-      {/* Buttons */}
+      <div className="flex justify-start mt-4 w-full">
+        <label className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            onClick={() => setIsTermsModalOpen(true)}
+            checked={hasAgreedToTerms}
+            onChange={(e) => setHasAgreedToTerms(e.target.checked)}
+            className="h-4 w-4 border-2 border-tc rounded"
+          />
+          <span className="text-tc text-sm">
+            I agree to the <a href="#" onClick={() => setIsTermsModalOpen(true)} className="text-blue-500 underline">
+              Terms of Service
+            </a>
+          </span>
+        </label>
+      </div>
+
       <div className="flex justify-between mt-8">
         <button
           onClick={prevPage}
@@ -133,9 +170,9 @@ const CheckInfo: React.FC<CheckInfoProps> = () => {
           Back
         </button>
         <button
-          // onClick={() => setShowConfirmDialog(true)}
           onClick={handleConfirmSubmit}
-          className="bg-btnBg font-poppins text-background rounded-lg w-5/12 py-2 shadow-md transition-all duration-500 ease-in-out hover:bg-gradient-to-br hover:from-accent hover:to-btnBg transform hover:scale-105"
+          className={`bg-btnBg font-poppins text-background rounded-lg w-5/12 py-2 shadow-md transition-all duration-500 ease-in-out hover:bg-gradient-to-br hover:from-accent hover:to-btnBg transform hover:scale-105 ${!hasAgreedToTerms ? 'disabled opacity-50 cursor-not-allowed' : ''}`}
+          disabled={!hasAgreedToTerms}
         >
           Submit
         </button>
@@ -162,7 +199,14 @@ const CheckInfo: React.FC<CheckInfoProps> = () => {
           </div>
         </div>
       )} */}
+
+      <TermsOfService 
+        isOpen={isTermsModalOpen}
+        onAgree={handleAgree}
+        onDisagree={handleDisagree}
+      />
     </div>
+
   );
 };
 
