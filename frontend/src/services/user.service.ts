@@ -4,30 +4,24 @@ import { AxiosError } from 'axios';
 import { API_CONFIG } from '../config/api.config';
 
 export class UserService {
-  static async registerUser(data: UserRegistrationData): Promise<ApiResponse<UserRegistrationData>> {
+  static async registerUser(data: UserRegistrationData): Promise<ApiResponse<null>> {
     try {
-      // Map data to backend format
       const backendData = mapToBackend(data);
-
-      const response = await apiClient.post<ApiResponse<Omit<UserRegistrationData, 'userCode'> & { schoolId: string }>>(
+  
+      const response = await apiClient.post<ApiResponse<null>>(
         API_CONFIG.ENDPOINTS.USER,
         backendData
       );
-
-      // Map response data to frontend format
-      const frontendData = mapToFrontend(response.data.data);
-
-      return {
-        ...response.data,
-        data: frontendData,
-      };
+  
+      console.log('Backend response:', response.data);
+      return response.data; // Simply return the backend response
     } catch (error) {
       if (error instanceof AxiosError) {
         console.error('Registration Error:', error.response?.data || error.message);
       }
       throw error;
     }
-  }
+  }  
 }
 
 // Utility functions for data transformation
@@ -36,13 +30,5 @@ const mapToBackend = (data: UserRegistrationData): Omit<UserRegistrationData, 'u
   return {
     ...rest,
     schoolId: userCode,
-  };
-};
-
-const mapToFrontend = (data: Omit<UserRegistrationData, 'userCode'> & { schoolId: string }): UserRegistrationData => {
-  const { schoolId, ...rest } = data;
-  return {
-    ...rest,
-    userCode: schoolId,
   };
 };

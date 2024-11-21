@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { useRegistrationStore } from './stores/useRegistrationStore';
@@ -17,6 +18,7 @@ const CheckInfo: React.FC<CheckInfoProps> = () => {
   const { formData, resetForm } = useRegistrationStore();
   const { prevPage } = usePaginationStore();
   const { imageUrl } = useImageStore();
+  const navigate = useNavigate();
   const [hasAgreedToTerms, setHasAgreedToTerms] = useState(false);
   const [isTermsModalOpen, setIsTermsModalOpen] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
@@ -47,24 +49,19 @@ const CheckInfo: React.FC<CheckInfoProps> = () => {
   };  
 
   const handleSubmit = async (formData: UserRegistrationData) => {
-    console.log('Form submitted');
     try {
       const response = await UserService.registerUser(formData);
-      console.log('Form submitted:', formData);
-      console.log('Registration successful:', response);
-      toast.success('Your information has been submitted successfully.');
-      resetForm();
-      clearLocalStorage();
-      if (!localStorage.getItem('formData')) {
-        console.log('Form data cleared from localStorage');
+  
+      if (response.statusCode === 202) {
+        console.log('Registration successful:', response.message);
+        toast.success('Your information has been submitted successfully.');
+  
+        resetForm();
+        clearLocalStorage();
+  
+        navigate('/');
       } else {
-        console.error('Failed to clear form data from localStorage');
-      }
-      clearLocalStorage();
-      if (!localStorage.getItem('formData')) {
-        console.log('Form data cleared from localStorage');
-      } else {
-        console.error('Failed to clear form data from localStorage');
+        throw new Error('Unexpected response from backend');
       }
     } catch (error) {
       console.error('Registration failed:', error);
