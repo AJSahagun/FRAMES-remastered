@@ -114,13 +114,18 @@ const CheckInfo: React.FC<CheckInfoProps> = () => {
       </div>
       <ToastContainer position="top-center"/>
 
-      <div className="flex items-center justify-center border-2 shadow-md border-tc rounded-2xl mt-8 h-40 w-2/5 mx-auto">
+      <div className="flex items-center justify-center border-2 shadow-md border-tc rounded-lg mt-8 h-[138px] w-2/5 mx-auto">
         {imageUrl ? (
-          <img src={imageUrl} alt="Captured" />
+          <img
+            src={imageUrl}
+            alt="Captured"
+            className="w-full h-full object-cover rounded-md"  // This ensures the image fits the container
+          />
         ) : (
           <p>No image captured.</p>
         )}
       </div>
+
 
       <div className="space-y-3 flex flex-col justify-center items-center w-full lg:space-y-4">
         {(filteredFormData).map(([key, value]) => (
