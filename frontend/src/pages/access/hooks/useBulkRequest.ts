@@ -23,7 +23,7 @@ export const useBulkRequest = () => {
       }
       else{
         //delete that rows in occupants
-        const idsToDelete = usersWithHistory.map(record => record.id);
+        const idsToDelete:any = usersWithHistory.map(record => record.id);
         await db.occupants.bulkDelete(idsToDelete);
       }
     }
