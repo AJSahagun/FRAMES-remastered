@@ -31,10 +31,21 @@ export class UserController {
     throw new HttpException('Success', HttpStatus.ACCEPTED)
   }
 
+  @Version(['1', '2'])
   @Get()
   @Roles(Role.Dev, Role.Admin)
   findAll() {
     return this.userService.findAll();
+  }
+
+  @Version(['1', '2'])
+  @Get(':school_id')
+  @Roles(Role.Dev, Role.Admin)
+  async findOne(@Param('school_id') school_id: string) {
+    const data = await this.userService.findOne(school_id);
+    if (data.error) handleError(data.error);
+    
+    return data
   }
 
 }

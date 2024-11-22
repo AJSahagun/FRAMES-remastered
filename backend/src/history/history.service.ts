@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { CreateHistoryDto } from './dto/create-history.dto';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class HistoryService {
@@ -40,10 +41,10 @@ export class HistoryService {
     }
 
     try {
-      await this.sql(
+      const stale_records=await this.sql(
         `delete from encodings where uuid not in
         (select uuid from encodings where school_id= '${schoolId}' order by date_created desc limit 5)
-        and school_id= '${schoolId}'`,
+        and school_id= '${schoolId}' returning id_ai`,
       );
     } catch (error) {
       throw new HttpException(

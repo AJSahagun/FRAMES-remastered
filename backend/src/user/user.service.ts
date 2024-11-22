@@ -28,8 +28,8 @@ export class UserService {
     const suffix= createUserDto.suffix
     const department= createUserDto.department
     const program= createUserDto.program
-    const encoding= JSON.stringify(createUserDto.encoding)
-    const name= `${first_name} ${middle_name?middle_name+" ":""}${last_name} ${suffix}`.trim()
+    const encoding= createUserDto.encoding
+    const name= `${first_name} ${middle_name?middle_name+" ":""}${last_name}${suffix?" "+suffix:""}`.trim()
 
 
     const {error:saveError}= await this.saveUser(first_name, last_name, sr_code, middle_name, suffix, department, program);
@@ -47,9 +47,9 @@ export class UserService {
     const suffix= createUserDto.suffix
     const department= createUserDto.department
     const program= createUserDto.program
-    const encoding= JSON.stringify(createUserDto.encoding)
+    const encoding= createUserDto.encoding
 
-    const name= `${first_name} ${middle_name} ${last_name} ${suffix}`.trim()
+    const name= `${first_name} ${middle_name?middle_name+" ":""}${last_name}${suffix?" "+suffix:""}`.trim()
 
     const {error:saveError}= await this.saveUser(first_name, last_name, school_id, middle_name, suffix, department, program);
     if(saveError) return saveError
@@ -82,7 +82,7 @@ export class UserService {
     }
   }
 
-  async syncEncoding(name:string, encoding:string, school_id:string): Promise<{ error:any }>{
+  async syncEncoding(name:string, encoding:number[], school_id:string): Promise<{ error:any }>{
     try {
       const idAi = await this.sql(
         `INSERT INTO encodings(encoding, school_id)
@@ -91,7 +91,7 @@ export class UserService {
         `,
       );
       this.eventEmitter.emit('onRegister', {
-        id: idAi[0]['id_ai'],
+        idAi: idAi[0]['id_ai'],
         name,
         school_id,
         encoding,
@@ -106,13 +106,41 @@ export class UserService {
     return await this.sql(`SELECT * FROM users`);
   }
 
+  async findOne(school_id:string): Promise<any>{
+    try {
+      const user = await this.sql(
+        `select * from users where school_id=$1`,[school_id],
+      );
+      if (user.length==0) return {error:404}
+      return user;
+    } catch (error) {
+      return {error}
+    }
+  }
+
   @OnEvent('syncEncodings')
   async findAllEncodings(latestId: number, callback: (result: any) => void) {
     try {
       const latestEncodings = await this.sql(
-        `SELECT concat(u.first_name, ' ', u.middle_name, ' ', u.last_name) as name, e.id_ai as "idAi", e.school_id as "schoolId", e."encoding" from encodings e 
-        left join users u on e.school_id = u.school_id
-        where e.id_ai > ${latestId}`,
+        `SELECT 
+          concat(
+              u.first_name, 
+              CASE 
+                  WHEN u.middle_name IS NOT NULL THEN ' ' || u.middle_name 
+                  ELSE '' 
+              END, 
+              ' ', 
+              u.last_name
+          ) AS name, 
+          e.id_ai AS "idAi", 
+          e.school_id AS "schoolId", 
+          e."encoding" 
+      FROM 
+          encodings e
+      LEFT JOIN 
+          users u ON e.school_id = u.school_id
+      WHERE 
+          e.id_ai > ${latestId};`,
       );
       callback({ success: true, data: latestEncodings });
     } catch (error) {
