@@ -45,7 +45,7 @@ export default function Access_OUT() {
     };
   }, [latestRequestTime]); 
 
-  const date = new Date().toISOString();
+  const date = new Date().toLocaleDateString('en-us', { weekday:"long", year:"numeric", month:"short", day:"numeric"});
 
   const handleFaceRecognition = async (faceDescriptor: number[]) => {
     const match = await findBestMatch(faceDescriptor);

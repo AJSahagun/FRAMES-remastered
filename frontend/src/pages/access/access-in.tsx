@@ -61,7 +61,7 @@ export default function Access_IN() {
     };
   }, []); 
   
-  const date = new Date().toISOString()
+  const date = new Date().toLocaleDateString('en-us', { weekday:"long", year:"numeric", month:"short", day:"numeric"});
 
   const handleFaceRecognition = async (faceDescriptor: number[]) => {
     try {
