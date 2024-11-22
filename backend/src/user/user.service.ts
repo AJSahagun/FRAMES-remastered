@@ -86,7 +86,7 @@ export class UserService {
     try {
       const idAi = await this.sql(
         `INSERT INTO encodings(encoding, school_id)
-        values('${encoding}','${school_id}')
+        values('${JSON.stringify(encoding)}','${school_id}')
         returning id_ai
         `,
       );
