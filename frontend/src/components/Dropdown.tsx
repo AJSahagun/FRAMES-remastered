@@ -1,14 +1,14 @@
 import { useState } from "react";
 
-interface Option {
+interface DropdownOption {
   value: string;
   label: string;
 }
 
 interface DropdownProps {
-  options: Option[];
+  options: DropdownOption[];
   value: string;
-  onChange: (value: string) => void;
+  onChange: (option: DropdownOption) => void;
   placeholder: string;
   disabled?: boolean;
 }
@@ -23,10 +23,13 @@ const Dropdown: React.FC<DropdownProps> = ({
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleDropdown = () => !disabled && setIsOpen(!isOpen);
-  const selectOption = (optionValue: string) => {
-    onChange(optionValue);
-    setIsOpen(false);
+
+  const selectOption = (option: DropdownOption) => {
+    onChange(option); // Pass the entire option object to the parent
+    setIsOpen(false); // Close dropdown after selection
   };
+
+  const selectedOption = options.find((opt) => opt.value === value);
 
   return (
     <div className="relative inline-block w-full text-left">
@@ -38,7 +41,9 @@ const Dropdown: React.FC<DropdownProps> = ({
           md:py-3 md:text-lg 
           ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
       >
-        <span className="text-gray-700">{value || placeholder}</span>
+        <span className="text-gray-700">
+          {selectedOption ? selectedOption.label : placeholder}
+        </span>
         <span className="ml-2">&#9662;</span> {/* Dropdown arrow */}
       </button>
 
@@ -49,7 +54,7 @@ const Dropdown: React.FC<DropdownProps> = ({
               <li
                 key={option.value}
                 className="cursor-pointer select-none py-2 px-4 hover:bg-gray-200"
-                onClick={() => selectOption(option.value)}
+                onClick={() => selectOption(option)}
               >
                 {option.label}
               </li>

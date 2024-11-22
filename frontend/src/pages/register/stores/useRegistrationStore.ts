@@ -1,38 +1,30 @@
+// useRegistrationStore.ts
 import { create } from 'zustand';
-
-interface UserFormData {
-  firstName: string;
-  middleName: string;
-  lastName: string;
-  suffix: string;
-  srCode: string;
-  department: string;
-  course: string;
-  encoding: number[];
-  imageUrl: string;
-}
+import { UserRegistrationData } from '../../../types/user.types';
 
 interface RegistrationState {
-  formData: UserFormData;
-  localFormData: UserFormData;
-  isFormValid: boolean;
-  isEditing: boolean;
-  setFormData: (data: Partial<UserFormData>) => void;
-  setLocalFormData: (data: Partial<UserFormData>) => void;
-  setIsFormValid: (isValid: boolean) => void;
+  formData: UserRegistrationData;
+  localFormData: UserRegistrationData;
+  setLocalFormData: (data: Partial<UserRegistrationData>) => void;
+  setFormData: (data: Partial<UserRegistrationData>) => void;
+  selectedDept: string;
+  setSelectedDept: (dept: string) => void;
+  selectedProgram: { value: string; label: string }[];
+  setSelectedProgram: (options: { value: string; label: string }[]) => void;  
+  userCodeError: string;
+  setUserCodeError: (error: string) => void;
   submitForm: () => void;
-  setIsEditing: (isEditing: boolean) => void;
   resetForm: () => void;
 }
 
-const initialFormData: UserFormData = {
+const initialFormData: UserRegistrationData = {
   firstName: "",
   middleName: "",
   lastName: "",
   suffix: "",
-  srCode: "",
+  userCode: "",
   department: "",
-  course: "",
+  program: "",
   encoding: [],
   imageUrl: ""
 };
@@ -40,18 +32,14 @@ const initialFormData: UserFormData = {
 export const useRegistrationStore = create<RegistrationState>((set) => ({
   formData: initialFormData,
   localFormData: initialFormData,
-  isFormValid: false,
-  isEditing: false,
-  setFormData: (data) => set((state) => ({
-    formData: { ...state.formData, ...data },
-  })),
-  setLocalFormData: (data) => set((state) => ({
-    localFormData: { ...state.localFormData, ...data },
-  })),
-  setIsFormValid: (isValid) => set({ isFormValid: isValid }),
-  submitForm: () => set((state) => ({
-    formData: state.localFormData,
-  })),
-  setIsEditing: (isEditing) => set({ isEditing }),
-  resetForm: () => set({ formData: initialFormData, localFormData: initialFormData, isFormValid: false}),
+  setLocalFormData: (data) => set((state) => ({ localFormData: { ...state.localFormData, ...data } })),
+  setFormData: (data) => set((state) => ({ formData: { ...state.formData, ...data } })),
+  selectedDept: "",
+  setSelectedDept: (dept) => set({ selectedDept: dept }),
+  selectedProgram: [],
+  setSelectedProgram: (options) => set({ selectedProgram: options }),
+  userCodeError: "",
+  setUserCodeError: (error) => set({ userCodeError: error }),
+  submitForm: () => set((state) => ({ formData: state.localFormData })),
+  resetForm: () => set({ localFormData: initialFormData })
 }));
