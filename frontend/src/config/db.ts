@@ -8,10 +8,11 @@ type Encodings ={
 }
 
 type Occupants ={
-  id: number;
+  id?: number;
   name: string;
   schoolId: string;
   timeIn: string;
+  timeOut: string | null;
 }
 
 const db = new Dexie('frames') as Dexie & {
