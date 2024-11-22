@@ -14,7 +14,7 @@ export class UserService {
       );
 
       console.log('Backend response:', response.data);
-      return response.data; // Simply return the backend response
+      return response.data;
     } catch (error) {
       if (error instanceof AxiosError) {
         console.error('Registration Error:', error.response?.data || error.message);
@@ -26,10 +26,11 @@ export class UserService {
 
 // Utility function for data transformation
 const mapToBackend = (data: UserRegistrationData): Record<string, unknown> => {
-  const { userCode, firstName, lastName, ...rest } = data;
+  const { userCode, firstName, lastName, middleName, ...rest } = data;
   return {
     ...rest,
     first_name: firstName,
+    middle_name: middleName,
     last_name: lastName,
     school_id: userCode,
   };
