@@ -62,6 +62,7 @@ export default function Access_IN() {
   }, []); 
   
   const date = new Date().toLocaleDateString('en-us', { weekday:"long", year:"numeric", month:"short", day:"numeric"});
+  const date2=new Date().toISOString()
 
   const handleFaceRecognition = async (faceDescriptor: number[]) => {
     try {
@@ -91,7 +92,7 @@ export default function Access_IN() {
           await db.occupants.add({
             name: data.name, 
             schoolId: data.schoolId, 
-            timeIn: date,
+            timeIn: date2,
             timeOut: null,
           });
           

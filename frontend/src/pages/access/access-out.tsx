@@ -13,6 +13,7 @@ export default function Access_OUT() {
   const [occupantCount, setOccupantCount] = useState<number>(0); 
   const [rows, latestRequestTime]= useBulkRequest();
   const [isConnected] = useSync()
+  const date2=new Date().toISOString()
 
   const fetchOccupantCount = async () => {
     try {
@@ -58,7 +59,7 @@ export default function Access_OUT() {
           .first();
         // 2. Check if an occupant was found (this step assumes your response returns the occupant data)
         if (data && data.timeOut ==null) {
-          await db.occupants.update(data, { timeOut: date });
+          await db.occupants.update(data, { timeOut: date2 });
             // 7. Call fetchOccupantCount to update the count after checkout
             fetchOccupantCount();
             // 8. Show success toasts for checkout
