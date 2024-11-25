@@ -14,6 +14,8 @@ module.exports = {
         accent: "hsl(var(--accent))",
         tc: "hsl(var(--textcolor))",
         sf: "hsla(var(--secondary-faded))",
+        tcf: "hsla(var(--textcolor-faded))",
+        ptcf: "hsla(var(--placeholder-tcf))",
 
         foreground: "hsl(var(--foreground))",
         btnBg: "hsl(var(--btn-bg))",

@@ -12,6 +12,8 @@
     --accent: 245, 24%, 18%;
     --textcolor: 3, 51%, 14%;
     --secondary-faded: 213, 49%, 80%, 28%;
+    --textcolor-faded: 3, 51%, 14%, 20%;
+    --placeholder-tcf: 3, 51%, 14%, 60%;
 
     --btn-bg: 352, 84%, 36%;
     --btn-hover: 352, 79%, 31%, 100%;
@@ -80,6 +82,10 @@ h1 {
   border-radius: 50%;
 }
 
+/* button:disabled {
+  pointer-events: none;
+} */
+  
 /* button {
   border-radius: 8px;
   border: 1px solid transparent;
