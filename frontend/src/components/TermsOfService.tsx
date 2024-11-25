@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { toast } from "react-toastify";
-import { termsService } from '../services/terms.service';
+// import { toast } from "react-toastify";
+// import { termsService } from '../services/terms.service';
 import { fallbackTerms } from '../data/terms-fallback';
 import { TermsOfService as TermsType } from '../types/terms.types';
 
@@ -76,16 +76,18 @@ const TermsOfService = ({ isOpen, onAgree, onDisagree }: TermsOfServiceProps) =>
 
   useEffect(() => {
     const fetchTerms = async () => {
-      try {
-        const termsData = await termsService.getTermsOfService();
-        setTerms(termsData);
-      } catch (error) {
-        console.warn('Failed to fetch terms from API:', error);
-        toast.warning('Using offline terms of service');
-        setTerms(fallbackTerms);
-      } finally {
-        setIsLoading(false);
-      }
+      setTerms(fallbackTerms);
+      setIsLoading(false);
+      // try {
+      //   const termsData = await termsService.getTermsOfService();
+      //   setTerms(termsData);
+      // } catch (error) {
+      //   console.warn('Failed to fetch terms from API:', error);
+      //   toast.warning('Using offline terms of service');
+      //   setTerms(fallbackTerms);
+      // } finally {
+      //   setIsLoading(false);
+      // }
     };
 
     if (isOpen) {
