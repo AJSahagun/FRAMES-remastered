@@ -1,4 +1,4 @@
-// import { useState } from "react";
+import { useState } from 'react';
 import { useRegistrationStore } from "./stores/useRegistrationStore";
 import { usePaginationStore } from "./stores/usePaginationStore";
 import Pagination from "../../components/Pagination";
@@ -7,14 +7,27 @@ import CheckInfo from "./CheckInfo";
 import FosterWeelerTag from '../../components/FosterWheelerTag';
 
 import InputInfo from "./InputInfo";
+import { useFormStore } from "./stores/useFormStore";
+import RegistrationGuide from "../../components/RegistrationGuide";
 
 export default function Register() {
   const { currentPage, nextPage, prevPage } = usePaginationStore();
-  const { formData, localFormData, isFormValid, submitForm } = useRegistrationStore();
+  const { formData, localFormData, submitForm } = useRegistrationStore();
+
+  const [showGuide, setShowGuide] = useState(true);
+  
+  const handleGuideClose = () => {
+    setShowGuide(false);
+    // Placeholder if added logic for close
+  };
+  
+  const handleGuideProceed = () => {
+    setShowGuide(false);
+    // Placeholder if added logic for proceed
+  };
+  const { isFormValid } = useFormStore();
 
   const handleNextClick = () => {
-    submitForm(); 
-    
     if (isFormValid) {
       submitForm();
       localStorage.setItem("formData", JSON.stringify(localFormData));
@@ -25,6 +38,11 @@ export default function Register() {
 
   return (
     <div className="relative w-full min-h-screen flex flex-col justify-between bg-background">
+      <RegistrationGuide 
+        isOpen={showGuide}
+        onClose={handleGuideClose}
+        onProceed={handleGuideProceed}
+      />
       <FosterWeelerTag />
 
       <div className="flex flex-col items-center lg:items-start">
@@ -42,7 +60,6 @@ export default function Register() {
           {currentPage === 1 && (
             <div className="w-full max-w-md lg:max-w-full flex flex-col items-center justify-center">
               <InputInfo formData={formData} onNext={handleNextClick} />
-
             </div>
           )}
 
@@ -75,21 +92,13 @@ export default function Register() {
           {currentPage === 3 && (
             <div className="w-full max-w-md">
               <CheckInfo formData={formData} />
-              {/* <div className="mt-4">
-                <button
-                  className="border-2 border-tc hover:bg-btnHover font-poppins text-tc rounded-lg px-6 py-2 transition-colors"
-                  onClick={prevPage}
-                >
-                  Back
-                </button>
-              </div> */}
             </div>
           )}
         </div>
       </div>
 
       <div className="lg:hidden font-poppins text-accent text-sm opacity-40 text-center py-6">
-        Foster Wheeler - Alangilan
+        Foster Wheeler Library - Alangilan
       </div>
     </div>
   );

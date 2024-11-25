@@ -1,24 +1,12 @@
+// useRegistrationStore.ts
 import { create } from 'zustand';
-
-interface UserFormData {
-  firstName: string;
-  middleName: string;
-  lastName: string;
-  suffix: string;
-  userCode: string;
-  department: string;
-  program: string;
-  encoding: number[];
-  imageUrl: string;
-}
+import { UserRegistrationData } from '../../../types/user.types';
 
 interface RegistrationState {
-  formData: UserFormData;
-  localFormData: UserFormData;
-  setLocalFormData: (data: Partial<UserFormData>) => void;
-  setFormData: (data: Partial<UserFormData>) => void;
-  isFormValid: boolean;
-  setIsFormValid: (isValid: boolean) => void;
+  formData: UserRegistrationData;
+  localFormData: UserRegistrationData;
+  setLocalFormData: (data: Partial<UserRegistrationData>) => void;
+  setFormData: (data: Partial<UserRegistrationData>) => void;
   selectedDept: string;
   setSelectedDept: (dept: string) => void;
   selectedProgram: { value: string; label: string }[];
@@ -29,7 +17,7 @@ interface RegistrationState {
   resetForm: () => void;
 }
 
-const initialFormData: UserFormData = {
+const initialFormData: UserRegistrationData = {
   firstName: "",
   middleName: "",
   lastName: "",
@@ -44,28 +32,14 @@ const initialFormData: UserFormData = {
 export const useRegistrationStore = create<RegistrationState>((set) => ({
   formData: initialFormData,
   localFormData: initialFormData,
-  isFormValid: false,
-  userCodeError: "",
-  selectedDept: '',
-  selectedProgram: [],
-  setFormData: (data) => set((state) => ({
-    formData: { ...state.formData, ...data },
-  })),
-  setLocalFormData: (data) => set((state) => ({
-    localFormData: { ...state.localFormData, ...data },
-  })),
-  setIsFormValid: (isValid) => set({ isFormValid: isValid }),
-  setUserCodeError: (error) => set({ userCodeError: error }),
+  setLocalFormData: (data) => set((state) => ({ localFormData: { ...state.localFormData, ...data } })),
+  setFormData: (data) => set((state) => ({ formData: { ...state.formData, ...data } })),
+  selectedDept: "",
   setSelectedDept: (dept) => set({ selectedDept: dept }),
+  selectedProgram: [],
   setSelectedProgram: (options) => set({ selectedProgram: options }),
-  submitForm: () => set((state) => ({
-    formData: state.localFormData,
-  })),
-  
-  resetForm: () => set({ 
-    formData: initialFormData, 
-    localFormData: initialFormData, 
-    isFormValid: false,
-    selectedProgram: []
-  }),
+  userCodeError: "",
+  setUserCodeError: (error) => set({ userCodeError: error }),
+  submitForm: () => set((state) => ({ formData: state.localFormData })),
+  resetForm: () => set({ localFormData: initialFormData })
 }));

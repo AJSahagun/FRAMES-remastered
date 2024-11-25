@@ -13,5 +13,5 @@ export interface UserRegistrationData {
 export interface ApiResponse<T> {
   data: T;
   message: string;
-  status: number;
+  statusCode: number;
 }
