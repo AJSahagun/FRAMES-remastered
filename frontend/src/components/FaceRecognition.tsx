@@ -5,8 +5,9 @@ import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 
 interface FaceRecognitionProps {
-  onSuccess: (encoding: number[]) => void;
-  isCheckIn?: boolean;
+  onSuccess: (faceDescriptor: number[]) => void;
+  isCheckIn: boolean;
+  shouldCapture: boolean;
 }
 
 interface DetectionBox {
@@ -16,7 +17,7 @@ interface DetectionBox {
   height: number;
 }
 
-const FaceRecognition: React.FC<FaceRecognitionProps> = ({ onSuccess }) => {
+const FaceRecognition: React.FC<FaceRecognitionProps> = ({ onSuccess, isCheckIn, shouldCapture }) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -27,6 +28,21 @@ const FaceRecognition: React.FC<FaceRecognitionProps> = ({ onSuccess }) => {
   const [videoDimensions, setVideoDimensions] = useState({ width: 0, height: 0 });
   const holdTimerRef = useRef<number>();
   const [holdProgress, setHoldProgress] = useState(0);
+
+  useEffect(() => {
+    const captureEnabled = isCheckIn || shouldCapture;
+
+    if (!captureEnabled) {
+      if (holdTimerRef.current) {
+        clearInterval(holdTimerRef.current);
+        holdTimerRef.current = undefined;
+      }
+      setHoldProgress(0);
+      clearInterval(detectionIntervalRef.current);
+    } else if (isVideoReady && isModelsLoaded) {
+      startFaceDetection();
+    }
+  }, [shouldCapture, isCheckIn, isVideoReady, isModelsLoaded]);
 
   useEffect(() => {
     const loadModels = async () => {
@@ -59,16 +75,6 @@ const FaceRecognition: React.FC<FaceRecognitionProps> = ({ onSuccess }) => {
       startWebcam();
     }
   }, [isModelsLoaded]);
-
-  useEffect(() => {
-    if (isVideoReady && isModelsLoaded && videoRef.current) {
-      startFaceDetection();
-    }
-    
-    return () => {
-      clearInterval(detectionIntervalRef.current);
-    };
-  }, [isVideoReady, isModelsLoaded]);
 
   const startWebcam = async (deviceId?: string) => {
     try {
@@ -128,12 +134,12 @@ const FaceRecognition: React.FC<FaceRecognitionProps> = ({ onSuccess }) => {
   };
 
   const startFaceDetection = () => {
-    if (!videoRef.current || !canvasRef.current) return;
+    if (!videoRef.current || !canvasRef.current || !(isCheckIn || shouldCapture)) return;
     
     clearInterval(detectionIntervalRef.current);
     
     detectionIntervalRef.current = window.setInterval(async () => {
-      if (!videoRef.current || !isVideoReady || videoRef.current.readyState !== 4) {
+      if (!videoRef.current || !isVideoReady || videoRef.current.readyState !== 4 || !(isCheckIn || shouldCapture)) {
         return;
       }
       
@@ -155,29 +161,29 @@ const FaceRecognition: React.FC<FaceRecognitionProps> = ({ onSuccess }) => {
           const detection = detections[0].box;
           const isAligned = isFaceInGuide(detection);
   
-          if (isAligned && !isProcessing) {
+          if (isAligned && !isProcessing && shouldCapture) {
             if (!holdTimerRef.current) {
-                let progress = 0;
-                const startTime = Date.now();
-                holdTimerRef.current = window.setInterval(() => {
-                  const elapsed = Date.now() - startTime;
-                  progress = Math.min((elapsed / 3000) * 100, 100);
-                  setHoldProgress(progress);
-                  
-                  if (progress >= 100) {
-                    clearInterval(holdTimerRef.current);
-                    holdTimerRef.current = undefined;
-                    processFace();
-                  }
-                }, 100);
-              }
-            } else {
-              if (holdTimerRef.current) {
-                clearInterval(holdTimerRef.current);
-                holdTimerRef.current = undefined;
-                setHoldProgress(0);
-              }
+              let progress = 0;
+              const startTime = Date.now();
+              holdTimerRef.current = window.setInterval(() => {
+                const elapsed = Date.now() - startTime;
+                progress = Math.min((elapsed / 3000) * 100, 100);
+                setHoldProgress(progress);
+                
+                if (progress >= 100) {
+                  clearInterval(holdTimerRef.current);
+                  holdTimerRef.current = undefined;
+                  processFace();
+                }
+              }, 100);
             }
+          } else {
+            if (holdTimerRef.current) {
+              clearInterval(holdTimerRef.current);
+              holdTimerRef.current = undefined;
+              setHoldProgress(0);
+            }
+          }
   
           context.strokeStyle = isAligned ? '#00FF00' : '#FF0000';
           context.strokeRect(detection.x, detection.y, detection.width, detection.height);
@@ -192,7 +198,7 @@ const FaceRecognition: React.FC<FaceRecognitionProps> = ({ onSuccess }) => {
         console.error("Face detection error:", error);
         clearInterval(detectionIntervalRef.current);
         setTimeout(() => {
-          if (isVideoReady && videoRef.current) {
+          if (isVideoReady && videoRef.current && shouldCapture) {
             startFaceDetection();
           }
         }, 1000);
@@ -201,7 +207,7 @@ const FaceRecognition: React.FC<FaceRecognitionProps> = ({ onSuccess }) => {
   };
 
   const processFace = async () => {
-    if (!videoRef.current || isProcessing) return;
+    if (!videoRef.current || isProcessing || !(isCheckIn || shouldCapture)) return;
 
     setIsProcessing(true);
     try {
@@ -214,7 +220,6 @@ const FaceRecognition: React.FC<FaceRecognitionProps> = ({ onSuccess }) => {
       if (detection) {
         const faceDescriptor = Array.from(detection.descriptor);
         onSuccess(faceDescriptor);
-        console.log(faceDescriptor);
       } else {
         toast.warn("No face detected. Please try again.");
       }
@@ -223,6 +228,7 @@ const FaceRecognition: React.FC<FaceRecognitionProps> = ({ onSuccess }) => {
       toast.error("Face processing failed. Please try again.");
     }
     setIsProcessing(false);
+    setHoldProgress(0);
   };
 
   return (
@@ -242,15 +248,15 @@ const FaceRecognition: React.FC<FaceRecognitionProps> = ({ onSuccess }) => {
           transition-all duration-300 ease-in-out" 
         />
 
-        {holdProgress > 0 && (
-            <div className="absolute top-4 left-1/2 transform -translate-x-1/2 w-3/4">
+        {holdProgress > 0 && (isCheckIn || shouldCapture) && (
+          <div className="absolute top-4 left-1/2 transform -translate-x-1/2 w-3/4">
             <div className="w-full bg-gray-200 rounded-full h-2.5">
-                <div 
+              <div 
                 className="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
                 style={{ width: `${holdProgress}%` }}
-                />
+              />
             </div>
-            </div>
+          </div>
         )}
 
         <canvas
@@ -264,6 +270,12 @@ const FaceRecognition: React.FC<FaceRecognitionProps> = ({ onSuccess }) => {
             objectFit: 'cover'
           }}
         />
+
+        {isCheckIn && !shouldCapture && (
+          <div className="absolute top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 rounded-lg">
+            <p className="text-white text-lg font-medium">Please enter your School ID first</p>
+          </div>
+        )}
 
         {isProcessing && (
           <div className="absolute top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 rounded-lg">

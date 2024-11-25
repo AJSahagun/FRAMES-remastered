@@ -1,7 +1,6 @@
-import '../../index.css';
 import FosterWeelerTag from '../../components/FosterWheelerTag';
-import { useEffect, useState } from 'react';
-import { Formik, Field, Form, ErrorMessage } from 'formik';
+import { useEffect, useState, useRef } from 'react';
+import { Formik, Field, Form, ErrorMessage, FormikHelpers } from 'formik';
 import * as Yup from 'yup';
 import FaceRecognition from '../../components/FaceRecognition';
 import { toast } from 'react-toastify';
@@ -9,10 +8,14 @@ import { db } from '../../config/db';
 import { useSync } from './hooks/useSync';
 import { findBestMatch } from '../../services/faceMatchService';
 
+interface FormValues {
+  schoolId: string;
+}
+
 const userCodeRegex = /^(2\d-\d{5}$|P-\d{5})$/;
 
 const validationSchema = Yup.object({
-  user_code: Yup.string()
+  schoolId: Yup.string()
     .required('This field is required')
     .matches(userCodeRegex, 'Example format: "20-12345" or "P-12345"')
     .test(
@@ -24,87 +27,79 @@ const validationSchema = Yup.object({
     )
 });
 
-
 export default function Access_IN() {
   const [time, setTime] = useState(new Date().toLocaleTimeString());
-  const [occupantCount, setOccupantCount] = useState<number>(0); // State to hold the count of occupants
-  const [isConnected] = useSync()
+  const [occupantCount, setOccupantCount] = useState<number>(0);
+  const [isConnected] = useSync();
+  const [shouldCapture, setShouldCapture] = useState(false);
+  const formikRef = useRef<FormikHelpers<FormValues>>();
 
-  // Function to fetch the count of occupants from IndexedDB
   const fetchOccupantCount = async () => {
     try {
       const allOccupants = await db.occupants.toArray();
       const checkedOutOccupants = allOccupants.filter(occupant => occupant.timeOut);
-      const currentOccupantCount = allOccupants.length - checkedOutOccupants.length; 
+      const currentOccupantCount = allOccupants.length - checkedOutOccupants.length;
       setOccupantCount(currentOccupantCount);
     } catch (error) {
-      console.error('Error fetching occupant count:', error); 
+      console.error('Error fetching occupant count:', error);
     }
   };
 
   useEffect(() => {
-    // 1. Timer that updates the time every second
     const timer = setInterval(() => {
       setTime(new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }));
     }, 1000);
-  
-    // 2. Fetch the initial occupant count and poll every 1 second for updates
-    fetchOccupantCount(); 
+
+    fetchOccupantCount();
     const interval = setInterval(() => {
-      fetchOccupantCount(); 
-    }, 1000); 
-  
-    // 3. Cleanup function to clear both the timer and the polling interval when the component unmounts
+      fetchOccupantCount();
+    }, 1000);
+
     return () => {
-      clearInterval(timer); 
-      clearInterval(interval); 
+      clearInterval(timer);
+      clearInterval(interval);
     };
-  }, []); 
-  
-  const date = new Date().toLocaleDateString('en-us', { weekday:"long", year:"numeric", month:"short", day:"numeric"});
-  const date2=new Date().toISOString()
+  }, []);
+
+  const date = new Date().toLocaleDateString('en-us', { weekday: "long", year: "numeric", month: "short", day: "numeric" });
+  const date2 = new Date().toISOString();
 
   const handleFaceRecognition = async (faceDescriptor: number[]) => {
-    try {
-      // Process for Access in:
-      // 1. Get request of face encodings from local db using 'school_id' (Sr-Code)
-      // 2. Compare it with detected face descriptors
-      // 3. If not match end, else get user name and display success
-      // 4. Send post request in history (Local db) and update occupancy count
-      // 5. Save face encodings and sr code in local db occupants table for check out later
-      
-      // Sample API call (Implement this using axios)
-      const data = await findBestMatch(faceDescriptor);
-      
-      if(data){
-        //  checks if user already has history
-        const user = await db.occupants
-        .where("schoolId")
-        .equals(data.schoolId)
-        .filter((user) => user.timeOut === null)
-        .first();
+    console.log(faceDescriptor);
 
-        if(user){
+    try {
+      const data = await findBestMatch(faceDescriptor);
+
+      if (data) {
+        const user = await db.occupants
+          .where("schoolId")
+          .equals(data.schoolId)
+          .filter((user) => user.timeOut === null)
+          .first();
+
+        if (user) {
           toast.warning(`Already encoded`);
-        }
-        else{
-          // Add the occupant to the occupants table
+        } else {
           await db.occupants.add({
-            name: data.name, 
-            schoolId: data.schoolId, 
+            name: data.name,
+            schoolId: data.schoolId,
             timeIn: date2,
             timeOut: null,
           });
-          
-          // count all occupants without timeOut
+
           const updatedCount = await db.occupants
             .filter(user => user.timeOut == null)
             .count();
           setOccupantCount(updatedCount);
           toast.success(`Welcome ${data.name}!`);
+          
+          // Clear the form after successful match
+          if (formikRef.current) {
+            formikRef.current.resetForm();
+          }
+          setShouldCapture(false);
         }
-      }
-      else{
+      } else {
         toast.error('No face match detected, register first');
       }
     } catch (error) {
@@ -115,81 +110,109 @@ export default function Access_IN() {
 
   return (
     <Formik
-      initialValues={{ user_code: '' }}
-      onSubmit={(value) => {
-        console.log(value);
+      initialValues={{ schoolId: '' }}
+      onSubmit={() => {
+        // Form submission is handled through validation
       }}
       validationSchema={validationSchema}>
-      <Form>
-        <div className="flex flex-col">
-          {/* heading */}
-          <div className="flex flex-row">
-            <div>
-              <h1 className="text-7xl gradient-text font-poppins font-medium ml-20 mt-16">
-                Check-in
-              </h1>
-            </div>
-            <div className="">
-              <FosterWeelerTag/>
-            </div>
-          </div>
+      {(formikProps) => {
+        // Store formik helpers for resetting the form
+        formikRef.current = formikProps;
 
-          {/* body */}
-          <div className="flex flex-row">
-            {/* left */}
-            <div className="w-1/2 flex flex-col">
-              <div className="w-3/5 ml-40 mt-10">
-                <FaceRecognition onSuccess={handleFaceRecognition} isCheckIn={true} />
-              </div>
-              {/* clock */}
-              <div className="flex justify-between w-full ml-24 mt-6">
+        // Enable face capture when the school ID is valid
+        const isValid = formikProps.isValid && formikProps.values.schoolId !== '';
+        if (isValid && !shouldCapture) {
+          setShouldCapture(true);
+        } else if (!isValid && shouldCapture) {
+          setShouldCapture(false);
+        }
+
+        return (
+          <Form>
+            <div className="flex flex-col">
+              {/* heading */}
+              <div className="flex flex-row">
                 <div>
-                  <p className="font-poppins text-6xl font-[500] gradient-text tracking-wide">
-                    {time}
-                  </p>
-                  <p className="font-poppins text-xl -mt-2 font-medium gradient-text tracking-wide">
-                    {date}
-                  </p>
+                  <h1 className="text-7xl gradient-text font-poppins font-medium ml-20 mt-16">
+                    Check-in
+                  </h1>
                 </div>
-                <div className="flex items-start mt-1 mr-8">
-                  <div className={`flex items-center space-x-2 ${isConnected ? 'text-green-500' : 'text-primary'}`}>
-                    <span className="font-poppins text-xl">{isConnected ? 'Online' : 'Offline'}</span>
-                    <div className={`w-4 h-4 rounded-full ${isConnected ? 'bg-green-500' : 'bg-btnBg'}`} />
+                <div className="">
+                  <FosterWeelerTag />
+                </div>
+              </div>
+
+              {/* body */}
+              <div className="flex flex-row">
+                {/* left */}
+                <div className="w-1/2 flex flex-col">
+                  <div className="w-3/5 ml-40 mt-10">
+                    <FaceRecognition 
+                      onSuccess={handleFaceRecognition} 
+                      isCheckIn={true}
+                      shouldCapture={shouldCapture} 
+                    />
+                  </div>
+                  {/* clock */}
+                  <div className="flex justify-between w-full ml-24 mt-6">
+                    <div>
+                      <p className="font-poppins text-6xl font-[500] gradient-text tracking-wide">
+                        {time}
+                      </p>
+                      <p className="font-poppins text-xl -mt-2 font-medium gradient-text tracking-wide">
+                        {date}
+                      </p>
+                    </div>
+                    <div className="flex items-start mt-1 mr-8">
+                      <div className={`flex items-center space-x-2 ${isConnected ? 'text-green-500' : 'text-primary'}`}>
+                        <span className="font-poppins text-xl">{isConnected ? 'Online' : 'Offline'}</span>
+                        <div className={`w-4 h-4 rounded-full ${isConnected ? 'bg-green-500' : 'bg-btnBg'}`} />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* right */}
+                <div className="w-1/2">
+                  <div className="flex justify-center mt-20">
+                    <img src="/logos/frames-square-logo.png" alt="FRAMES Logo" className="" />
+                  </div>
+
+                  <div className="flex flex-col items-center mt-12">
+                    <div className="relative w-1/3">
+                      <Field
+                        type="text"
+                        name="schoolId"
+                        placeholder="Enter code"
+                        className="w-full px-8 py-4 rounded-md bg-accent font-poppins text-white text-lg placeholder:text-lg placeholder:font-poppins focus:outline-secondary"
+                      />
+                      {formikProps.values.schoolId && (
+                        <button
+                          type="button"
+                          onClick={() => formikProps.setFieldValue('schoolId', '')}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-white hover:text-gray-200"
+                        >
+                          ✕
+                        </button>
+                      )}
+                    </div>
+                    <ErrorMessage name="schoolId" component="div" className="text-red-500 text-sm" />
+                  </div>
+
+                  <div className="flex flex-col items-center mt-16">
+                    <p>
+                      <span className="font-poppins font-semibold text-7xl gradient-text">{occupantCount}</span>
+                      <span className="font-poppins font-medium text-5xl text-accent">/</span>
+                      <span className="font-poppins font-semibold text-5xl text-accent">250</span>
+                    </p>
+                    <h2 className="font-noto_sans font-semibold text-5xl text-accent">OCCUPANTS</h2>
                   </div>
                 </div>
               </div>
             </div>
-
-
-            {/* right */}
-						<div className="w-1/2">
-							<div className="flex justify-center mt-20">
-								<img src="/logos/frames-square-logo.png" alt="FRAMES Logo" 
-								className=""/>
-							</div>
-
-							<div className="flex flex-col items-center mt-12">
-								<Field
-									type="text"
-									name="user_code"
-									placeholder="Enter code"
-									className="w-1/3 px-8 py-4 rounded-md bg-accent font-poppins text-white text-lg placeholder:text-lg placeholder:font-poppins  focus:outline-secondary ">		
-								</Field>
-								<ErrorMessage name="user_code" component="div" className="text-red-500 text-sm" />
-							</div>
-
-							<div className="flex flex-col items-center mt-16">
-								<p>
-									<span className="font-poppins font-semibold text-7xl gradient-text">{occupantCount}</span>
-									<span className="font-poppins font-medium text-5xl text-accent">/</span>
-									<span className="font-poppins font-semibold text-5xl text-accent">250</span>
-								</p>
-								<h2 className="font-noto_sans font-semibold text-5xl text-accent">OCCUPANTS</h2>
-							</div>
-						</div>
-					</div>      
-				</div>
-			</Form>
-		</Formik>
+          </Form>
+        );
+      }}
+    </Formik>
   );
 }

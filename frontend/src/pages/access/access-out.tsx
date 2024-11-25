@@ -97,7 +97,7 @@ export default function Access_OUT() {
         {/* left */}
         <div className="w-1/2 flex flex-col">
           <div className="w-3/5 ml-40 mt-10">
-            <FaceRecognition onSuccess={handleFaceRecognition} isCheckIn={false} />
+            <FaceRecognition onSuccess={handleFaceRecognition} isCheckIn={false} shouldCapture={true} />
           </div>
           {/* clock */}
           <div className="flex justify-between w-full ml-24 mt-6">
