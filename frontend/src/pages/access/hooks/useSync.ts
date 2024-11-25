@@ -28,6 +28,7 @@ export const useSync = () => {
       db.encodings.add({ id, name, schoolId, encoding });
     } catch (error) {
       console.log("Failed to add encoding to local storage");
+      console.log(error);
     }
   }
   const onConnect = async () => {
@@ -45,6 +46,7 @@ export const useSync = () => {
       );
     } catch (error) {
       console.log("Failed to fetch latest encoding");
+      console.log(error);
     }
     console.log("Connected");
   };
