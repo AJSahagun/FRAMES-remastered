@@ -1,6 +1,5 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { CreateHistoryDto } from './dto/create-history.dto';
-import { UpdateHistoryDto } from './dto/update-history.dto';
 
 @Injectable()
 export class HistoryService {
@@ -47,4 +46,7 @@ export class HistoryService {
     return await this.sql(`SELECT * FROM history`);
   }
 
+  async findLatestHistory(): Promise<any> {
+    return await this.sql(`select id_ai from history order by id_ai desc limit 1`);
+  }
 }

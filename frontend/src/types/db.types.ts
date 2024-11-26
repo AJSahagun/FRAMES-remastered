@@ -1,11 +1,12 @@
 type Encodings = {
+  id: number;
   name: string;
   schoolId: string;
-  encoding: string;
+  encoding: number[];
 };
 
 type Occupants = {
-  id: number;
+  id?: number
   name: string;
   schoolId: string;
   timeIn: string;
