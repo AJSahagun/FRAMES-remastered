@@ -10,8 +10,8 @@ const db = new Dexie('frames') as Dexie & {
 
 // Schema declaration:
 db.version(1).stores({
-  encodings: '++id, name, schoolId, encoding',
-  occupants: '++id, name, schoolId, timeIn, timeOut'
+  encodings: '++id, name, school_id, encoding',
+  occupants: '++id, name, school_id, time_in, time_out'
 });
 
 export type { Encodings };

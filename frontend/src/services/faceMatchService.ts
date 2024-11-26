@@ -19,7 +19,6 @@ export async function findBestMatch(userDescriptor: number[]):Promise<Occupants|
     
     users.forEach((user) => {
       const distance = euclideanDistance(userDescriptor, user.encoding);
-      console.log(distance+"-")
       if (distance < bestDistance) {
         bestDistance = distance;
         bestMatch = user;

@@ -37,7 +37,7 @@ export default function Access_IN() {
   const fetchOccupantCount = async () => {
     try {
       const allOccupants = await db.occupants.toArray();
-      const checkedOutOccupants = allOccupants.filter(occupant => occupant.timeOut);
+      const checkedOutOccupants = allOccupants.filter(occupant => occupant.time_out);
       const currentOccupantCount = allOccupants.length - checkedOutOccupants.length;
       setOccupantCount(currentOccupantCount);
     } catch (error) {
@@ -65,7 +65,6 @@ export default function Access_IN() {
   const date2 = new Date().toISOString();
 
   const handleFaceRecognition = async (faceDescriptor: number[]) => {
-    console.log(faceDescriptor);
 
     try {
       const data = await findBestMatch(faceDescriptor);
@@ -73,8 +72,8 @@ export default function Access_IN() {
       if (data) {
         const user = await db.occupants
           .where("schoolId")
-          .equals(data.schoolId)
-          .filter((user) => user.timeOut === null)
+          .equals(data.school_id)
+          .filter((user) => user.time_out === null)
           .first();
 
         if (user) {
@@ -82,13 +81,13 @@ export default function Access_IN() {
         } else {
           await db.occupants.add({
             name: data.name,
-            schoolId: data.schoolId,
-            timeIn: date2,
-            timeOut: null,
+            school_id: data.school_id,
+            time_in: date2,
+            time_out: null,
           });
 
           const updatedCount = await db.occupants
-            .filter(user => user.timeOut == null)
+            .filter(user => user.time_out == null)
             .count();
           setOccupantCount(updatedCount);
           toast.success(`Welcome ${data.name}!`);

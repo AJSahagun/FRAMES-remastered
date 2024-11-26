@@ -15,17 +15,18 @@ export const useSync = () => {
   const onSync = (data: EncodingResponse[]) => {
     data.map((encoding) =>
       addEncoding(
-        encoding.idAi,
+        encoding.id_ai,
         encoding.name,
-        encoding.schoolId,
+        encoding.school_id,
         encoding.encoding
       )
     );
   };
 
-  const addEncoding=(id: number, name: string, schoolId: string, encoding: number[]) =>{
+  const addEncoding=(id: number, name: string, school_id: string, encoding: number[]) =>{
+    console.log({ id, name, school_id, encoding })
     try {
-      db.encodings.add({ id, name, schoolId, encoding });
+      db.encodings.add({ id, name, school_id, encoding });
     } catch (error) {
       console.log("Failed to add encoding to local storage");
       console.log(error);
@@ -54,21 +55,20 @@ export const useSync = () => {
     setIsConnected(false);
     console.log("Disconnected");
   };
-  const onMessage = (data: any) => {
+  const onRegister = (data: EncodingResponse) => {
     encodingStore.setEncodings(data);
     addEncoding(data.id_ai, data.name, data.school_id, data.encoding);
-    console.log("new encoding: "+data);
   };
 
   useEffect(() => {
     socket.on("connect", onConnect);
-    socket.on("onMessage", onMessage); // server to client after registration
+    socket.on("onRegister", onRegister); // server to client after registration
     socket.on("onSync", onSync);
     socket.on("disconnect", onDisconnect);
     return () => {
       console.log("Unregistering");
       socket.off("connect", onConnect);
-      socket.off("onMessage", onMessage);
+      socket.off("onRegister", onRegister);
       socket.off("onSync", onSync);
       socket.off("disconnect", onDisconnect);
     };

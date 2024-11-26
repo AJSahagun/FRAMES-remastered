@@ -12,7 +12,7 @@ export class HistoryController {
 
   @Version('2')
   @Post()
-  create(@Body() createHistoryDto: CreateHistoryDto) {
+  create(@Body() createHistoryDto: CreateHistoryDto[]) {
     return this.historyService.create(createHistoryDto);
   }
 

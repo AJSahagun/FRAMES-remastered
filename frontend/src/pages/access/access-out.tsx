@@ -18,7 +18,7 @@ export default function Access_OUT() {
   const fetchOccupantCount = async () => {
     try {
       const allOccupants = await db.occupants.toArray();
-      const checkedOutOccupants = allOccupants.filter(occupant => occupant.timeOut);
+      const checkedOutOccupants = allOccupants.filter(occupant => occupant.time_out);
       const currentOccupantCount = allOccupants.length - checkedOutOccupants.length; 
       setOccupantCount(currentOccupantCount); 
     } catch (error) {
@@ -54,12 +54,12 @@ export default function Access_OUT() {
       if(match){
         const data = await db.occupants
           .where("schoolId")
-          .equals(match?.schoolId)
-          .filter((record) => record.timeOut === null)
+          .equals(match?.school_id)
+          .filter((record) => record.time_out === null)
           .first();
         // 2. Check if an occupant was found (this step assumes your response returns the occupant data)
-        if (data && data.timeOut ==null) {
-          await db.occupants.update(data, { timeOut: date2 });
+        if (data && data.time_out ==null) {
+          await db.occupants.update(data, { time_out: date2 });
             // 7. Call fetchOccupantCount to update the count after checkout
             fetchOccupantCount();
             // 8. Show success toasts for checkout

@@ -60,7 +60,7 @@ describe('UserService', () => {
   });
 
   it('should be defined', () => {
-    expect(userService).toBeDefined();
+    expect(service).toBeDefined();
   });
 
   describe('Create user related', () => {

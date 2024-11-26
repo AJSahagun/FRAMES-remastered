@@ -23,18 +23,6 @@ export class HistoryService {
       `;
 
       await this.sql(historyInsertQuery);
-
-      // // insert recent encodings
-      // await this.sql(
-      //   `insert into encodings(school_id, encoding) values('${schoolId}', '${encoding}')
-      //   `)
-
-      // // delete old encodings
-      // await this.sql(
-      //   `delete from encodings where uuid not in
-      //   (select uuid from encodings where school_id= '${schoolId}' order by date_created desc limit 5)
-      //   and school_id= '${schoolId}'
-      // `)
       return { success: true, message: 'Bulk data processed successfully' };
     } catch (error) {
       console.log(error)

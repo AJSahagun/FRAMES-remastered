@@ -9,7 +9,7 @@ export const useBulkRequest = () => {
   const sendBulkRequest = async () => {
     const currentTime = new Date().toDateString();
     const usersWithHistory = await db.occupants
-    .filter(user => user.timeOut !== null)
+    .filter(user => user.time_out !== null)
     .toArray();
     
     if(usersWithHistory.length >0){

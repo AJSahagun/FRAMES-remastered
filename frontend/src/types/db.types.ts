@@ -1,16 +1,16 @@
 type Encodings = {
   id: number;
   name: string;
-  schoolId: string;
+  school_id: string;
   encoding: number[];
 };
 
 type Occupants = {
   id?: number
   name: string;
-  schoolId: string;
-  timeIn: string;
-  timeOut: string | null;  
+  school_id: string;
+  time_in: string;
+  time_out: string | null;  
 };
 
 type ResponseType = {
@@ -19,10 +19,10 @@ type ResponseType = {
 };
 
 type EncodingResponse = {
-  idAi: number;
+  id_ai: number;
   name: string;
   encoding: number[];  
-  schoolId: string;
+  school_id: string;
 };
 
 export type { Encodings, Occupants, ResponseType, EncodingResponse };
