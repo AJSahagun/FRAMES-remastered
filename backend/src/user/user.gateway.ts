@@ -1,7 +1,7 @@
-import { MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import { MessageBody, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer, WsException } from '@nestjs/websockets';
 
 import { UserService } from './user.service';
-import { Server } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import { forwardRef, Inject } from '@nestjs/common';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { configDotenv } from 'dotenv';
@@ -12,7 +12,7 @@ configDotenv();
     origin: process.env.FRAMES_FRONTEND_URL || '*'
   },
 })
-export class UserGateway {
+export class UserGateway implements OnGatewayConnection, OnGatewayDisconnect{
   @WebSocketServer()
   server: Server
   
@@ -20,11 +20,31 @@ export class UserGateway {
       private eventEmitter: EventEmitter2
   ){}
 
+  // jwt things
+  private verifyToken(token: string): boolean {
+    return token === 'valid-token'; // Replace with actual logic (e.g., JWT verification)
+  }
+
+  async handleConnection(client: Socket) {
+    const token = client.handshake.auth?.token;
+
+    if (!token || !this.verifyToken(token)) {
+      console.log('Unauthorized client disconnected');
+      client.disconnect();
+      return;
+    }
+
+    console.log('Client connected:', client.id);
+  }
+
+  handleDisconnect(client: Socket) {
+    console.log('Client disconnected:', client.id);
+  }
+
 
   // sync client history to server
   @SubscribeMessage('syncEncodings')
   async onSyncEncodings(@MessageBody() latestId: number) {
-    // const latestEncodings =await this.userService.findAllEncodings(latestId)
 
     return new Promise((resolve,reject)=>{
       this.eventEmitter.emit('syncEncodings',latestId, (result)=>{
