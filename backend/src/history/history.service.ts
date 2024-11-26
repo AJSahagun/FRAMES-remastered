@@ -33,10 +33,6 @@ export class HistoryService {
     return await this.sql(`SELECT * FROM history`);
   }
 
-  async findLatestHistory(): Promise<any> {
-    return await this.sql(`select id_ai from history order by id_ai desc limit 1`);
-  }
-
   async filterByQuery():Promise<any>{
     const query=`
     WITH user_with_history AS (
