@@ -33,7 +33,7 @@ export const useBulkRequest = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       sendBulkRequest();
-    }, 60 * 60* 1000); // Every 1 hour
+    }, 60*30* 1000); // Every 1 hour
 
     return () => clearInterval(interval);
   }, []);

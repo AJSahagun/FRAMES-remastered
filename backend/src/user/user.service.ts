@@ -92,11 +92,12 @@ export class UserService {
       const idAi = await this.sql(
         `INSERT INTO encodings (encoding, school_id)
          VALUES ($1, $2)
-         RETURNING id_ai`,
+         RETURNING id_ai, date_created `,
         [JSON.stringify(encoding), school_id], // Serialize array as JSON for storage
       );
       const data = {
         id_ai: idAi[0]['id_ai'],
+        date_created: idAi[0]['date_created'],
         name,
         school_id,
         encoding,
@@ -140,6 +141,7 @@ export class UserService {
           ) AS name, 
           e.id_ai, 
           e.school_id, 
+          e.date_created, 
           e."encoding" 
       FROM 
           encodings e

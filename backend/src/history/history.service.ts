@@ -9,12 +9,11 @@ export class HistoryService {
 
 
   async create(createHistoryDto: CreateHistoryDto[]):Promise<any> {
-    console.log(createHistoryDto)
     try {
       const historyValues = createHistoryDto.map((dto) => {
-        const timeIn = dto.timeIn;
-        const timeOut = dto.timeOut || null;
-        return `('${dto.schoolId}', '${timeIn}', ${timeOut ? `'${timeOut}'` : 'NULL'})`;
+        const timeIn = dto.time_in;
+        const timeOut = dto.time_out || null;
+        return `('${dto.school_id}', '${timeIn}', ${timeOut ? `'${timeOut}'` : 'NULL'})`;
       });
 
       const historyInsertQuery = `

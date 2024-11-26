@@ -53,12 +53,12 @@ export default function Access_OUT() {
     try {
       if(match){
         const data = await db.occupants
-          .where("schoolId")
+          .where("school_id")
           .equals(match?.school_id)
           .filter((record) => record.time_out === null)
           .first();
         // 2. Check if an occupant was found (this step assumes your response returns the occupant data)
-        if (data && data.time_out ==null) {
+        if (data && data.time_out == null) {
           await db.occupants.update(data, { time_out: date2 });
             // 7. Call fetchOccupantCount to update the count after checkout
             fetchOccupantCount();
@@ -66,7 +66,7 @@ export default function Access_OUT() {
             toast.success(`Goodbye ${data.name}!`);
         } else {
           // 9. No matching occupant found
-          toast.error('Entry already recorded');
+          toast.error('Entry already recorded or no matching occupants');
         }
       }
       else{

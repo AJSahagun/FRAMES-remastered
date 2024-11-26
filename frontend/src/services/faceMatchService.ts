@@ -26,7 +26,7 @@ export async function findBestMatch(userDescriptor: number[]):Promise<Occupants|
     });
   
     // Define a threshold for matching
-    const THRESHOLD = 0.4; // Adjust based on accuracy needs
+    const THRESHOLD = 0.5; // Adjust based on accuracy needs
     return bestDistance <= THRESHOLD ? bestMatch : null;
   }
   

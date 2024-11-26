@@ -2,13 +2,13 @@ import { IsDate, IsISO8601, IsNotEmpty } from "class-validator"
 
 export class CreateHistoryDto {
     @IsNotEmpty()
-    schoolId:string
+    school_id:string
     @IsNotEmpty()
     
     @IsISO8601()
-    timeIn:Date
+    time_in:Date
     @IsISO8601()
-    timeOut:Date
+    time_out:Date
 
     // @IsNotEmpty()
     // encoding: number[];

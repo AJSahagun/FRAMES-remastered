@@ -7,6 +7,7 @@ import { toast } from 'react-toastify';
 import { db } from '../../config/db';
 import { useSync } from './hooks/useSync';
 import { findBestMatch } from '../../services/faceMatchService';
+import { EncodingResponse, Encodings } from '../../types/db.types';
 
 interface FormValues {
   schoolId: string;
@@ -33,6 +34,8 @@ export default function Access_IN() {
   const [isConnected] = useSync();
   const [shouldCapture, setShouldCapture] = useState(false);
   const formikRef = useRef<FormikHelpers<FormValues>>();
+  const date = new Date().toLocaleDateString('en-us', { weekday: "long", year: "numeric", month: "short", day: "numeric" });
+  const date2 = new Date().toISOString();
 
   const fetchOccupantCount = async () => {
     try {
@@ -44,6 +47,7 @@ export default function Access_IN() {
       console.error('Error fetching occupant count:', error);
     }
   };
+  
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -61,17 +65,35 @@ export default function Access_IN() {
     };
   }, []);
 
-  const date = new Date().toLocaleDateString('en-us', { weekday: "long", year: "numeric", month: "short", day: "numeric" });
-  const date2 = new Date().toISOString();
+  const recordLatestEncoding = async (data:Encodings)=>{
+    await db.encodings.add({
+      date_created: data.date_created,
+      name: data.name,
+      school_id: data.school_id,
+      encoding: data.encoding
+    });
+
+    // delete old encodings here
+    const userRecords = await db.encodings
+    .where('school_id')
+    .equals(data.school_id)
+    .sortBy('date_created'); // Returns sorted records for this user
+
+    if (userRecords.length > 5) {
+      const recordsToDelete = userRecords.slice(0, userRecords.length - 5); // Keep the latest 5
+      const idsToDelete:any = recordsToDelete.map((record) => record.id);
+  
+      await db.encodings.bulkDelete(idsToDelete);
+    }
+
+  }
 
   const handleFaceRecognition = async (faceDescriptor: number[]) => {
-
     try {
       const data = await findBestMatch(faceDescriptor);
-
       if (data) {
         const user = await db.occupants
-          .where("schoolId")
+          .where("school_id")
           .equals(data.school_id)
           .filter((user) => user.time_out === null)
           .first();
@@ -85,6 +107,7 @@ export default function Access_IN() {
             time_in: date2,
             time_out: null,
           });
+          recordLatestEncoding({...data, date_created:date2, encoding:faceDescriptor})
 
           const updatedCount = await db.occupants
             .filter(user => user.time_out == null)

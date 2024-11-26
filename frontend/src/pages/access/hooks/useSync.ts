@@ -16,6 +16,7 @@ export const useSync = () => {
     data.map((encoding) =>
       addEncoding(
         encoding.id_ai,
+        encoding.date_created,
         encoding.name,
         encoding.school_id,
         encoding.encoding
@@ -23,10 +24,10 @@ export const useSync = () => {
     );
   };
 
-  const addEncoding=(id: number, name: string, school_id: string, encoding: number[]) =>{
-    console.log({ id, name, school_id, encoding })
+  const addEncoding=(id: number, date_created:string, name: string, school_id: string, encoding: number[]) =>{
+    console.log({ id, date_created, name, school_id, encoding })
     try {
-      db.encodings.add({ id, name, school_id, encoding });
+      db.encodings.add({ id, date_created, name, school_id, encoding });
     } catch (error) {
       console.log("Failed to add encoding to local storage");
       console.log(error);
@@ -57,7 +58,7 @@ export const useSync = () => {
   };
   const onRegister = (data: EncodingResponse) => {
     encodingStore.setEncodings(data);
-    addEncoding(data.id_ai, data.name, data.school_id, data.encoding);
+    addEncoding(data.id_ai, data.date_created, data.name, data.school_id, data.encoding);
   };
 
   useEffect(() => {

@@ -1,8 +1,9 @@
 type Encodings = {
-  id: number;
+  id?: number;
   name: string;
   school_id: string;
   encoding: number[];
+  date_created: string;
 };
 
 type Occupants = {
@@ -20,6 +21,7 @@ type ResponseType = {
 
 type EncodingResponse = {
   id_ai: number;
+  date_created: string;
   name: string;
   encoding: number[];  
   school_id: string;
