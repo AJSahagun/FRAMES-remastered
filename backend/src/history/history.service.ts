@@ -58,4 +58,50 @@ export class HistoryService {
   async findAll(): Promise<any> {
     return await this.sql(`SELECT * FROM history`);
   }
+
+  async filterByQuery():Promise<any>{
+    const query=`
+    WITH user_with_history AS (
+      SELECT 
+          u.school_id, 
+          u.department, 
+          u.program, 
+          CONCAT(
+            u.first_name,
+            CASE 
+              WHEN u.middle_name IS NOT NULL THEN ' ' || u.middle_name 
+              ELSE '' 
+            END,
+            ' ', u.last_name, 
+            CASE 
+              WHEN u.suffix IS NOT NULL THEN ' ' || u.suffix 
+              ELSE '' 
+            END
+          ) AS name, 
+          json_agg(
+            json_build_object(
+              'time_in', h.time_in, 
+              'time_out', h.time_out
+            )
+          ) AS history
+      FROM users u
+      JOIN history h ON u.school_id = h.school_id
+      GROUP BY u.school_id, u.department, u.program, u.first_name, u.middle_name, u.last_name, u.suffix
+  )
+  SELECT 
+      school_id, 
+      name, 
+      department, 
+      program, 
+      history
+  FROM user_with_history
+  WHERE 
+      ($1::VARCHAR IS NULL OR school_id ILIKE '%' || $1 || '%')
+      AND ($2::VARCHAR IS NULL OR name ILIKE '%' || $2 || '%')
+      AND ($3::VARCHAR IS NULL OR department ILIKE '%' || $3 || '%')
+      AND ($4::VARCHAR IS NULL OR program ILIKE '%' || $4 || '%');`
+  }
+
+
+  const 
 }
