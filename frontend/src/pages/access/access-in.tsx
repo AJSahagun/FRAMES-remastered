@@ -211,6 +211,7 @@ export default function Access_IN() {
                         type="text"
                         name="schoolId"
                         placeholder="Enter code"
+                        autocomplete="off"
                         className="w-full px-8 py-4 rounded-md bg-accent font-poppins text-white text-lg placeholder:text-lg placeholder:font-poppins focus:outline-secondary"
                       />
                       {formikProps.values.schoolId && (
