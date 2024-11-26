@@ -1,62 +1,40 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { CreateHistoryDto } from './dto/create-history.dto';
-import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class HistoryService {
-  constructor(@Inject('POSTGRES_POOL') private readonly sql: any) {}
+  constructor(
+    @Inject('POSTGRES_POOL') private readonly sql:any,
+  ){}
 
-  async create(createHistoryDto: CreateHistoryDto): Promise<any> {
-    const schoolId = createHistoryDto.school_id;
-    const timeIn = createHistoryDto.time_in;
-    const timeOut = createHistoryDto.time_out;
-    const encoding = JSON.stringify(createHistoryDto.encoding);
 
+  async create(createHistoryDto: CreateHistoryDto[]):Promise<any> {
     try {
-      if (timeOut) {
-        await this.sql(
-          `insert into history("school_id", "time_in", "time_out") values('${schoolId}', '${timeIn}', '${timeOut}')`,
-        );
-      } else {
-        await this.sql(
-          `insert into history("school_id", "time_in") values('${schoolId}', '${timeIn}')`,
-        );
-      }
-    } catch (error) {
-      throw new HttpException(
-        `Error inserting history: ${error.message}`,
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+      const historyValues = createHistoryDto.map((dto) => {
+        const timeIn = dto.time_in;
+        const timeOut = dto.time_out || null;
+        return `('${dto.school_id}', '${timeIn}', ${timeOut ? `'${timeOut}'` : 'NULL'})`;
+      });
 
-    try {
-      await this.sql(
-        `insert into encodings(school_id, encoding) values('${schoolId}', '${encoding}')`,
-      );
-    } catch (error) {
-      throw new HttpException(
-        `Error inserting encoding: ${error.message}`,
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+      const historyInsertQuery = `
+        INSERT INTO history ("school_id", "time_in", "time_out")
+        VALUES ${historyValues.join(', ')};
+      `;
 
-    try {
-      const stale_records=await this.sql(
-        `delete from encodings where uuid not in
-        (select uuid from encodings where school_id= '${schoolId}' order by date_created desc limit 5)
-        and school_id= '${schoolId}' returning id_ai`,
-      );
+      await this.sql(historyInsertQuery);
+      return { success: true, message: 'Bulk data processed successfully' };
     } catch (error) {
-      throw new HttpException(
-        `Error deleting old encodings: ${error.message}`,
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      console.log(error)
+      throw new HttpException(`${error}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
-    throw new HttpException('Success', HttpStatus.ACCEPTED);
   }
 
-  async findAll(): Promise<any> {
+  async findAll():Promise<any> {
     return await this.sql(`SELECT * FROM history`);
+  }
+
+  async findLatestHistory(): Promise<any> {
+    return await this.sql(`select id_ai from history order by id_ai desc limit 1`);
   }
 
   async filterByQuery():Promise<any>{

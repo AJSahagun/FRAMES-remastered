@@ -58,8 +58,8 @@ const CheckInfo: React.FC<CheckInfoProps> = () => {
   
         resetForm();
         clearLocalStorage();
-  
-        navigate('/');
+
+        new Promise(resolve => setTimeout(resolve, 1000)).then(() => { navigate('/'); });
       } else {
         throw new Error('Unexpected response from backend');
       }

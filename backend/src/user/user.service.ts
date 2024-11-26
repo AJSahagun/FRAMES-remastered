@@ -82,24 +82,31 @@ export class UserService {
     }
   }
 
-  async syncEncoding(name:string, encoding:number[], school_id:string): Promise<{ error:any }>{
+    async syncEncoding(
+      name: string,
+      encoding: number[],
+      school_id: string,
+    ): Promise<{ error: any }> {
     try {
+      // Use parameterized queries to handle array input properly
       const idAi = await this.sql(
-        `INSERT INTO encodings(encoding, school_id)
-        values('${JSON.stringify(encoding)}','${school_id}')
-        returning id_ai
-        `,
+        `INSERT INTO encodings (encoding, school_id)
+         VALUES ($1, $2)
+         RETURNING id_ai, date_created `,
+        [JSON.stringify(encoding), school_id], // Serialize array as JSON for storage
       );
-      this.eventEmitter.emit('onRegister', {
-        idAi: idAi[0]['id_ai'],
+      const data = {
+        id_ai: idAi[0]['id_ai'],
+        date_created: idAi[0]['date_created'],
         name,
         school_id,
         encoding,
-      });
+      };
+      this.eventEmitter.emit('onRegister', data);
 
-      return {error:null}
+      return { error: null };
     } catch (error) {
-      return {error}
+      return { error };
     }
   }
   async findAll(): Promise<any[]> {
@@ -132,8 +139,9 @@ export class UserService {
               ' ', 
               u.last_name
           ) AS name, 
-          e.id_ai AS "idAi", 
-          e.school_id AS "schoolId", 
+          e.id_ai, 
+          e.school_id, 
+          e.date_created, 
           e."encoding" 
       FROM 
           encodings e
