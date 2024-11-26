@@ -1,13 +1,13 @@
 import FosterWeelerTag from '../../components/FosterWheelerTag';
 import { useEffect, useState, useRef } from 'react';
-import { Formik, Field, Form, ErrorMessage, FormikHelpers } from 'formik';
+import { Formik, Field, Form, ErrorMessage, FormikProps  } from 'formik';
 import * as Yup from 'yup';
 import FaceRecognition from '../../components/FaceRecognition';
 import { toast } from 'react-toastify';
 import { db } from '../../config/db';
 import { useSync } from './hooks/useSync';
-import { findBestMatch } from '../../services/faceMatchService';
-import { EncodingResponse, Encodings } from '../../types/db.types';
+import { findBestMatchBySchoolId } from '../../services/faceMatchService';
+import { Encodings } from '../../types/db.types';
 
 interface FormValues {
   schoolId: string;
@@ -33,7 +33,7 @@ export default function Access_IN() {
   const [occupantCount, setOccupantCount] = useState<number>(0);
   const [isConnected] = useSync();
   const [shouldCapture, setShouldCapture] = useState(false);
-  const formikRef = useRef<FormikHelpers<FormValues>>();
+  const formikRef = useRef<FormikProps<FormValues>>(null);
   const date = new Date().toLocaleDateString('en-us', { weekday: "long", year: "numeric", month: "short", day: "numeric" });
   const date2 = new Date().toISOString();
 
@@ -54,7 +54,6 @@ export default function Access_IN() {
       setTime(new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }));
     }, 1000);
 
-    fetchOccupantCount();
     const interval = setInterval(() => {
       fetchOccupantCount();
     }, 1000);
@@ -90,14 +89,22 @@ export default function Access_IN() {
 
   const handleFaceRecognition = async (faceDescriptor: number[]) => {
     try {
-      const data = await findBestMatch(faceDescriptor);
+      const schoolId = formikRef.current?.values.schoolId;
+      
+      if (!schoolId) {
+        toast.error('Please enter a valid School ID');
+        return;
+      }
+  
+      const data = await findBestMatchBySchoolId(faceDescriptor, schoolId);
+      
       if (data) {
         const user = await db.occupants
           .where("school_id")
           .equals(data.school_id)
           .filter((user) => user.time_out === null)
           .first();
-
+  
         if (user) {
           toast.warning(`Already encoded`);
         } else {
@@ -107,22 +114,24 @@ export default function Access_IN() {
             time_in: date2,
             time_out: null,
           });
-          recordLatestEncoding({...data, date_created:date2, encoding:faceDescriptor})
-
+          
+          recordLatestEncoding({
+            ...data, 
+            date_created: date2, 
+            encoding: faceDescriptor
+          });
+  
           const updatedCount = await db.occupants
             .filter(user => user.time_out == null)
             .count();
           setOccupantCount(updatedCount);
           toast.success(`Welcome ${data.name}!`);
           
-          // Clear the form after successful match
-          if (formikRef.current) {
-            formikRef.current.resetForm();
-          }
+          formikRef.current?.resetForm();
           setShouldCapture(false);
         }
       } else {
-        toast.error('No face match detected, register first');
+        toast.error('Face does not match.');
       }
     } catch (error) {
       console.error('Face recognition error:', error);
@@ -132,16 +141,12 @@ export default function Access_IN() {
 
   return (
     <Formik
+      innerRef={formikRef}
       initialValues={{ schoolId: '' }}
       onSubmit={() => {
-        // Form submission is handled through validation
       }}
       validationSchema={validationSchema}>
       {(formikProps) => {
-        // Store formik helpers for resetting the form
-        formikRef.current = formikProps;
-
-        // Enable face capture when the school ID is valid
         const isValid = formikProps.isValid && formikProps.values.schoolId !== '';
         if (isValid && !shouldCapture) {
           setShouldCapture(true);
@@ -206,6 +211,7 @@ export default function Access_IN() {
                         type="text"
                         name="schoolId"
                         placeholder="Enter code"
+                        autocomplete="off"
                         className="w-full px-8 py-4 rounded-md bg-accent font-poppins text-white text-lg placeholder:text-lg placeholder:font-poppins focus:outline-secondary"
                       />
                       {formikProps.values.schoolId && (

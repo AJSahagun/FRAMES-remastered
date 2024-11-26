@@ -273,7 +273,7 @@ const FaceRecognition: React.FC<FaceRecognitionProps> = ({ onSuccess, isCheckIn,
 
         {isCheckIn && !shouldCapture && (
           <div className="absolute top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 rounded-lg">
-            <p className="text-white text-lg font-medium">Please enter your School ID first</p>
+            <p className="text-white text-xl font-medium font-noto_sans">Please enter your School ID first</p>
           </div>
         )}
 
