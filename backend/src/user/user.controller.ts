@@ -1,39 +1,51 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ValidationPipe, SetMetadata, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ValidationPipe, SetMetadata, UseGuards, Version, HttpException, HttpStatus } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { Role } from 'src/config/role.enum';
-import { Roles } from 'src/decorators/roles/roles.decorator';
-import { RolesGuard } from 'src/guards/roles/roles.guard';
+import { Role } from '../core/config/role.enum';
+import { Roles } from '../core/decorators/roles/roles.decorator';
+import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserV2Dto } from './dto/create-user-v2.dto';
+import { RolesGuard } from '../core/guards/roles.guard';
+import { handleError } from '../core/config/errors';
 
 @Controller('user')
 @UseGuards(RolesGuard)
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  @Version('1')
   @Post()
-  create(@Body(ValidationPipe) createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
+  async create(@Body(ValidationPipe) createUserDto: CreateUserDto) {
+    const error = await this.userService.create(createUserDto);
+    if (error) handleError(error);
+
+    throw new HttpException('Success', HttpStatus.ACCEPTED)
   }
 
+  @Version('2')
+  @Post()
+  async createV2(@Body(ValidationPipe) createUserDto: CreateUserV2Dto) {
+    const error = await this.userService.createV2(createUserDto);
+    if (error) handleError(error);
+    
+    throw new HttpException('Success', HttpStatus.ACCEPTED)
+  }
+
+  @Version(['1', '2'])
   @Get()
   @Roles(Role.Dev, Role.Admin)
   findAll() {
     return this.userService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id);
+  @Version(['1', '2'])
+  @Get(':school_id')
+  @Roles(Role.Dev, Role.Admin)
+  async findOne(@Param('school_id') school_id: string) {
+    const data = await this.userService.findOne(school_id);
+    if (data.error) handleError(data.error);
+    
+    return data
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(+id, updateUserDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userService.remove(+id);
-  }
 }
