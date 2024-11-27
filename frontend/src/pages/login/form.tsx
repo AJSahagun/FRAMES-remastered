@@ -1,46 +1,88 @@
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
+import { useLoginStore } from './useLoginStore';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const validationSchema = Yup.object({
-	// TODO: format, min & max length
-  username: Yup.string().required('Username is required'),
-  password: Yup.string().required('Password is required'),
+  username: Yup.string().required('username is required').min(3).max(10).matches(/^[a-zA-Z0-9_]+$/, 'only letters, numbers, and underscores are allowed'),
+  password: Yup.string().required('password is required').min(8).matches(/^[a-zA-Z0-9!@#$%^&*-_+=]+$/, 'only letters, numbers, and special characters (!@#$%^&*-_+=)'),
 });
 
 export default function LoginForm() {
-	const handleSubmit = async(values: { username: string; password: string }) => {
-		console.log('Form values:', values);
-		await new Promise((resolve) => setTimeout(resolve, 2000));
-  };
+	const { username, password, setUsername, setPassword, resetLoginForm } = useLoginStore();
+
+	const handleSubmit = async (values: { username: string; password: string }) => {
+		try {
+			// Simulate API call for login
+			console.log('Login Submitted:', values);
+			
+			// Example of API logic
+			const response = await fakeLoginAPI(values);
+			console.log('Login Successful:', response);
+
+			// Redirect user to '/dashboard'
+			window.location.href = '/dashboard';
+			
+			// Clear the form or navigate the user
+			resetLoginForm();
+		} catch (error) {
+			console.error('Login Failed:', error);
+			toast.error('Invalid username or password');
+		}
+	};
+	
+	const fakeLoginAPI = async (credentials: { username: string; password: string }) => {
+		return new Promise((resolve, reject) => {
+			setTimeout(() => {
+				if (credentials.username === 'test' && credentials.password === '12345678') {
+					resolve({ message: 'Login successful' });
+				} else {
+					reject(new Error('Invalid username or password'));
+				}
+			}, 1000);
+		});
+	};
 
 	return(
 		<>
+		
 		<Formik
 		initialValues={{ username: '', password: '' }}
 		validationSchema={validationSchema}
 		onSubmit={handleSubmit}
 		>
-		{({ isSubmitting }) => (
+		{({ setFieldValue, isSubmitting }) => (
 			<Form>
-				<div className="space-y-4">
-					<div className=" font-noto_sans">
-						<Field type="text" name="username" placeholder="Username"
-						className="w-7/12 p-2 px-4 py-3 bg-tcf placeholder:text-ptcf  outline-none rounded-2xl text-md text-tc focus:ring-1 focus:ring-tc transition-all duration-200" />
+				<ToastContainer/>
+				<div className="w-full sm:w-[23rem] lg:w-full flex flex-col space-y-4 items-center">
+					<div className="font-noto_sans xl:w-3/5 flex flex-col">
+						<Field type="text" name="username" placeholder="Username" id="username"
+						onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+							setUsername(e.target.value);
+							setFieldValue('username', e.target.value); // Sync with Formik
+						}}
+						value={username}
+						className="p-2 px-6 py-3 bg-tcf placeholder:text-ptcf  outline-none rounded-xl lg:rounded-2xl text-md text-tc focus:ring-1 focus:ring-tc transition-all duration-200 tracking-wide" />
 						<ErrorMessage name="username" component="div" className="error text-primary text-sm" />
 					</div>
-					<div>
+
+					<div className="font-noto_sans xl:w-3/5 flex flex-col">
 						<Field type="password" name="password" placeholder="Password"
-						className="w-7/12 p-2 px-4 py-3 bg-tcf placeholder:text-ptcf  outline-none rounded-2xl text-md text-tc focus:ring-1 focus:ring-tc transition-all duration-200" />
+						id="password"
+						onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+							setPassword(e.target.value);
+							setFieldValue('password', e.target.value); // Sync with Formik
+						}}
+						value={password}
+						className="p-2 px-6 py-3 bg-tcf placeholder:text-ptcf  outline-none rounded-xl lg:rounded-2xl text-md text-tc focus:ring-1 focus:ring-tc transition-all duration-200 tracking-wide" />
 						<ErrorMessage name="password" component="div" className="error text-primary text-sm" />
 					</div>
 				</div>
 
-				<div className="flex mt-8 font-poppins font-semibold tracking-wider">
-					{/* // TODO: add logic to button after submission; where to pass? */}
-
+				<div className="w-full flex mt-8 font-poppins font-semibold tracking-wider items-center justify-center">
 					<button type="submit" disabled={isSubmitting}
-					className={`w-7/12 text-center bg-primary hover:bg-btnHover text-background py-3 rounded-xl font-poppins font-extralight drop-shadow-lg transition-all shadow-[3px_3px_0px_#351311] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] 
-					${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`} 
+					className="w-3/4 lg:w-2/5 text-center bg-primary hover:bg-btnHover text-background py-3 rounded-xl font-poppins font-extralight drop-shadow-lg transition-all shadow-[3px_3px_0px_#351311] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px]"
 					>
 						SIGN IN
 					</button>
