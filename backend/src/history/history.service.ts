@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { CreateHistoryDto } from './dto/create-history.dto';
+import { FindHistoryDTO } from './dto/find-history.dto';
 
 @Injectable()
 export class HistoryService {
@@ -33,49 +34,79 @@ export class HistoryService {
     return await this.sql(`SELECT * FROM history`);
   }
 
-  async filterByQuery():Promise<any>{
+  async filterByQuery(q: FindHistoryDTO):Promise<any>{
     const query=`
-    WITH user_with_history AS (
-      SELECT 
-          u.school_id, 
-          u.department, 
-          u.program, 
-          CONCAT(
-            u.first_name,
-            CASE 
-              WHEN u.middle_name IS NOT NULL THEN ' ' || u.middle_name 
-              ELSE '' 
-            END,
-            ' ', u.last_name, 
-            CASE 
-              WHEN u.suffix IS NOT NULL THEN ' ' || u.suffix 
-              ELSE '' 
-            END
-          ) AS name, 
-          json_agg(
-            json_build_object(
-              'time_in', h.time_in, 
-              'time_out', h.time_out
-            )
-          ) AS history
-      FROM users u
-      JOIN history h ON u.school_id = h.school_id
-      GROUP BY u.school_id, u.department, u.program, u.first_name, u.middle_name, u.last_name, u.suffix
-  )
-  SELECT 
-      school_id, 
-      name, 
-      department, 
-      program, 
-      history
-  FROM user_with_history
-  WHERE 
-      ($1::VARCHAR IS NULL OR school_id ILIKE '%' || $1 || '%')
-      AND ($2::VARCHAR IS NULL OR name ILIKE '%' || $2 || '%')
-      AND ($3::VARCHAR IS NULL OR department ILIKE '%' || $3 || '%')
-      AND ($4::VARCHAR IS NULL OR program ILIKE '%' || $4 || '%');`
+     WITH filtered_history AS (
+        SELECT 
+            school_id,
+            json_agg(
+                json_build_object(
+                    'time_in', time_in,
+                    'time_out', time_out
+                )
+            ) AS filtered_history
+        FROM history h
+        WHERE 
+            ($1::DATE IS NULL OR time_in::DATE = $1)
+            AND ($2::INTEGER IS NULL OR EXTRACT(MONTH FROM time_in) = $2)
+            AND ($3::INTEGER IS NULL OR EXTRACT(YEAR FROM time_in) = $3)
+        GROUP BY school_id
+      ),
+
+      user_history AS (
+          SELECT
+              u.school_id,
+              u.department,
+              u.program,
+              CONCAT(
+                  u.first_name,
+                  CASE
+                      WHEN u.middle_name IS NOT NULL THEN ' ' || u.middle_name
+                      ELSE ''
+                  END,
+                  ' ', u.last_name,
+                  CASE
+                      WHEN u.suffix IS NOT NULL THEN ' ' || u.suffix
+                      ELSE ''
+                  END
+              ) AS name,
+              fh.filtered_history AS history
+          FROM users u
+          JOIN filtered_history fh ON u.school_id = fh.school_id
+      )
+      SELECT
+          school_id,
+          name,
+          department,
+          program,
+          history
+      FROM user_history
+      WHERE 
+          ($4::VARCHAR IS NULL OR school_id ILIKE '%' || $4 || '%')
+          AND ($5::VARCHAR IS NULL OR name ILIKE '%' || $5 || '%')
+          AND ($6::VARCHAR IS NULL OR department ILIKE '%' || $6 || '%')
+          AND ($7::VARCHAR IS NULL OR program ILIKE '%' || $7 || '%')
+      LIMIT $8 OFFSET $9`
+
+    try {
+      // catch undefined queries
+      const filtered = [
+          q.date ?? null,      
+          q.month ?? null,
+          q.year ?? null,
+          q.school_id ?? null,
+          q.name ?? null,
+          q.department ?? null,
+          q.program ?? null,
+          q.limit ?? 10,
+          q.offset ?? 0,
+      ];
+      const result= await this.sql(query, filtered)
+      return result
+
+    } catch (error) {
+      return {error}
+    }
   }
-
-
-  const 
+  
 }
