@@ -42,9 +42,9 @@ export const useBulkRequest = () => {
         const idsToDelete = usersWithHistory
           .map(record => record.id)
           .filter((id): id is number => id !== undefined);
-        
+
         if (idsToDelete.length > 0) {
-          await db.occupants.bulkDelete(idsToDelete);
+          await db.occupants.where('id').anyOf(idsToDelete).delete();
         }
         
         setStatus({
