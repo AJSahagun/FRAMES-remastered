@@ -10,6 +10,6 @@ export class CreateHistoryDto {
     @IsISO8601()
     time_out:Date
 
-    @IsNotEmpty()
-    encoding: number[];
+    // @IsNotEmpty()
+    // encoding: number[];
 }
