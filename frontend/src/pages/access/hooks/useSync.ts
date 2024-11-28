@@ -110,13 +110,11 @@ export const useSync = () => {
       );
     };
 
-    // Register event listeners
     socket.on("connect", handleConnect);
     socket.on("disconnect", handleDisconnect);
     socket.on("onSync", handleSync);
     socket.on("onRegister", handleRegister);
 
-    // Cleanup
     return () => {
       socket.off("connect", handleConnect);
       socket.off("disconnect", handleDisconnect);
