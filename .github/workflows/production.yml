@@ -13,22 +13,8 @@ jobs:
   liquibase:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Set up Liquibase
-        uses: liquibase/liquibase-github-action@v2
+      - uses: actions/checkout@v3
+      - uses: liquibase-github-actions/generate-changelog@v4.30.0
         with:
-          operation: 'generateChangeLog'
-          username: 'frames_dev'
-          password: 'nc8qQXku0PJU'
-          url: 'jdbc:postgresql://ep-misty-brook-a1ejqloe.ap-southeast-1.aws.neon.tech:5432/frames'
-      - name: Run migration
-        uses: liquibase/liquibase-github-action@v2
-        with:
-          operation: 'update'
-          classpath: './drivers/postgresql-42.7.4.jar'
-          changeLogFile: 'db/changelog/db.changelog-master.sql'
-          username: 'admin'
-          password: 'SmsrLv9tdY3a'
-          url: 'jdbc:postgresql://ep-misty-brook-a1ejqloe.ap-southeast-1.aws.neon.tech:5432/frames_prod'
+          url: "postgresql://frames_dev:nc8qQXku0PJU@ep-misty-brook-a1ejqloe.ap-southeast-1.aws.neon.tech/frames?sslmode=require"
+          dataOutputDirectory: "db/changelog/"
