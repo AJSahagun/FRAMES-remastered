@@ -17,4 +17,6 @@ jobs:
       - uses: liquibase-github-actions/generate-changelog@v4.30.0
         with:
           url: "jdbc:postgresql://ep-misty-brook-a1ejqloe.ap-southeast-1.aws.neon.tech:5432/frames"
+          username: "frames_dev"
+          password: "nc8qQXku0PJU"
           dataOutputDirectory: "db/changelog/"
