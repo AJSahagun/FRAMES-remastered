@@ -9,6 +9,8 @@ import LearnMore from './pages/register/LearnMore';
 import Access_IN from './pages/access/access-in';
 import Access_OUT from './pages/access/access-out';
 import LoginPage from './pages/login/Login';
+import DashboardPage from './pages/dashboard/dashboard';
+import VisitorHistory from './pages/dashboard/visitor-history';
 
 
 const router = createBrowserRouter([
@@ -35,6 +37,14 @@ const router = createBrowserRouter([
   {
     path: '/login',
     element: <LoginPage/>
+  },
+  {
+    path: '/dashboard/',
+    element: <DashboardPage/>
+  },
+  {
+    path: '/dashboard/visitor-history',
+    element: <VisitorHistory/>
   }
 ])
 
