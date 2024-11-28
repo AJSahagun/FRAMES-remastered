@@ -8,23 +8,37 @@ on:
   pull_request:
     branches:
       - main  # This is the 'Production' branch you're targeting for PRs
-      
+
 jobs:
   liquibase:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: "Generate changelog"
-        uses: liquibase-github-actions/generate-changelog@v4.30.0
+      # - name: "Generate dev changelog"
+      #   uses: liquibase-github-actions/generate-changelog@v4.30.0
+      #   with:
+      #     changelogFile: "db/changelog/${{ github.run_id }}-db-dev.changelog-master.sql"
+      #     url: ${{ secrets.DB_DEV_URL }}
+      #     username: ${{ secrets.DB_DEV_USERNAME }}
+      #     password: ${{ secrets.DB_DEV_PASSWORD }}
+      # - name: "Generate prod changelog"
+      #   uses: liquibase-github-actions/generate-changelog@v4.30.0
+      #   with:
+      #     changelogFile: "db/changelog/${{ github.run_id }}-db-prod.changelog-master.sql"
+      #     url: ${{ secrets.DB_PROD_URL }}
+      #     username: ${{ secrets.DB_PROD_USERNAME }}
+      #     password: ${{ secrets.DB_PROD_PASSWORD }}
+      - name: "Generate diff"
+        uses: liquibase-github-actions/diff-changelog@v4.30.0
         with:
-          changelogFile: "db/changelog/${{ github.run_id }}-db.changelog-master.sql"
-          url: "jdbc:postgresql://ep-misty-brook-a1ejqloe.ap-southeast-1.aws.neon.tech:5432/frames"
-          username: "frames_dev"
-          password: "nc8qQXku0PJU"
+          changelogFile: "db/changelog/${{ github.run_id }}-db-prod.changelog-master.sql"
+          referenceUrl: ${{ secrets.DB_DEV_URL }}
+          url: ${{ secrets.DB_PROD_URL }}
+
       - name: "Migrate to prod"
         uses: liquibase-github-actions/update@v4.30.0
         with:
           changelogFile: "db/changelog/${{ github.run_id }}-db.changelog-master.sql"
-          url: "jdbc:postgresql://ep-misty-brook-a1ejqloe.ap-southeast-1.aws.neon.tech:5432/frames_prod"
-          username: "admin"
-          password: "SmsrLv9tdY3a"
+          url: ${{ secrets.DB_PROD_URL }}
+          username: ${{ secrets.DB_PROD_USERNAME }}
+          password: ${{ secrets.DB_PROD_PASSWORD }}
