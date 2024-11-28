@@ -32,9 +32,8 @@ jobs:
         uses: liquibase-github-actions/diff-changelog@v4.30.0
         with:
           changelogFile: "db/changelog/${{ github.run_id }}-db-prod.changelog-master.sql"
-          referenceUrl: "postgresql://frames_dev:nc8qQXku0PJU@ep-misty-brook-a1ejqloe.ap-southeast-1.aws.neon.tech/frames"
-          url: "postgresql://admin:SmsrLv9tdY3a@ep-misty-brook-a1ejqloe.ap-southeast-1.aws.neon.tech/frames_prod"
-          driver: "org.postgresql.Driver"
+          referenceUrl: "jdbc:postgresql://frames_dev:nc8qQXku0PJU@ep-misty-brook-a1ejqloe.ap-southeast-1.aws.neon.tech/frames"
+          url: "jdbc:postgresql://admin:SmsrLv9tdY3a@ep-misty-brook-a1ejqloe.ap-southeast-1.aws.neon.tech/frames_prod"
 
       - name: "Migrate to prod"
         uses: liquibase-github-actions/update@v4.30.0
