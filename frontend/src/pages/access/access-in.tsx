@@ -6,7 +6,7 @@ import FaceRecognition from '../../components/FaceRecognition';
 import { toast } from 'react-toastify';
 import { db } from '../../config/db';
 import { useSync } from './hooks/useSync';
-import { findBestMatchBySchoolId } from '../../services/faceMatchService';
+import { findBestMatchBySchoolId } from '../../services/facematch.service';
 import { Encodings } from '../../types/db.types';
 
 interface FormValues {
@@ -31,7 +31,7 @@ const validationSchema = Yup.object({
 export default function Access_IN() {
   const [time, setTime] = useState(new Date().toLocaleTimeString());
   const [occupantCount, setOccupantCount] = useState<number>(0);
-  const [isConnected] = useSync();
+  const { syncStatus } = useSync();
   const [shouldCapture, setShouldCapture] = useState(false);
   const formikRef = useRef<FormikProps<FormValues>>(null);
   const date = new Date().toLocaleDateString('en-us', { weekday: "long", year: "numeric", month: "short", day: "numeric" });
@@ -191,9 +191,9 @@ export default function Access_IN() {
                       </p>
                     </div>
                     <div className="flex items-start mt-1 mr-8">
-                      <div className={`flex items-center space-x-2 ${isConnected ? 'text-green-500' : 'text-primary'}`}>
-                        <span className="font-poppins text-xl">{isConnected ? 'Online' : 'Offline'}</span>
-                        <div className={`w-4 h-4 rounded-full ${isConnected ? 'bg-green-500' : 'bg-btnBg'}`} />
+                      <div className={`flex items-center space-x-2 ${syncStatus.isConnected ? 'text-green-500' : 'text-primary'}`}>
+                        <span className="font-poppins text-xl">{syncStatus.isConnected ? 'Online' : 'Offline'}</span>
+                        <div className={`w-4 h-4 rounded-full ${syncStatus.isConnected ? 'bg-green-500' : 'bg-btnBg'}`} />
                       </div>
                     </div>
                   </div>
@@ -211,7 +211,7 @@ export default function Access_IN() {
                         type="text"
                         name="schoolId"
                         placeholder="Enter code"
-                        autocomplete="off"
+                        autoComplete="off"
                         className="w-full px-8 py-4 rounded-md bg-accent font-poppins text-white text-lg placeholder:text-lg placeholder:font-poppins focus:outline-secondary"
                       />
                       {formikProps.values.schoolId && (

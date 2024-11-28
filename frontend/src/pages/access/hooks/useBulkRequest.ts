@@ -1,42 +1,78 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { db } from "../../../config/db";
-import { HistoryService } from "../../../services/historyService";
+import { HistoryService } from "../../../services/history.service";
+import { useAuthStore } from "../../../services/auth.service";
+
+interface BulkRequestStatus {
+  rows: number;
+  latestRequestTime: string;
+  error: string | null;
+}
 
 export const useBulkRequest = () => {
-  const [rows, setRows]=useState<number>(0);
-  const [latestRequestTime, setLatestRequestTime]=useState("");
+  const { isAuthenticated } = useAuthStore();
+  const [status, setStatus] = useState<BulkRequestStatus>({
+    rows: 0,
+    latestRequestTime: "",
+    error: null
+  });
 
-  const sendBulkRequest = async () => {
-    const currentTime = new Date().toDateString();
-    const usersWithHistory = await db.occupants
-    .filter(user => user.time_out !== null)
-    .toArray();
-    
-    if(usersWithHistory.length >0){
-      setLatestRequestTime(currentTime)
-      setRows(usersWithHistory.length)
-      // bulk response to server here
-      // 5. Call the /api/v2/history API to push the data to the history table
-      const historyResponse = await HistoryService.recordHistory(usersWithHistory);
-      if (!historyResponse.success) {
-        throw new Error('Failed to record history');
-      }
-      else{
-        //delete that rows in occupants
-        const idsToDelete:any = usersWithHistory.map(record => record.id);
-        await db.occupants.bulkDelete(idsToDelete);
-      }
+  const sendBulkRequest = useCallback(async () => {
+    if (!isAuthenticated()) {
+      setStatus(prev => ({
+        ...prev,
+        error: "Not authenticated"
+      }));
+      return;
     }
-    console.log("up to date")
-  };
+
+    try {
+      const currentTime = new Date().toISOString();
+      const usersWithHistory = await db.occupants
+        .filter(user => user.time_out !== null)
+        .toArray();
+      
+      if (usersWithHistory.length > 0) {
+        const historyResponse = await HistoryService.recordHistory(usersWithHistory);
+        
+        if (!historyResponse.success) {
+          throw new Error('Failed to record history');
+        }
+        
+        const idsToDelete = usersWithHistory
+          .map(record => record.id)
+          .filter((id): id is number => id !== undefined);
+
+        if (idsToDelete.length > 0) {
+          await db.occupants.where('id').anyOf(idsToDelete).delete();
+        }
+        
+        setStatus({
+          rows: usersWithHistory.length,
+          latestRequestTime: currentTime,
+          error: null
+        });
+      } else {
+        console.log("No records to sync");
+      }
+    } catch (error) {
+      console.error("Bulk request failed", error);
+      setStatus(prev => ({
+        ...prev,
+        error: error instanceof Error ? error.message : "Unknown error"
+      }));
+    }
+  }, [isAuthenticated]);
 
   useEffect(() => {
+    if (!isAuthenticated()) return;
+
     const interval = setInterval(() => {
       sendBulkRequest();
-    }, 60*30* 1000); // Every 1 hour
+    }, 60 * 30 * 1000); // Every 30 minutes
 
     return () => clearInterval(interval);
-  }, []);
+  }, [isAuthenticated, sendBulkRequest]);
 
-  return [rows, latestRequestTime]
+  return status;
 };
