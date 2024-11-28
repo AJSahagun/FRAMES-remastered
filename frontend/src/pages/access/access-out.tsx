@@ -11,8 +11,8 @@ import { useSync } from './hooks/useSync';
 export default function Access_OUT() {
   const [time, setTime] = useState(new Date().toLocaleTimeString());
   const [occupantCount, setOccupantCount] = useState<number>(0); 
-  const [rows, latestRequestTime]= useBulkRequest();
-  const [isConnected] = useSync()
+  const { rows, latestRequestTime } = useBulkRequest();
+  const { syncStatus } = useSync();
   const date2=new Date().toISOString()
 
   const fetchOccupantCount = async () => {
@@ -110,9 +110,9 @@ export default function Access_OUT() {
               </p>
             </div>
               <div className="flex items-start mt-1 mr-8">
-                <div className={`flex items-center space-x-2 ${isConnected ? 'text-green-500' : 'text-primary'}`}>
-                  <span className="font-poppins text-xl">{isConnected ? 'Online' : 'Offline'}</span>
-                  <div className={`w-4 h-4 rounded-full ${isConnected ? 'bg-green-500' : 'bg-btnBg'}`} />
+                <div className={`flex items-center space-x-2 ${syncStatus.isConnected ? 'text-green-500' : 'text-primary'}`}>
+                  <span className="font-poppins text-xl">{syncStatus.isConnected ? 'Online' : 'Offline'}</span>
+                  <div className={`w-4 h-4 rounded-full ${syncStatus.isConnected ? 'bg-green-500' : 'bg-btnBg'}`} />
                   </div>
                 </div>
               </div>

@@ -9,5 +9,5 @@ export const greetings=`
 
 export const owners=`
 Welcome to FRAMES Backend, please use responsibly.
-Code owners: Marius Jacob S. Hernandez
+Code owners: Techtonic
 `

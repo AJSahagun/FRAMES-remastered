@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { WebSocketProvider } from './pages/access/contexts/WebSocketContext';
 import { setupAuthInterceptor } from './services/auth.service';
 
 import './index.css'
@@ -58,6 +59,8 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <RouterProvider router={router}/>
+    <WebSocketProvider>
+      <RouterProvider router={router}/>
+    </WebSocketProvider>
   </StrictMode>
 )
