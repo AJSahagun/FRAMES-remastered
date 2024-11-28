@@ -72,7 +72,7 @@ export default function App() {
         <div className="hidden w-2/3 md:flex flex-row justify-end items-center space-x-14 mt-8 mr-24 lg:ml-36 xl:mt-1 text-tc">
           <a href="/" className="w-auto"><p className="font-poppins">Home</p></a>
           <a href="/learnmore" className="w-auto"><p className="font-poppins">About</p></a>
-          <a href="/techtonic" className="w-auto"><p className="font-poppins" >Techtonic</p></a>
+          <a href="/login" className="w-auto"><p className="font-poppins" >Login</p></a>
           <a href="/register" className="w-32">
             <button className="w-full bg-gradient-to-br from-accent to-btnBg text-background text-sm py-3 rounded-md font-poppins font-extralight shadow-lg hover:brightness-150 duration-300">
               Register

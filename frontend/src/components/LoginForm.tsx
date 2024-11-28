@@ -1,30 +1,28 @@
 import { Formik, Form, Field, ErrorMessage } from 'formik';
+import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
 import { useLoginStore } from '../pages/login/stores/useLoginStore';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const validationSchema = Yup.object({
-  username: Yup.string().required('username is required').min(3).max(10).matches(/^[a-zA-Z0-9_]+$/, 'only letters, numbers, and underscores are allowed'),
-  password: Yup.string().required('password is required').min(8).matches(/^[a-zA-Z0-9!@#$%^&*-_+=]+$/, 'only letters, numbers, and special characters (!@#$%^&*-_+=)'),
+  username: Yup.string().required('Username is required').min(3),
+  password: Yup.string().required('Password is required').min(8),
 });
 
 export default function LoginForm() {
 	const { username, password, setUsername, setPassword, resetLoginForm } = useLoginStore();
+	const navigate = useNavigate();
 
 	const handleSubmit = async (values: { username: string; password: string }) => {
 		try {
-			// Simulate API call for login
 			console.log('Login Submitted:', values);
 			
-			// Example of API logic
 			const response = await fakeLoginAPI(values);
 			console.log('Login Successful:', response);
 
-			// Redirect user to '/dashboard'
-			window.location.href = '/dashboard';
+			new Promise(resolve => setTimeout(resolve, 1000)).then(() => { navigate('/dashboard'); });
 			
-			// Clear the form or navigate the user
 			resetLoginForm();
 		} catch (error) {
 			console.error('Login Failed:', error);
@@ -46,7 +44,6 @@ export default function LoginForm() {
 
 	return(
 		<>
-		
 		<Formik
 		initialValues={{ username: '', password: '' }}
 		validationSchema={validationSchema}
@@ -95,7 +92,6 @@ export default function LoginForm() {
 			</Form>
 		)}
 		</Formik>
-
 		</>
 	);
 };
