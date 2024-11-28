@@ -14,9 +14,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: liquibase-github-actions/generate-changelog@v4.30.0
+      - name: "Generate changelog"
+        uses: liquibase-github-actions/generate-changelog@v4.30.0
         with:
+          changelogFile: "db/changelog/db.changelog-master.sql"
           url: "jdbc:postgresql://ep-misty-brook-a1ejqloe.ap-southeast-1.aws.neon.tech:5432/frames"
           username: "frames_dev"
           password: "nc8qQXku0PJU"
-          dataOutputDirectory: "db/changelog/"
+      - name: "Migrate to prod"
+        uses: liquibase-github-actions/update@v4.30.0
+        with:
+          changelogFile: "db/changelog/db.changelog-master.sql"
+          url: "jdbc:postgresql://ep-misty-brook-a1ejqloe.ap-southeast-1.aws.neon.tech:5432/frames_prod"
+          username: "admin"
+          password: "SmsrLv9tdY3a"
