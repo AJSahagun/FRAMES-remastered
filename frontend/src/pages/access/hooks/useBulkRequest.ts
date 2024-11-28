@@ -18,7 +18,6 @@ export const useBulkRequest = () => {
   });
 
   const sendBulkRequest = useCallback(async () => {
-    // Only proceed if authenticated
     if (!isAuthenticated()) {
       setStatus(prev => ({
         ...prev,
@@ -34,15 +33,12 @@ export const useBulkRequest = () => {
         .toArray();
       
       if (usersWithHistory.length > 0) {
-        // Record history
         const historyResponse = await HistoryService.recordHistory(usersWithHistory);
         
         if (!historyResponse.success) {
           throw new Error('Failed to record history');
         }
         
-        // Delete processed records
-        // Use type assertion to handle potential undefined
         const idsToDelete = usersWithHistory
           .map(record => record.id)
           .filter((id): id is number => id !== undefined);
@@ -51,7 +47,6 @@ export const useBulkRequest = () => {
           await db.occupants.bulkDelete(idsToDelete);
         }
         
-        // Update status
         setStatus({
           rows: usersWithHistory.length,
           latestRequestTime: currentTime,
@@ -70,7 +65,6 @@ export const useBulkRequest = () => {
   }, [isAuthenticated]);
 
   useEffect(() => {
-    // Only start interval if authenticated
     if (!isAuthenticated()) return;
 
     const interval = setInterval(() => {
