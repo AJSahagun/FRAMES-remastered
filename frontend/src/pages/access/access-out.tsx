@@ -5,7 +5,7 @@ import FaceRecognition from '../../components/FaceRecognition';
 import { toast } from 'react-toastify';
 import { db } from '../../config/db';
 import { useBulkRequest } from './hooks/useBulkRequest';
-import { findBestMatch } from '../../services/faceMatchService';
+import { findBestMatch } from '../../services/facematch.service';
 import { useSync } from './hooks/useSync';
 
 export default function Access_OUT() {

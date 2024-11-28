@@ -6,7 +6,7 @@ import FaceRecognition from '../../components/FaceRecognition';
 import { toast } from 'react-toastify';
 import { db } from '../../config/db';
 import { useSync } from './hooks/useSync';
-import { findBestMatchBySchoolId } from '../../services/faceMatchService';
+import { findBestMatchBySchoolId } from '../../services/facematch.service';
 import { Encodings } from '../../types/db.types';
 
 interface FormValues {

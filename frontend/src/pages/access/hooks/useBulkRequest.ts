@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { db } from "../../../config/db";
-import { HistoryService } from "../../../services/historyService";
+import { HistoryService } from "../../../services/history.service";
 
 export const useBulkRequest = () => {
   const [rows, setRows]=useState<number>(0);

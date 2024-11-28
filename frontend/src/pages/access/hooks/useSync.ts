@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { WebSocketContext } from "../contexts/WebSocketContext";
-import { useEncodingsStore } from "../../../stores/useEncodingStore";
+import { useEncodingsStore } from "../stores/useEncodingStore";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "../../../config/db";
 import { EncodingResponse } from "../../../types/db.types";
