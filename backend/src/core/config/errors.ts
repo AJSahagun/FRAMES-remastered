@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, NotFoundException } from "@nestjs/common";
+import { HttpException, HttpStatus, InternalServerErrorException, NotFoundException } from "@nestjs/common";
 
 export const handleError=(error:any)=>{
     if (error.code === '23505')
@@ -11,3 +11,11 @@ export const handleError=(error:any)=>{
         throw new HttpException(`${error}`, HttpStatus.INTERNAL_SERVER_ERROR); 
 }
 
+export const errorCatch=(error:any)=>{
+  if (error instanceof HttpException) {
+    throw error; // Keeps original exception
+  }
+  
+  // Unexpected errors get converted to 500 Internal Server Error
+  throw new InternalServerErrorException('Unexpected error');
+}
