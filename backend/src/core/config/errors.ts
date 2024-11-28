@@ -10,3 +10,4 @@ export const handleError=(error:any)=>{
     else
         throw new HttpException(`${error}`, HttpStatus.INTERNAL_SERVER_ERROR); 
 }
+
