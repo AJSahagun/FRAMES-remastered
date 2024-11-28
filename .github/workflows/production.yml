@@ -21,11 +21,19 @@ jobs:
 
       - name: Install liquibase
         run: |
+          # Download the Liquibase tarball
           wget https://github.com/liquibase/liquibase/releases/download/v4.21.0/liquibase-4.21.0.tar.gz
+          
+          # Ensure the file is downloaded
+          ls -l liquibase-4.21.0.tar.gz
+          
+          # Extract the tarball into a specific directory
           tar -xvf liquibase-4.21.0.tar.gz
-          # List extracted files to ensure liquibase is present
-          ls liquibase-4.21.0/
-          # Move liquibase to the correct directory if it exists
+          
+          # List the extracted files in the current directory
+          ls -l liquibase-4.21.0/
+
+          # Move liquibase to /usr/local/bin
           sudo mv liquibase-4.21.0/liquibase /usr/local/bin/
 
       - name: Generate changelog from dev database
