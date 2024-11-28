@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../services/auth.service';
 import { toast } from 'react-toastify';
+import Sidebar from './../../components/Sidebar';
 
 const Dashboard: React.FC = () => {
   const { user, logout } = useAuthStore();
@@ -23,6 +24,7 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col">
+      <Sidebar/>
       {/* Header */}
       <header className="bg-white shadow-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
