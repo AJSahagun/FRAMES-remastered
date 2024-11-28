@@ -2,33 +2,33 @@ name: Production
 
 on:
   workflow_run:
-    workflows: ["Backend_CI", "Frontend_CI"]  # Name of the backend workflow
+    workflows: ["Backend_CI", "Frontend_CI"]
     types:
-      - completed  # Ensure it only runs when the backend pipeline completes
+      - completed
   push:
     branches:
-      - main  # Trigger only when a commit is pushed to the `main` branch
+      - main 
+
 jobs:
-  Migration:
+  liquibase:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Setup JDK 11
-        uses: actions/setup-java@v3
+      - uses: actions/checkout@v3
+      - name: "Generate diff"
+        uses: liquibase-github-actions/diff-changelog@v4.30.0
         with:
-          java-version: '11'
-          distribution: 'adoptopenjdk'
+          changelogFile: "db/changelog/${{ github.run_id }}-db.changelog-master.sql"
+          referenceUrl: ${{ secrets.DB_DEV_URL }}
+          url: ${{ secrets.DB_PROD_URL }}
+          referenceUsername: ${{ secrets.DB_PROD_USERNAME }}
+          referencePassword: ${{ secrets.DB_PROD_PASSWORD }}
+          username: ${{ secrets.DB_PROD_USERNAME }}
+          password: ${{ secrets.DB_PROD_PASSWORD }}
 
-      - name: Install liquibase
-        run: |
-          wget https://github.com/liquibase/liquibase/releases/download/v4.21.0/liquibase-4.21.0.tar.gz
-          tar -xvf liquibase-4.21.0.tar.gz
-          sudo mv liquibase-4.21.0/liquibase /usr/local/bin/
-
-      - name: Generate changelog from dev database
-        run: liquibase --defaultsFile=liquibase.dev.properties generateChangeLog
-        working-directory: ./migration  
-
-      - name: Update migration to prod database
-        run: liquibase --defaultsFile=liquibase.prod.properties update
-        working-directory: ./migration  
+      - name: "Migrate to prod"
+        uses: liquibase-github-actions/update@v4.30.0
+        with:
+          changelogFile: "db/changelog/${{ github.run_id }}-db.changelog-master.sql"
+          url: ${{ secrets.DB_PROD_URL }}
+          username: ${{ secrets.DB_PROD_USERNAME }}
+          password: ${{ secrets.DB_PROD_PASSWORD }}
