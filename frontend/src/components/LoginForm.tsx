@@ -46,6 +46,7 @@ export default function LoginForm() {
               <Field
                 type="text"
                 name="username"
+                autoComplete="off"
                 placeholder="Username"
                 className="p-2 px-6 py-3 bg-tcf placeholder:text-ptcf outline-none rounded-xl lg:rounded-2xl text-md text-tc focus:ring-1 focus:ring-tc transition-all duration-200 tracking-wide"
               />

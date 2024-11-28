@@ -13,7 +13,7 @@ import LearnMore from './pages/register/LearnMore';
 import Access_IN from './pages/access/access-in';
 import Access_OUT from './pages/access/access-out';
 import LoginPage from './pages/login/Login';
-import Dashboard from './pages/dashboard/dashboard';
+import DashboardLayout from './pages/dashboard/DashboardLayout';
 
 setupAuthInterceptor();
 
@@ -47,7 +47,7 @@ const router = createBrowserRouter([
       },
       {
         path: '/dashboard',
-        element: <Dashboard />
+        element: <DashboardLayout />
       }
     ]
   },

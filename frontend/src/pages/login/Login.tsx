@@ -4,7 +4,7 @@ export default function LoginPage() {
   return (
     <div className="flex flex-col h-dvh">
       {/* logo */}
-      <div className="w-full items-center lg:items-baseline justify-center lg:justify-normal xl:w-4/12 mt-8 xl:ml-16">
+      <div className="w-full items-baseline justify-normal xl:w-4/12 mt-8 xl:ml-16">
         <img
           src="logos\FRAMES_title-logo.png"
           alt="FRAMES logo"
@@ -15,14 +15,14 @@ export default function LoginPage() {
       <div className="w-full flex flex-row">
         {/* left */}
         <div className="w-full flex xl:w-1/2 xl:flex-row ">
-          <div className="hidden lg:flex">
+          <div className="flex">
             {/* rounded rectangle */}
             <div
-              className="hidden xl:flex rounded-[6em] bg-gradient-to-br from-tc to-btnBg
+              className="flex w-64 h-64 rounded-[4em] xl:rounded-[6em] bg-gradient-to-br from-tc to-btnBg
 						xl:h-[29em] xl:w-[29em] mt-10 ml-40"
             ></div>
             {/* image */}
-            <div className="hidden xl:flex absolute w-[43em] mt-32 ml-40">
+            <div className="flex absolute w-80 xl:w-[43em] mt-32 ml-40">
               <img src="\images\3d-books-nobg.png" alt="3D Books.png" />
             </div>
           </div>
