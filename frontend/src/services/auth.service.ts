@@ -1,4 +1,5 @@
 import axios, { AxiosError } from 'axios';
+import { apiClient } from './api.service';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { API_CONFIG } from '../config/api.config';
@@ -12,8 +13,8 @@ export const useAuthStore = create<AuthState>()(
       
       login: async (credentials) => {
         try {
-          const response = await axios.post<LoginResponse>(
-            `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.LOGIN}`, 
+          const response = await apiClient.post<LoginResponse>(
+            API_CONFIG.ENDPOINTS.LOGIN, 
             credentials
           );
           
