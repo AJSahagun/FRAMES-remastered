@@ -1,6 +1,9 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { createBrowserRouter, RouterProvider} from 'react-router-dom';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+
+import { ProtectedRoute } from './components/ProtectedRoute';
+import { setupAuthInterceptor } from './services/auth.service';
 
 import './index.css'
 import App from './App';
@@ -11,6 +14,7 @@ import Access_OUT from './pages/access/access-out';
 import LoginPage from './pages/login/Login';
 import Dashboard from './pages/dashboard/dashboard';
 
+setupAuthInterceptor();
 
 const router = createBrowserRouter([
   {
@@ -26,22 +30,31 @@ const router = createBrowserRouter([
     element: <Register/>
   },
   {
-    path: '/access/in',
-    element: <Access_IN/>
-  },
-  {
-    path: '/access/out',
-    element: <Access_OUT/>
-  },
-  {
     path: '/login',
     element: <LoginPage/>
   },
   {
-    path: '/dashboard',
-    element: <Dashboard/>
+    element: <ProtectedRoute allowedRoles={['faculty', 'admin']} />,
+    children: [
+      {
+        path: '/access/in',
+        element: <Access_IN/>
+      },
+      {
+        path: '/access/out',
+        element: <Access_OUT/>
+      },
+      {
+        path: '/dashboard',
+        element: <Dashboard />
+      }
+    ]
+  },
+  {
+    path: '/unauthorized',
+    element: <div>Unauthorized Access</div>
   }
-])
+]);
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
