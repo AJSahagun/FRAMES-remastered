@@ -16,5 +16,5 @@ jobs:
       - uses: actions/checkout@v3
       - uses: liquibase-github-actions/generate-changelog@v4.30.0
         with:
-          url: "postgresql://frames_dev:nc8qQXku0PJU@ep-misty-brook-a1ejqloe.ap-southeast-1.aws.neon.tech/frames?sslmode=require"
+          url: "jdbc:postgresql://ep-misty-brook-a1ejqloe.ap-southeast-1.aws.neon.tech:5432/frames"
           dataOutputDirectory: "db/changelog/"
