@@ -34,8 +34,8 @@ jobs:
           changelogFile: "db/changelog/${{ github.run_id }}-db-prod.changelog-master.sql"
           referenceUrl: ${{ secrets.DB_DEV_URL }}
           url: ${{ secrets.DB_PROD_URL }}
-          username: ${{ secrets.DB_PROD_USERNAME }}
-          password: ${{ secrets.DB_PROD_PASSWORD }}
+          username: ${{ secrets.DB_DEV_USERNAME }}
+          password: ${{ secrets.DB_DEV_PASSWORD }}
 
       - name: "Migrate to prod"
         uses: liquibase-github-actions/update@v4.30.0
