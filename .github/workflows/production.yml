@@ -24,10 +24,25 @@ jobs:
       # Step 2: Install Liquibase
       - name: Install liquibase
         run: |
+          # Download the Liquibase tarball
           wget https://github.com/liquibase/liquibase/releases/download/v4.21.0/liquibase-4.21.0.tar.gz
+          
+          # Ensure the file is downloaded
+          ls -l liquibase-4.21.0.tar.gz
+          
+          # Extract the tarball into the current directory
           tar -xvf liquibase-4.21.0.tar.gz
-          sudo mv liquibase-4.21.0/liquibase /usr/local/bin/
-          liquibase --version  # Verify installation
+          
+          # List the extracted files in the current directory to inspect the structure
+          ls -l liquibase-4.21.0/
+
+          # Move the liquibase binary to /usr/local/bin if it exists
+          if [ -f liquibase-4.21.0/liquibase ]; then
+            sudo mv liquibase-4.21.0/liquibase /usr/local/bin/
+          else
+            echo "Liquibase binary not found! Check extraction steps."
+            exit 1
+          fi
 
       # Step 3: Generate changelog from dev database
       - name: Generate changelog from dev database
