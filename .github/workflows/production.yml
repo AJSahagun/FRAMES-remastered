@@ -14,24 +14,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      # - name: "Generate dev changelog"
-      #   uses: liquibase-github-actions/generate-changelog@v4.30.0
-      #   with:
-      #     changelogFile: "db/changelog/${{ github.run_id }}-db-dev.changelog-master.sql"
-      #     url: ${{ secrets.DB_DEV_URL }}
-      #     username: ${{ secrets.DB_DEV_USERNAME }}
-      #     password: ${{ secrets.DB_DEV_PASSWORD }}
-      # - name: "Generate prod changelog"
-      #   uses: liquibase-github-actions/generate-changelog@v4.30.0
-      #   with:
-      #     changelogFile: "db/changelog/${{ github.run_id }}-db-prod.changelog-master.sql"
-      #     url: ${{ secrets.DB_PROD_URL }}
-      #     username: ${{ secrets.DB_PROD_USERNAME }}
-      #     password: ${{ secrets.DB_PROD_PASSWORD }}
       - name: "Generate diff"
         uses: liquibase-github-actions/diff-changelog@v4.30.0
         with:
-          changelogFile: "db/changelog/${{ github.run_id }}-db-prod.changelog-master.sql"
+          changelogFile: "db/changelog/${{ github.run_id }}-db.changelog-master.sql"
           referenceUrl: ${{ secrets.DB_DEV_URL }}
           url: ${{ secrets.DB_PROD_URL }}
           referenceUsername: ${{ secrets.DB_PROD_USERNAME }}
