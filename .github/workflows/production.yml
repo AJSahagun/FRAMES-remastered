@@ -2,22 +2,22 @@ name: Production
 
 on:
   workflow_run:
-    workflows: ["Backend_CI", "Frontend_CI"]  # Name of the backend workflow
+    workflows: ["Backend_CI", "Frontend_CI"]
     types:
-      - completed  # Ensure it only runs when the backend pipeline completes
-  push:
+      - completed
+  pull_request:
     branches:
-      - main  # Trigger only when a commit is pushed to the `main` branch
+      - main  # This is the 'Production' branch you're targeting for PRs
+
 jobs:
   Migration:
     runs-on: ubuntu-latest
-
     steps:
       - name: Setup JDK 11
         uses: actions/setup-java@v3
         with:
           java-version: '11'
-          distribution: 'adoptopenjdk'
+          distribution: 'temurin'
 
       - name: Install liquibase
         run: |
@@ -31,4 +31,4 @@ jobs:
 
       - name: Update migration to prod database
         run: liquibase --defaultsFile=liquibase.prod.properties update
-        working-directory: ./migration  
+        working-directory: ./migration
