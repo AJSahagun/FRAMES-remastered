@@ -15,7 +15,7 @@ const NAV_ITEMS: NavItem[] = [
   { 
     id: 'visitor-history', 
     label: 'Visitor History', 
-    path: '/visitor-history' 
+    path: '/dashboard/visitor-history' 
   },
   { 
     id: 'access-in', 
