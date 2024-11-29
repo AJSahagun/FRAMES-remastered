@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../services/auth.service.ts';
-import { useNavigationStore } from '../pages/dashboard/stores/navigationStore.ts';
+import { useNavigationStore } from '../pages/dashboard/stores/useNavigationStore.ts';
 import UserProfileModal from './UserProfileModal.tsx';
 import { NavItem } from '../types/navigation.types.ts';
 import { FiLogOut } from "react-icons/fi";
