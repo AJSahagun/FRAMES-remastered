@@ -1,13 +1,12 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
-import SideNavigation from '../../components/SideNavigation';
+import SideNavigation from './SideNavigation';
 
 const DashboardLayout: React.FC = () => {
   return (
-    <div className="flex h-screen">
+    <div className="flex">
       <SideNavigation />
-      <main className="flex-grow ml-64 xl:ml-80 p-6 overflow-y-auto">
-        {/* Outlet will render child routes */}
+      <main className="ml-64 xl:ml-80 w-3/4 xl:w-4/5 p-6">
         <Outlet />
       </main>
     </div>

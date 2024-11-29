@@ -5,6 +5,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { WebSocketProvider } from './pages/access/contexts/WebSocketContext';
 import { setupAuthInterceptor } from './services/auth.service';
+import DashboardLayout from './components/DashboardLayout';
 
 import './index.css'
 import App from './App';
@@ -14,7 +15,7 @@ import Access_IN from './pages/access/access-in';
 import Access_OUT from './pages/access/access-out';
 import LoginPage from './pages/login/Login';
 import VisitorHistory from './pages/dashboard/VisitorHistory';
-import DashboardLayout from './pages/dashboard/DashboardLayout';
+import DashboardHome from './pages/dashboard/Home';
 
 setupAuthInterceptor();
 
@@ -36,12 +37,21 @@ const router = createBrowserRouter([
     element: <LoginPage/>
   },
   {
-    path: '/login',
-    element: <LoginPage/>
-  },
-  {
     element: <ProtectedRoute allowedRoles={['faculty', 'admin']} />,
     children: [
+      {
+        element: <DashboardLayout />,
+        children: [
+          {
+            path: '/dashboard',
+            element: <DashboardHome />
+          },
+          {
+            path: '/dashboard/visitor-history',
+            element: <VisitorHistory/>
+          }
+        ]
+      },
       {
         path: '/access/in',
         element: <Access_IN/>
@@ -49,14 +59,6 @@ const router = createBrowserRouter([
       {
         path: '/access/out',
         element: <Access_OUT/>
-      },
-      {
-        path: '/dashboard',
-        element: <DashboardLayout />
-      },
-      {
-        path: '/dashboard/visitor-history',
-        element: <VisitorHistory/>
       }
     ]
   },

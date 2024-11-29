@@ -10,22 +10,26 @@ const NAV_ITEMS: NavItem[] = [
   { 
     id: 'dashboard', 
     label: 'Dashboard', 
-    path: '/dashboard' 
+    path: '/dashboard',
+    newTab: false
   },
   { 
     id: 'visitor-history', 
     label: 'Visitor History', 
-    path: '/dashboard/visitor-history' 
+    path: '/dashboard/visitor-history',
+    newTab: false
   },
   { 
     id: 'access-in', 
     label: 'Access Check-in', 
-    path: '/access/in' 
+    path: '/access/in',
+    newTab: true
   },
   { 
     id: 'access-out', 
     label: 'Access Check-out', 
-    path: '/access/out' 
+    path: '/access/out',
+    newTab: true
   },
 ];
 
@@ -35,9 +39,13 @@ const SideNavigation: React.FC = () => {
   const { currentPath, setCurrentPath } = useNavigationStore();
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
 
-  const handleNavItemClick = (path: string) => {
-    setCurrentPath(path);
-    navigate(path);
+  const handleNavItemClick = (path: string, newTab: boolean = false) => {
+    if (newTab) {
+      window.open(path, '_blank');
+    } else {
+      navigate(path);
+      setCurrentPath(path);
+    }
   };
 
   return (
@@ -48,7 +56,6 @@ const SideNavigation: React.FC = () => {
       {/* Top Logo/Icon Section */}
       <div className="flex justify-center items-center py-6">
         <div className="xl:w-64 flex items-center justify-center">
-          {/* Company Logo or Icon */}
           <img src="\logos\frames-white-logo-big.png" alt="Frames White Logo" />
         </div>
       </div>
@@ -58,7 +65,7 @@ const SideNavigation: React.FC = () => {
         {NAV_ITEMS.map((item) => (
           <button
             key={item.id}
-            onClick={() => handleNavItemClick(item.path)}
+            onClick={() => handleNavItemClick(item.path, item.newTab)}
             className={`
               w-full flex items-center space-x-3 py-2 pl-6 xl:pl-8 rounded-l-full transition-colors duration-200
               ${currentPath === item.path 
