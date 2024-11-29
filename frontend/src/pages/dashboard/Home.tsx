@@ -40,17 +40,23 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { FileDown, Search } from "lucide-react";
+import { FileDown, Search, X } from "lucide-react";
 import {
-  dailyVisitorData,
   monthlyVisitorSummaryData,
-  libraryUserData,
 } from "@/data/dashboard-mockdata";
 import { MonthlyVisitorSummary } from "@/types/dashboard.types";
 import { useDashboardStore } from "./stores/useDashboardStore";
 
 const DashboardHome: React.FC = () => {
-  const { filters, setMonth, setYear, setSearchTerm } = useDashboardStore();
+  const { 
+    filters, 
+    filteredVisitorData, 
+    filteredVisitorSummaryData, 
+    filteredLibraryUserData,
+    setMonth,
+    setYear,
+    setSearchTerm,
+  } = useDashboardStore();
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 3;
 
@@ -69,7 +75,7 @@ const DashboardHome: React.FC = () => {
     "December",
   ];
 
-  const totalVisitors = monthlyVisitorSummaryData.reduce(
+  const totalVisitors = filteredVisitorSummaryData.reduce(
     (sum, summary) => sum + summary.visitors,
     0
   );
@@ -142,12 +148,88 @@ const DashboardHome: React.FC = () => {
 
   const indexOfLastRow = currentPage * rowsPerPage;
   const indexOfFirstRow = indexOfLastRow - rowsPerPage;
-  const currentRows = libraryUserData.slice(indexOfFirstRow, indexOfLastRow);
-
-  const totalPages = Math.ceil(libraryUserData.length / rowsPerPage);
+  const currentRows = filteredLibraryUserData.slice(indexOfFirstRow, indexOfLastRow);
+  const totalPages = Math.ceil(filteredLibraryUserData.length / rowsPerPage);
 
   const handlePageChange = (pageNumber: number) => {
     setCurrentPage(pageNumber);
+  };
+
+  const renderPaginationItems = () => {
+    const paginationItems = [];
+    const maxVisiblePages = 5;
+
+    if (totalPages <= maxVisiblePages) {
+      return [...Array(totalPages)].map((_, index) => (
+        <PaginationItem key={index}>
+          <PaginationLink
+            onClick={() => handlePageChange(index + 1)}
+            isActive={currentPage === index + 1}
+          >
+            {index + 1}
+          </PaginationLink>
+        </PaginationItem>
+      ));
+    }
+
+    paginationItems.push(
+      <PaginationItem key="first">
+        <PaginationLink
+          className="hover:text-white"
+          onClick={() => handlePageChange(1)}
+          isActive={currentPage === 1}
+        >
+          1
+        </PaginationLink>
+      </PaginationItem>
+    );
+
+    if (currentPage > 2) {
+      paginationItems.push(
+        <PaginationItem key="start-ellipsis">
+          <span className="px-2">...</span>
+        </PaginationItem>
+      );
+    }
+
+    const startPage = Math.max(2, currentPage - 1);
+    const endPage = Math.min(totalPages - 1, currentPage + 1);
+
+    for (let i = startPage; i <= endPage; i++) {
+      paginationItems.push(
+        <PaginationItem key={i}>
+          <PaginationLink
+            className="hover:text-white"
+            onClick={() => handlePageChange(i)}
+            isActive={currentPage === i}
+          >
+            {i}
+          </PaginationLink>
+        </PaginationItem>
+      );
+    }
+
+    if (currentPage < totalPages - 1) {
+      paginationItems.push(
+        <PaginationItem key="end-ellipsis">
+          <span className="px-2">...</span>
+        </PaginationItem>
+      );
+    }
+
+    paginationItems.push(
+      <PaginationItem key="last">
+        <PaginationLink
+          className="hover:text-white"
+          onClick={() => handlePageChange(totalPages)}
+          isActive={currentPage === totalPages}
+        >
+          {totalPages}
+        </PaginationLink>
+      </PaginationItem>
+    );
+
+    return paginationItems;
   };
 
   return (
@@ -197,7 +279,7 @@ const DashboardHome: React.FC = () => {
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={150}>
-              <LineChart data={dailyVisitorData}>
+              <LineChart data={filteredVisitorData}>
                 <XAxis dataKey="date" />
                 <YAxis />
                 <Tooltip
@@ -237,7 +319,7 @@ const DashboardHome: React.FC = () => {
             <ResponsiveContainer width="100%" height={250}>
               <PieChart>
                 <Pie
-                  data={monthlyVisitorSummaryData}
+                  data={filteredVisitorSummaryData}
                   cx="50%"
                   cy="50%"
                   innerRadius={60}
@@ -245,7 +327,7 @@ const DashboardHome: React.FC = () => {
                   paddingAngle={5}
                   dataKey="visitors"
                 >
-                  {monthlyVisitorSummaryData.map((entry, index) => (
+                  {filteredVisitorSummaryData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
                 </Pie>
@@ -309,6 +391,16 @@ const DashboardHome: React.FC = () => {
                 value={filters.searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setSearchTerm("")}
+                className={`hover:bg-transparent absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground ${
+                  filters.searchTerm ? "visible" : "invisible"
+                }`}
+              >
+                <X size={16} />
+              </Button>
             </div>
             <Button
               variant="outline"
@@ -361,17 +453,7 @@ const DashboardHome: React.FC = () => {
                     }
                   />
                 </PaginationItem>
-                {[...Array(totalPages)].map((_, index) => (
-                  <PaginationItem key={index}>
-                    <PaginationLink
-                      onClick={() => handlePageChange(index + 1)}
-                      isActive={currentPage === index + 1}
-                      className="hover:text-white"
-                    >
-                      {index + 1}
-                    </PaginationLink>
-                  </PaginationItem>
-                ))}
+                {renderPaginationItems()}
                 <PaginationItem>
                   <PaginationNext
                     onClick={() => handlePageChange(currentPage + 1)}
