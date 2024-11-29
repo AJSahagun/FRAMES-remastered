@@ -1,8 +1,8 @@
 import { BadRequestException, Controller, Get, ParseIntPipe, Query } from '@nestjs/common';
 import { Role } from '../core/config/role.enum';
 import { Roles } from '../core/decorators/roles/roles.decorator';
-import { FindTopVisitorDto } from './dto/find-top-visitor.dto';
 import { DashboardService } from './dashboard.service';
+import { QueryDto } from './dto/query.dto';
 
 @Controller('dashboard')
 @Roles(Role.Dev, Role.Admin, Role.Librarian)
@@ -12,7 +12,7 @@ export class DashboardController {
     ){}
 
     @Get('top-visitor')
-    topVisitor(@Query() query:FindTopVisitorDto){
+    topVisitor(@Query() query:QueryDto){
         try {
             return this.dashboardService.topVisitor(query)
         } catch (error) {
@@ -29,10 +29,10 @@ export class DashboardController {
         }
     }
     @Get('month-by-day')
-    monthByDay(@Query('month') month:number, @Query('year') year:number){
-        if (month === undefined || year === undefined) throw new BadRequestException('Query parameter "year and month" is required.');
+    monthByDay(@Query() query:QueryDto){
+        // if (month === undefined || year === undefined) throw new BadRequestException('Query parameter "year and month" is required.');
         try {
-            return this.dashboardService.monthByDay(month, year)
+            return this.dashboardService.monthByDay(query)
         } catch (error) {
             throw error
         }
@@ -50,10 +50,10 @@ export class DashboardController {
         }
     }
 
-    @Get('visitor-per-department')
-    visitorPerDepartment(@Query('department') department:string){
+    @Get('visitor-count-per-department')
+    visitorCountPerDepartment(@Query() query:QueryDto){
         try {
-            return this.dashboardService.visitorPerDepartment(department)
+            return this.dashboardService.visitorCountPerDepartment(query)
         } catch (error) {
             throw error
         }

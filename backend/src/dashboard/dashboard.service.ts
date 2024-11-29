@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { FindTopVisitorDto } from './dto/find-top-visitor.dto';
 import { errorCatch } from '../core/config/errors';
+import { QueryDto } from './dto/query.dto';
 
 @Injectable()
 export class DashboardService {
@@ -8,14 +8,14 @@ export class DashboardService {
         @Inject('POSTGRES_POOL') private readonly sql:any,
     ){}
 
-    async topVisitor(q:FindTopVisitorDto){
+    async topVisitor(q:QueryDto){
         try {
             const params=[
                 q.department ?? null,   
                 q.program ?? null,   
                 q.year ?? null,  
                 q.month ?? null,   
-                q.date ?? null,
+                q.date ?? null
             ]
             const query=`
             with count_visit as(
@@ -45,9 +45,7 @@ export class DashboardService {
                 "program"
             FROM count_visit
             ORDER BY total_count DESC 
-            LIMIT 1;
-
-            `
+            LIMIT 1;`
             const result=await this.sql(query,params)
             return result
         } catch (error) {
@@ -64,16 +62,31 @@ export class DashboardService {
             errorCatch(error)
         }
     }
-    async monthByDay(month:number, year:number){
+    async monthByDay(q:QueryDto){
         try {
+            const params=[
+                q.department ?? null,   
+                q.program ?? null,   
+                q.year ?? null,  
+                q.month ?? null,
+                q.limit ?? 30,
+                q.offset ?? 0
+            ]
             const query=`
-                SELECT COUNT(*), time_out::date
-                FROM history h
-                WHERE time_out >= MAKE_DATE($1, $2, 1) 
-                AND time_out < MAKE_DATE($1, $2, 1) + INTERVAL '1 month' 
-                GROUP BY time_out::date
-                ORDER BY time_out ASC;`
-            const result = await this.sql(query, [year,month])  
+                with extracted_date as(
+                    SELECT COUNT(*) as count, time_out::date
+                    FROM history h
+                    JOIN users u ON u.school_id = h.school_id 
+                    WHERE
+                    ($1::VARCHAR IS NULL OR u.department ILIKE '%' || $1 || '%')
+                    AND ($2::VARCHAR IS NULL OR u."program" ILIKE '%' || $2 || '%')
+                    AND ($3::integer IS NULL OR EXTRACT(YEAR FROM h.time_out) = $3)
+                    AND ($4::integer IS NULL OR EXTRACT(MONTH FROM h.time_out) = $4)
+                    GROUP BY time_out::date
+                    ORDER BY time_out ASC
+                )
+                SELECT count, TO_CHAR(time_out, 'YYYY-MM-DD') AS date from extracted_date limit $5 offset $6`
+            const result = await this.sql(query, params)  
             console.log(result)
             return result
         } catch (error) {
@@ -97,19 +110,31 @@ export class DashboardService {
             errorCatch(error)
         }
     }
-    async visitorPerDepartment(department:string){
+    async visitorCountPerDepartment(q:QueryDto){
         try {
+            const params=[
+                q.department ?? null,   
+                q.program ?? null,   
+                q.year ?? null,  
+                q.month ?? null,   
+                q.date ?? null,
+            ]
             const query=`
                 SELECT 
                     COUNT(*), u.department
                 FROM history h
                 join users u on u.school_id = h.school_id 
 
-                where ($1::VARCHAR IS NULL OR u.department ILIKE '%' || $1 || '%')
+                where 
+                ($1::VARCHAR IS NULL OR u.department ILIKE '%' || $1 || '%')
+                AND ($2::VARCHAR IS NULL OR u."program" ILIKE '%' || $2 || '%')
+                AND ($3::integer IS NULL OR EXTRACT(YEAR FROM h.time_out) = $3)
+                AND ($4::integer IS NULL OR EXTRACT(MONTH FROM h.time_out) = $4)
+                AND ($5::VARCHAR IS NULL OR h.time_out::DATE = $5::DATE)
                 GROUP BY u.department
                 ORDER BY count desc
             `
-            const result= await this.sql(query, [department])
+            const result= await this.sql(query, params)
             return result
         } catch (error) {
             errorCatch(error)
@@ -140,6 +165,9 @@ export class DashboardService {
         } catch (error) {
             errorCatch(error)
         }
+    }
+    async utilizationReport(){
+
     }
 
     

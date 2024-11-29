@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import helmet from 'helmet';
-import { VersioningType } from '@nestjs/common';
+import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { greetings, owners } from './core/config/landing';
 
 async function bootstrap() {
@@ -18,7 +18,7 @@ async function bootstrap() {
     origin:process.env.FRAMES_FRONTEND_URL,
     methods:'GET, POST, PUT'
   })
-
+  app.useGlobalPipes(new ValidationPipe());
   await app.listen(3001);
   console.log(greetings)
   console.log(owners)

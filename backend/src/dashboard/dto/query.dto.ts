@@ -1,6 +1,6 @@
-import { IsOptional } from "class-validator"
+import { IsIn, IsOptional } from "class-validator"
 
-export class FindTopVisitorDto {
+export class QueryDto {
     @IsOptional()
     department:string
     @IsOptional()
@@ -11,4 +11,9 @@ export class FindTopVisitorDto {
     date:string
     @IsOptional()
     month:number
+
+    @IsOptional()
+    limit:number
+    @IsOptional()
+    offset:number
 }
