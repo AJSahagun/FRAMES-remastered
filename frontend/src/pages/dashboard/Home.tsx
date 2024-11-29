@@ -41,139 +41,84 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { FileDown, Search } from "lucide-react";
-
-interface Visitor {
-  date: string;
-  visitors: number;
-}
-
-interface DepartmentVisitor {
-  department: string;
-  visitors: number;
-  color: string;
-}
-
-interface LibraryUser {
-  name: string;
-  schoolId: string;
-  department: string;
-  course: string;
-  timeIn: string;
-  timeOut: string;
-}
-
-// Sample data
-const visitorData: Visitor[] = [
-  { date: "2024-01-01", visitors: 100 },
-  { date: "2024-01-02", visitors: 120 },
-  { date: "2024-01-03", visitors: 90 },
-  { date: "2024-01-04", visitors: 120 },
-  { date: "2024-01-05", visitors: 92 },
-  { date: "2024-01-06", visitors: 74 },
-  { date: "2024-01-07", visitors: 150 },
-  { date: "2024-01-08", visitors: 120 },
-  { date: "2024-01-09", visitors: 160 },
-  { date: "2024-01-10", visitors: 70 },
-  { date: "2024-01-11", visitors: 50 },
-  { date: "2024-01-12", visitors: 120 },
-];
-
-const departmentVisitorData: DepartmentVisitor[] = [
-  { department: "CICS", visitors: 150, color: "#302977" },
-  { department: "CoE", visitors: 305, color: "#C30D26" },
-  { department: "CAFAD", visitors: 100, color: "#8BA757" },
-  { department: "CET", visitors: 130, color: "#FFAE4C" },
-  { department: "Others", visitors: 50, color: "#7C7070" },
-];
-
-const libraryUserData: LibraryUser[] = [
-  {
-    name: "Jane Cooper",
-    schoolId: "21-43421",
-    department: "CICS",
-    course: "BSIT",
-    timeIn: "2023-01-02 07:00",
-    timeOut: "2023-01-02 07:12",
-  },
-  {
-    name: "Jane Cooper",
-    schoolId: "21-43421",
-    department: "CICS",
-    course: "BSIT",
-    timeIn: "2023-01-02 07:00",
-    timeOut: "2023-01-02 07:12",
-  },
-  {
-    name: "Jane Cooper",
-    schoolId: "21-43421",
-    department: "CICS",
-    course: "BSIT",
-    timeIn: "2023-01-02 07:00",
-    timeOut: "2023-01-02 07:12",
-  },
-  {
-    name: "Jake Sam",
-    schoolId: "21-34252",
-    department: "CICS",
-    course: "BSCS",
-    timeIn: "2023-01-02 07:00",
-    timeOut: "2023-01-02 07:12",
-  },
-  {
-    name: "Jake Sam",
-    schoolId: "21-34252",
-    department: "CICS",
-    course: "BSCS",
-    timeIn: "2023-01-02 07:00",
-    timeOut: "2023-01-02 07:12",
-  },
-  {
-    name: "Jake Sam",
-    schoolId: "21-34252",
-    department: "CICS",
-    course: "BSCS",
-    timeIn: "2023-01-02 07:00",
-    timeOut: "2023-01-02 07:12",
-  },
-];
+import {
+  dailyVisitorData,
+  monthlyVisitorSummaryData,
+  libraryUserData,
+} from "@/data/dashboard-mockdata";
+import { MonthlyVisitorSummary } from "@/types/dashboard.types";
+import { useDashboardStore } from "./stores/useDashboardStore";
 
 const DashboardHome: React.FC = () => {
-  // Implement useDashboardStore here when integration
-  const [selectedMonth, setSelectedMonth] = useState<string>("January");
-  const [selectedYear, setSelectedYear] = useState<string>("2024");
-  const [searchTerm, setSearchTerm] = useState<string>("");
+  const { filters, setMonth, setYear, setSearchTerm } = useDashboardStore();
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 3;
 
-  const totalVisitors = departmentVisitorData.reduce(
-    (sum, dept) => sum + dept.visitors,
+  const monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+
+  // Calculate total visitors from monthly visitor summary
+  const totalVisitors = monthlyVisitorSummaryData.reduce(
+    (sum, summary) => sum + summary.visitors,
     0
   );
 
   const handleExportCSV = () => {
+    const getDaysInMonth = (month: string, year: string): number => {
+      const monthIndex = monthNames.indexOf(month);
+      return new Date(parseInt(year), monthIndex + 1, 0).getDate();
+    };
+
+    const daysInMonth = getDaysInMonth(filters.month, filters.year);
+
     const headerRow1 = [
-      `LIBRARY USERS for the MONTH of ${selectedMonth} ${selectedYear}`,
+      `LIBRARY USERS for the MONTH of ${filters.month} ${filters.year}`,
     ];
 
     const headerRow2 = [
       "COLLEGE/ DEPARTMENT/ OFFICE",
-      ...Array.from({ length: 31 }, (_, i) => `${i + 1}`), // Change length depend on month
+      ...Array.from({ length: daysInMonth }, (_, i) => `${i + 1}`),
       "Total",
     ];
 
-    // Placeholder logic since no individual days yet (Change into days value)
-    const departmentRows = departmentVisitorData.map((dept) => [
+    // Prepare department data for CSV export
+    const departmentData = monthlyVisitorSummaryData.map((summary) => {
+      const dailyVisitors = Array.from({ length: daysInMonth }, (_, index) => {
+        const day = index + 1;
+        return summary.dailyVisitors[day] || 0;
+      });
+
+      return {
+        department: summary.department,
+        dailyVisitors,
+        total: dailyVisitors.reduce((sum, visitors) => sum + visitors, 0),
+      };
+    });
+
+    const departmentRows = departmentData.map((dept) => [
       dept.department,
-      ...Array.from({ length: 31 }, () => dept.visitors / 31), // Average lol
-      dept.visitors,
+      ...dept.dailyVisitors,
+      dept.total,
     ]);
 
     const totalRow = [
       "TOTAL",
-      ...Array.from({ length: 31 }, () =>
-        departmentVisitorData.reduce((sum, dept) => sum + dept.visitors / 31, 0)
+      ...Array.from({ length: daysInMonth }, (_, i) =>
+        departmentData.reduce((sum, dept) => sum + dept.dailyVisitors[i], 0)
       ),
-      totalVisitors,
+      departmentData.reduce((sum, dept) => sum + dept.total, 0),
     ];
 
     const csvContent = [
@@ -189,7 +134,7 @@ const DashboardHome: React.FC = () => {
     link.setAttribute("href", url);
     link.setAttribute(
       "download",
-      `Library_Users_${selectedMonth}_${selectedYear}.csv`
+      `Library_Users_${filters.month}_${filters.year}.csv`
     );
     link.style.visibility = "hidden";
     document.body.appendChild(link);
@@ -215,25 +160,12 @@ const DashboardHome: React.FC = () => {
           Dashboard
         </h1>
         <div className="flex space-x-4">
-          <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+          <Select value={filters.month} onValueChange={setMonth}>
             <SelectTrigger className="w-[140px] bg-white">
               <SelectValue placeholder="Select Month" />
             </SelectTrigger>
             <SelectContent>
-              {[
-                "January",
-                "February",
-                "March",
-                "April",
-                "May",
-                "June",
-                "July",
-                "August",
-                "September",
-                "October",
-                "November",
-                "December",
-              ].map((month) => (
+              {monthNames.map((month) => (
                 <SelectItem key={month} value={month}>
                   {month}
                 </SelectItem>
@@ -241,7 +173,7 @@ const DashboardHome: React.FC = () => {
             </SelectContent>
           </Select>
 
-          <Select value={selectedYear} onValueChange={setSelectedYear}>
+          <Select value={filters.year} onValueChange={setYear}>
             <SelectTrigger className="w-[100px] bg-white">
               <SelectValue placeholder="Select Year" />
             </SelectTrigger>
@@ -267,7 +199,7 @@ const DashboardHome: React.FC = () => {
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={150}>
-              <LineChart data={visitorData}>
+              <LineChart data={dailyVisitorData}>
                 <XAxis dataKey="date" />
                 <YAxis />
                 <Tooltip
@@ -298,14 +230,16 @@ const DashboardHome: React.FC = () => {
         {/* Department Visitor Distribution */}
         <Card className="h-64">
           <CardContent className="flex items-center justify-center">
-            <div className="font-poppins absolute text-center z-0 -translate-x-10">
-            <p className="text-xs font-base uppercase text-gray-400">Total Visitors</p>
+            <div className="font-poppins absolute text-center z-0 translate-x-[-4rem]">
+              <p className="text-xs font-base uppercase text-gray-400">
+                Total Visitors
+              </p>
               <p className="text-4xl font-bold">{totalVisitors}</p>
             </div>
             <ResponsiveContainer width="100%" height={250}>
               <PieChart>
                 <Pie
-                  data={departmentVisitorData}
+                  data={monthlyVisitorSummaryData}
                   cx="50%"
                   cy="50%"
                   innerRadius={60}
@@ -313,17 +247,18 @@ const DashboardHome: React.FC = () => {
                   paddingAngle={5}
                   dataKey="visitors"
                 >
-                  {departmentVisitorData.map((entry, index) => (
+                  {monthlyVisitorSummaryData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
                 </Pie>
                 <Tooltip
                   content={({ active, payload }) => {
                     if (active && payload && payload.length) {
-                      const data = payload[0].payload;
+                      const data = payload[0].payload as MonthlyVisitorSummary;
                       return (
                         <div className="bg-white p-4 shadow-lg rounded z-100">
                           <p>{`Department: ${data.department}`}</p>
+                          <p>{`Course: ${data.course}`}</p>
                           <p>{`Visitors: ${data.visitors}`}</p>
                         </div>
                       );
@@ -332,15 +267,17 @@ const DashboardHome: React.FC = () => {
                   }}
                 />
                 <Legend
+                  width={125}
                   layout="vertical"
                   verticalAlign="middle"
                   align="right"
+                  iconSize={10}
                   iconType="circle"
                   formatter={(value, entry) => {
                     if (entry && entry.payload) {
-                      const departmentData =
-                        entry.payload as unknown as DepartmentVisitor;
-                      return departmentData.department;
+                      const summaryData =
+                        entry.payload as unknown as MonthlyVisitorSummary;
+                      return `${summaryData.course} (${summaryData.department})`;
                     }
                     return value;
                   }}
@@ -371,7 +308,7 @@ const DashboardHome: React.FC = () => {
               <Input
                 placeholder="Search..."
                 className="font-noto_sans pl-8 w-[200px]"
-                value={searchTerm}
+                value={filters.searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
@@ -431,6 +368,7 @@ const DashboardHome: React.FC = () => {
                     <PaginationLink
                       onClick={() => handlePageChange(index + 1)}
                       isActive={currentPage === index + 1}
+                      className="hover:text-white"
                     >
                       {index + 1}
                     </PaginationLink>
