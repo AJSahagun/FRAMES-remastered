@@ -43,13 +43,13 @@ const SideNavigation: React.FC = () => {
   return (
     <>
     <div 
-      className="fixed left-0 top-0 h-full w-1/5 xl:w-1/6 bg-gradient-to-bl from-tc to-80% to-btnHover text-white flex flex-col drop-shadow-2xl"
+      className="fixed left-0 top-0 h-full w-1/4 xl:w-1/5 bg-gradient-to-bl from-tc to-80% to-btnHover text-white flex flex-col drop-shadow-2xl"
     >
       {/* Top Logo/Icon Section */}
       <div className="flex justify-center items-center py-6">
         <div className="xl:w-64 flex items-center justify-center">
           {/* Company Logo or Icon */}
-          <img src="\logos\frames-white-logo.png" alt="Frames White Logo" />
+          <img src="\logos\frames-white-logo-big.png" alt="Frames White Logo" />
         </div>
       </div>
 
@@ -86,7 +86,7 @@ const SideNavigation: React.FC = () => {
             <div className="font-semibold">{user.username}</div>
             <div className="text-sm text-red-200">{user.role}</div>
           </div>
-          <FiLogOut className='relative right-0'/>
+          <FiLogOut className='w-full right-0'/>
         </div>
       )}
     </div>

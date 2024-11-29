@@ -13,7 +13,7 @@ import LearnMore from './pages/register/LearnMore';
 import Access_IN from './pages/access/access-in';
 import Access_OUT from './pages/access/access-out';
 import LoginPage from './pages/login/Login';
-import VisitorHistory from './pages/dashboard/visitor-history';
+import VisitorHistory from './pages/dashboard/VisitorHistory';
 import DashboardLayout from './pages/dashboard/DashboardLayout';
 
 setupAuthInterceptor();
