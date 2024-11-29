@@ -69,7 +69,6 @@ const DashboardHome: React.FC = () => {
     "December",
   ];
 
-  // Calculate total visitors from monthly visitor summary
   const totalVisitors = monthlyVisitorSummaryData.reduce(
     (sum, summary) => sum + summary.visitors,
     0
@@ -93,7 +92,6 @@ const DashboardHome: React.FC = () => {
       "Total",
     ];
 
-    // Prepare department data for CSV export
     const departmentData = monthlyVisitorSummaryData.map((summary) => {
       const dailyVisitors = Array.from({ length: daysInMonth }, (_, index) => {
         const day = index + 1;
@@ -101,7 +99,7 @@ const DashboardHome: React.FC = () => {
       });
 
       return {
-        department: summary.department,
+        department: summary.course,
         dailyVisitors,
         total: dailyVisitors.reduce((sum, visitors) => sum + visitors, 0),
       };
