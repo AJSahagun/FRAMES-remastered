@@ -12,6 +12,7 @@ export const handleError=(error:any)=>{
 }
 
 export const errorCatch=(error:any)=>{
+  console.log(error)
   if (error instanceof HttpException) {
     throw error; // Keeps original exception
   }

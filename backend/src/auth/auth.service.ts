@@ -24,7 +24,7 @@ export class AuthService {
             const {password, uuid, ...woPAss}=user
             
             
-            return {token:this.jwtService.sign(woPAss)}
+            return {token:this.jwtService.sign(woPAss), role:user.role}
         }
         return { error: {code:404}}
     }

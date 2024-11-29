@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { CreateHistoryDto } from './dto/create-history.dto';
 import { FindHistoryDTO } from './dto/find-history.dto';
+import { errorCatch } from '../core/config/errors';
 
 @Injectable()
 export class HistoryService {
@@ -105,7 +106,7 @@ export class HistoryService {
       return result
 
     } catch (error) {
-      return {error}
+      errorCatch(error)
     }
   }
   
