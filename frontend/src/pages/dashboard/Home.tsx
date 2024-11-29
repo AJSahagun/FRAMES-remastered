@@ -298,9 +298,9 @@ const DashboardHome: React.FC = () => {
         {/* Department Visitor Distribution */}
         <Card className="h-64">
           <CardContent className="flex items-center justify-center">
-            <div className="absolute text-center z-0 -translate-x-10">
-              <p className="text-2xl font-bold">{totalVisitors}</p>
-              <p className="text-sm text-gray-500">Total Visitors</p>
+            <div className="font-poppins absolute text-center z-0 -translate-x-10">
+            <p className="text-xs font-base uppercase text-gray-400">Total Visitors</p>
+              <p className="text-4xl font-bold">{totalVisitors}</p>
             </div>
             <ResponsiveContainer width="100%" height={250}>
               <PieChart>
