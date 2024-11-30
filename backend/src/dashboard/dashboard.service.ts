@@ -113,7 +113,6 @@ export class DashboardService {
                 )
                 SELECT TO_CHAR(time_out, 'YYYY-MM-DD') AS date, count as visitors from extracted_date limit $5 offset $6`
             const result = await this.sql(query, params)  
-            console.log(result)
             return result
         } catch (error) {
             errorCatch(error)
@@ -152,7 +151,7 @@ export class DashboardService {
         try {
             const query=`
                 SELECT 
-                    COUNT(*),
+                    count(*),
                     to_char(DATE_TRUNC('month', h.time_out), 'fmmonth') AS month
                 FROM history h
                 WHERE EXTRACT(YEAR FROM h.time_out) = $1
