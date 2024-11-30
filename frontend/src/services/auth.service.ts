@@ -22,7 +22,7 @@ export const useAuthStore = create<AuthState>()(
             token: response.data.token,
             user: { 
               username: credentials.username, 
-              role: 'faculty' // Default role
+              role: 'admin' // Default role
             } 
           });
         } catch (error) {

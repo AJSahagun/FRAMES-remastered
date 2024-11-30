@@ -1,12 +1,10 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { WebSocketProvider } from './pages/access/contexts/WebSocketContext';
 import { setupAuthInterceptor } from './services/auth.service';
 import DashboardLayout from './components/DashboardLayout';
-
 import './index.css'
 import App from './App';
 import Register from './pages/register/register-page';
@@ -16,6 +14,8 @@ import Access_OUT from './pages/access/access-out';
 import LoginPage from './pages/login/Login';
 import VisitorHistory from './pages/dashboard/VisitorHistory';
 import DashboardHome from './pages/dashboard/Home';
+import ManageUsers from './pages/dashboard/ManageUsers';
+import TermsOfService from './pages/dashboard/TermsOfService';
 
 setupAuthInterceptor();
 
@@ -49,6 +49,14 @@ const router = createBrowserRouter([
           {
             path: '/dashboard/visitor-history',
             element: <VisitorHistory/>
+          },
+          {
+            path: '/dashboard/manage-users',
+            element: <ManageUsers/>
+          },
+          {
+            path: '/dashboard/terms-of-service',
+            element: <TermsOfService/>
           }
         ]
       },
