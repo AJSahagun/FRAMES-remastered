@@ -100,7 +100,7 @@ export class DashboardService {
             ]
             const query=`
                 with extracted_date as(
-                    SELECT COUNT(*) as count, time_out::date
+                    SELECT COUNT(*), time_out::date
                     FROM history h
                     JOIN users u ON u.school_id = h.school_id 
                     WHERE
@@ -111,7 +111,7 @@ export class DashboardService {
                     GROUP BY time_out::date
                     ORDER BY time_out ASC
                 )
-                SELECT count, TO_CHAR(time_out, 'YYYY-MM-DD') AS date from extracted_date limit $5 offset $6`
+                SELECT TO_CHAR(time_out, 'YYYY-MM-DD') AS date, count as visitors from extracted_date limit $5 offset $6`
             const result = await this.sql(query, params)  
             console.log(result)
             return result
@@ -123,18 +123,22 @@ export class DashboardService {
         try {
             const query=`
             with daily_count as(
-                select count(*), u.program, extract(day from h.time_out) as day
+                select count(*), u.program, u.department, extract(day from h.time_out) as day
                 from history h join users u on u.school_id = h.school_id
                 where 
                 ($1::integer IS NULL OR EXTRACT(YEAR FROM h.time_out) = $1)
                 AND ($2::integer IS NULL OR EXTRACT(MONTH FROM h.time_out) = $2)
-                group by program, day
+                group by program, department, day 
             ),
 
             group_by_program as(
-                select program, jsonb_object_agg(day, count) as counts_per_day
+                select TO_CHAR(DATE '2000-01-01' + ($2 - 1) * INTERVAL '1 month', 'FMMonth') as month, 
+                $1::text as year,  
+                program, department,
+                sum(count) as visitors, 
+                jsonb_object_agg(day, count) as "dailyVisitors"
                 from daily_count
-                group by program
+                group by program, department
             )
             select * from group_by_program
             `
