@@ -62,6 +62,32 @@ export class DashboardService {
             errorCatch(error)
         }
     }
+    async uniqueVisitorsCount(){
+        try {
+            const query=`
+                SELECT  
+                    count(*)
+                FROM history h
+                GROUP BY h.school_id
+                HAVING COUNT(*) = 1;
+            `
+            const result= await this.sql(query)
+            return result
+        } catch (error) {
+            errorCatch(error)
+        }
+    }
+    async avgDailyVisitor(){
+        try {
+            const query=`select round(avg(count),0) as avg from (
+                    select count(*) from history
+                    group by date(time_out))`
+            const result= await this.sql(query)
+            return result
+        } catch (error) {
+            errorCatch(error)
+        }
+    }
     async monthByDay(q:QueryDto){
         try {
             const params=[
@@ -88,6 +114,31 @@ export class DashboardService {
                 SELECT count, TO_CHAR(time_out, 'YYYY-MM-DD') AS date from extracted_date limit $5 offset $6`
             const result = await this.sql(query, params)  
             console.log(result)
+            return result
+        } catch (error) {
+            errorCatch(error)
+        }
+    }
+    async allProgramMonthByDay(year:number, month:number){
+        try {
+            const query=`
+            with daily_count as(
+                select count(*), u.program, extract(day from h.time_out) as day
+                from history h join users u on u.school_id = h.school_id
+                where 
+                ($1::integer IS NULL OR EXTRACT(YEAR FROM h.time_out) = $1)
+                AND ($2::integer IS NULL OR EXTRACT(MONTH FROM h.time_out) = $2)
+                group by program, day
+            ),
+
+            group_by_program as(
+                select program, jsonb_object_agg(day, count) as counts_per_day
+                from daily_count
+                group by program
+            )
+            select * from group_by_program
+            `
+            const result= await this.sql(query, [year,month])
             return result
         } catch (error) {
             errorCatch(error)
@@ -121,7 +172,7 @@ export class DashboardService {
             ]
             const query=`
                 SELECT 
-                    COUNT(*), u.department
+                    COUNT(*), coalesce(u.department,'Faculty') as department
                 FROM history h
                 join users u on u.school_id = h.school_id 
 
@@ -140,35 +191,8 @@ export class DashboardService {
             errorCatch(error)
         }
     }
-    async uniqueVisitors(){
-        try {
-            const query=`
-                SELECT  
-                    h.school_id
-                FROM history h
-                GROUP BY h.school_id
-                HAVING COUNT(*) = 1;
-            `
-            const result= await this.sql(query)
-            return result
-        } catch (error) {
-            errorCatch(error)
-        }
-    }
-    async avgDailyVisitor(){
-        try {
-            const query=`select avg(count) from (
-                    select count(*) from history
-                    group by date(time_out))`
-            const result= await this.sql(query)
-            return result
-        } catch (error) {
-            errorCatch(error)
-        }
-    }
-    async utilizationReport(){
-
-    }
+    
+    
 
     
 }

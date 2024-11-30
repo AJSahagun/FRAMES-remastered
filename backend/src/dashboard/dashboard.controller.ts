@@ -16,7 +16,7 @@ export class DashboardController {
         try {
             return this.dashboardService.topVisitor(query)
         } catch (error) {
-            throw error
+            return error
         }
     }
 
@@ -25,28 +25,27 @@ export class DashboardController {
         try {
             return this.dashboardService.avgOccupancy()
         } catch (error) {
-            throw error
+            return error
         }
     }
     @Get('month-by-day')
     monthByDay(@Query() query:QueryDto){
-        // if (month === undefined || year === undefined) throw new BadRequestException('Query parameter "year and month" is required.');
         try {
             return this.dashboardService.monthByDay(query)
         } catch (error) {
-            throw error
+            return error
         }
     }
 
     @Get('year-by-month')
     yearByMonth(@Query('year', ParseIntPipe) year:number){
         if (year === undefined) {
-            throw new BadRequestException('Query parameter "year" is required.');
+            return new BadRequestException('Query parameter "year" is required.');
         }
         try {
             return this.dashboardService.yearByMonth(year)
         } catch (error) {
-            throw error
+            return error
         }
     }
 
@@ -55,16 +54,16 @@ export class DashboardController {
         try {
             return this.dashboardService.visitorCountPerDepartment(query)
         } catch (error) {
-            throw error
+            return error
         }
     }
 
-    @Get('unique-visitor-count')
-    uniqueVisitors(){
+    @Get('unique-visitors-count')
+    uniqueVisitorsCount(){
         try {
-            return this.dashboardService.uniqueVisitors()
+            return this.dashboardService.uniqueVisitorsCount()
         } catch (error) {
-            throw error
+            return error
         }
     }
     @Get('avg-daily-visitor')
@@ -72,7 +71,17 @@ export class DashboardController {
         try {
             return this.dashboardService.avgDailyVisitor()
         } catch (error) {
-            throw error
+            return error
+        }
+    }
+
+    @Get('all-program-month-by-day')
+    allProgramMonthByDay(@Query('year') year:number, @Query('month') month:number){
+        if(month == undefined || year == undefined) throw new BadRequestException('Both month and year is required')
+        try {
+            return this.dashboardService.allProgramMonthByDay(year,month)
+        } catch (error) {
+            return error
         }
     }
 }
