@@ -31,7 +31,33 @@ const NAV_ITEMS: NavItem[] = [
     path: '/access/out',
     newTab: true
   },
+  {
+    id: 'manage-user',
+    label: 'Manage Users',
+    path: '/dashboard/manage-users',
+    newTab: false,
+    roles: ['admin']
+  },
+  {
+    id: 'terms-of-service',
+    label: 'Terms of Service',
+    path: '/dashboard/terms-of-service',
+    newTab: false,
+    roles: ['admin']
+  },
+  {
+    id: 'settings',
+    label: 'Settings',
+    path: '/dashboard/settings',
+    newTab: false,
+    roles: ['admin']
+  }
 ];
+
+// Function to get navigation items based on user role
+const getNavItemsForRole = (role: string): NavItem[] => {
+  return NAV_ITEMS.filter(item => !item.roles || item.roles.includes(role));
+};
 
 const SideNavigation: React.FC = () => {
   const navigate = useNavigate();
@@ -48,6 +74,8 @@ const SideNavigation: React.FC = () => {
     }
   };
 
+  const navItemsForUser = user ? getNavItemsForRole(user.role) : [];
+
   return (
     <>
     <div 
@@ -62,7 +90,7 @@ const SideNavigation: React.FC = () => {
 
       {/* Navigation Items */}
       <nav className="flex-grow pl-6 xl:pl-8 space-y-1 text-white font-noto_sans text-base xl:text-lg">
-        {NAV_ITEMS.map((item) => (
+        {navItemsForUser.map((item) => (
           <button
             key={item.id}
             onClick={() => handleNavItemClick(item.path, item.newTab)}

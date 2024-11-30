@@ -3,4 +3,5 @@ export interface NavItem {
     label: string;
     path: string;
     newTab: boolean;
+    roles?: string[];
   }
