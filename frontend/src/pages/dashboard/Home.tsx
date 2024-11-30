@@ -32,26 +32,18 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
+import TablePagination from "@/components/TablePagination";
 import { FileDown, Search, X } from "lucide-react";
-import {
-  monthlyVisitorSummaryData,
-} from "@/data/dashboard-mockdata";
+import { monthNames } from "@/data/month-names";
 import { MonthlyVisitorSummary } from "@/types/dashboard.types";
 import { useDashboardStore } from "./stores/useDashboardStore";
+import { exportToCSV } from "@/utils/export-csv";
 
 const DashboardHome: React.FC = () => {
-  const { 
-    filters, 
-    filteredVisitorData, 
-    filteredVisitorSummaryData, 
+  const {
+    filters,
+    filteredVisitorData,
+    filteredVisitorSummaryData,
     filteredLibraryUserData,
     setMonth,
     setYear,
@@ -60,176 +52,21 @@ const DashboardHome: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 3;
 
-  const monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
-
   const totalVisitors = filteredVisitorSummaryData.reduce(
     (sum, summary) => sum + summary.visitors,
     0
   );
 
-  const handleExportCSV = () => {
-    const getDaysInMonth = (month: string, year: string): number => {
-      const monthIndex = monthNames.indexOf(month);
-      return new Date(parseInt(year), monthIndex + 1, 0).getDate();
-    };
-
-    const daysInMonth = getDaysInMonth(filters.month, filters.year);
-
-    const headerRow1 = [
-      `LIBRARY USERS for the MONTH of ${filters.month} ${filters.year}`,
-    ];
-
-    const headerRow2 = [
-      "COLLEGE/ DEPARTMENT/ OFFICE",
-      ...Array.from({ length: daysInMonth }, (_, i) => `${i + 1}`),
-      "Total",
-    ];
-
-    const departmentData = monthlyVisitorSummaryData.map((summary) => {
-      const dailyVisitors = Array.from({ length: daysInMonth }, (_, index) => {
-        const day = index + 1;
-        return summary.dailyVisitors[day] || 0;
-      });
-
-      return {
-        department: summary.course,
-        dailyVisitors,
-        total: dailyVisitors.reduce((sum, visitors) => sum + visitors, 0),
-      };
-    });
-
-    const departmentRows = departmentData.map((dept) => [
-      dept.department,
-      ...dept.dailyVisitors,
-      dept.total,
-    ]);
-
-    const totalRow = [
-      "TOTAL",
-      ...Array.from({ length: daysInMonth }, (_, i) =>
-        departmentData.reduce((sum, dept) => sum + dept.dailyVisitors[i], 0)
-      ),
-      departmentData.reduce((sum, dept) => sum + dept.total, 0),
-    ];
-
-    const csvContent = [
-      headerRow1.join(","),
-      headerRow2.join(","),
-      ...departmentRows.map((row) => row.join(",")),
-      totalRow.join(","),
-    ].join("\n");
-
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const link = document.createElement("a");
-    const url = URL.createObjectURL(blob);
-    link.setAttribute("href", url);
-    link.setAttribute(
-      "download",
-      `Library_Users_${filters.month}_${filters.year}.csv`
-    );
-    link.style.visibility = "hidden";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
   const indexOfLastRow = currentPage * rowsPerPage;
   const indexOfFirstRow = indexOfLastRow - rowsPerPage;
-  const currentRows = filteredLibraryUserData.slice(indexOfFirstRow, indexOfLastRow);
+  const currentRows = filteredLibraryUserData.slice(
+    indexOfFirstRow,
+    indexOfLastRow
+  );
   const totalPages = Math.ceil(filteredLibraryUserData.length / rowsPerPage);
 
   const handlePageChange = (pageNumber: number) => {
     setCurrentPage(pageNumber);
-  };
-
-  const renderPaginationItems = () => {
-    const paginationItems = [];
-    const maxVisiblePages = 5;
-
-    if (totalPages <= maxVisiblePages) {
-      return [...Array(totalPages)].map((_, index) => (
-        <PaginationItem key={index}>
-          <PaginationLink
-            onClick={() => handlePageChange(index + 1)}
-            isActive={currentPage === index + 1}
-          >
-            {index + 1}
-          </PaginationLink>
-        </PaginationItem>
-      ));
-    }
-
-    paginationItems.push(
-      <PaginationItem key="first">
-        <PaginationLink
-          className="hover:text-white"
-          onClick={() => handlePageChange(1)}
-          isActive={currentPage === 1}
-        >
-          1
-        </PaginationLink>
-      </PaginationItem>
-    );
-
-    if (currentPage > 2) {
-      paginationItems.push(
-        <PaginationItem key="start-ellipsis">
-          <span className="px-2">...</span>
-        </PaginationItem>
-      );
-    }
-
-    const startPage = Math.max(2, currentPage - 1);
-    const endPage = Math.min(totalPages - 1, currentPage + 1);
-
-    for (let i = startPage; i <= endPage; i++) {
-      paginationItems.push(
-        <PaginationItem key={i}>
-          <PaginationLink
-            className="hover:text-white"
-            onClick={() => handlePageChange(i)}
-            isActive={currentPage === i}
-          >
-            {i}
-          </PaginationLink>
-        </PaginationItem>
-      );
-    }
-
-    if (currentPage < totalPages - 1) {
-      paginationItems.push(
-        <PaginationItem key="end-ellipsis">
-          <span className="px-2">...</span>
-        </PaginationItem>
-      );
-    }
-
-    paginationItems.push(
-      <PaginationItem key="last">
-        <PaginationLink
-          className="hover:text-white"
-          onClick={() => handlePageChange(totalPages)}
-          isActive={currentPage === totalPages}
-        >
-          {totalPages}
-        </PaginationLink>
-      </PaginationItem>
-    );
-
-    return paginationItems;
   };
 
   return (
@@ -404,7 +241,7 @@ const DashboardHome: React.FC = () => {
             </div>
             <Button
               variant="outline"
-              onClick={handleExportCSV}
+              onClick={() => exportToCSV(filters)}
               className="font-noto_sans rounded-xl"
             >
               <FileDown size={16} className="mr-2" />
@@ -438,36 +275,12 @@ const DashboardHome: React.FC = () => {
             </TableBody>
           </Table>
 
-          <div className="flex justify-between items-center mt-4">
-            <Pagination>
-              <PaginationContent>
-                <PaginationItem>
-                  <PaginationPrevious
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    aria-disabled={currentPage <= 1}
-                    tabIndex={currentPage <= 1 ? -1 : undefined}
-                    className={
-                      currentPage <= 1
-                        ? "pointer-events-none opacity-50"
-                        : undefined
-                    }
-                  />
-                </PaginationItem>
-                {renderPaginationItems()}
-                <PaginationItem>
-                  <PaginationNext
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    aria-disabled={currentPage === totalPages}
-                    tabIndex={currentPage === totalPages ? +1 : undefined}
-                    className={
-                      currentPage === totalPages
-                        ? "pointer-events-none opacity-50"
-                        : undefined
-                    }
-                  />
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
+          <div className="items-center mt-4">
+            <TablePagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+            />
           </div>
         </CardContent>
       </Card>

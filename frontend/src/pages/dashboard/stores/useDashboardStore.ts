@@ -5,12 +5,7 @@ import {
   monthlyVisitorSummaryData,
   libraryUserData,
 } from "@/data/dashboard-mockdata";
-
-interface DashboardFilters {
-  month: string;
-  year: string;
-  searchTerm: string;
-}
+import { DashboardFilters } from "@/types/dashboard.types";
 
 interface DashboardStore {
   filters: DashboardFilters;

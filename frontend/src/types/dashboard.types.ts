@@ -25,3 +25,13 @@ export interface LibraryUser {
   timeIn: string;
   timeOut: string;
 }
+
+export const parseDateTime = (dateString: string): Date => {
+  return new Date(dateString);
+}
+
+export interface DashboardFilters {
+  month: string;
+  year: string;
+  searchTerm: string;
+}
