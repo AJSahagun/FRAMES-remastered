@@ -36,6 +36,7 @@ import TablePagination from "@/components/TablePagination";
 import { FileDown, Search, X } from "lucide-react";
 import { MonthlyVisitorSummary } from "@/types/dashboard.types";
 import { useDashboardStore } from "./stores/useDashboardStore";
+import { format } from "date-fns";
 import { exportToCSV } from "@/utils/export-csv";
 
 const DashboardHome: React.FC = () => {
@@ -274,8 +275,8 @@ const DashboardHome: React.FC = () => {
                   <TableCell>{user.schoolId}</TableCell>
                   <TableCell>{user.department}</TableCell>
                   <TableCell>{user.course}</TableCell>
-                  <TableCell>{user.timeIn}</TableCell>
-                  <TableCell>{user.timeOut}</TableCell>
+                  <TableCell>{format(user.timeIn, "MMM dd, yyyy HH:mm")}</TableCell>
+                  <TableCell>{format(user.timeOut, "MMM dd, yyyy HH:mm")}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
