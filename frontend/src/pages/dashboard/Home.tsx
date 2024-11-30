@@ -34,7 +34,6 @@ import {
 } from "@/components/ui/table";
 import TablePagination from "@/components/TablePagination";
 import { FileDown, Search, X } from "lucide-react";
-import { monthNames } from "@/data/month-names";
 import { MonthlyVisitorSummary } from "@/types/dashboard.types";
 import { useDashboardStore } from "./stores/useDashboardStore";
 import { exportToCSV } from "@/utils/export-csv";
@@ -69,6 +68,13 @@ const DashboardHome: React.FC = () => {
     setCurrentPage(pageNumber);
   };
 
+  const months = Array.from({ length: 12 }, (_, i) =>
+    new Date(0, i).toLocaleString("default", { month: "long" })
+  );
+  const years = Array.from({ length: 10 }, (_, i) =>
+    (new Date().getFullYear() - 5 + i).toString()
+  );
+
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
@@ -82,7 +88,7 @@ const DashboardHome: React.FC = () => {
               <SelectValue placeholder="Select Month" />
             </SelectTrigger>
             <SelectContent>
-              {monthNames.map((month) => (
+              {months.map((month) => (
                 <SelectItem key={month} value={month}>
                   {month}
                 </SelectItem>
@@ -95,7 +101,7 @@ const DashboardHome: React.FC = () => {
               <SelectValue placeholder="Select Year" />
             </SelectTrigger>
             <SelectContent>
-              {["2022", "2023", "2024"].map((year) => (
+              {years.map((year) => (
                 <SelectItem key={year} value={year}>
                   {year}
                 </SelectItem>
