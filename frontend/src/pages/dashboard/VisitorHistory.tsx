@@ -92,6 +92,7 @@ export const VisitorHistory: React.FC = () => {
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            className="hover:text-white"
           >
             Time In
             <ChevronDown className="ml-2 h-4 w-4" />

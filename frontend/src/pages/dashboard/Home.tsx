@@ -33,7 +33,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import TablePagination from "@/components/TablePagination";
-import { FileDown, Search, X } from "lucide-react";
+import { FileDown, Search, X, RotateCcw } from "lucide-react";
 import { MonthlyVisitorSummary } from "@/types/dashboard.types";
 import { useDashboardStore } from "./stores/useDashboardStore";
 import { format } from "date-fns";
@@ -48,6 +48,7 @@ const DashboardHome: React.FC = () => {
     setMonth,
     setYear,
     setSearchTerm,
+    resetFilters
   } = useDashboardStore();
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 3;
@@ -109,6 +110,14 @@ const DashboardHome: React.FC = () => {
               ))}
             </SelectContent>
           </Select>
+
+          <Button
+            variant="outline"
+            onClick={resetFilters}
+            className="drop-shadow-md mr-2 bg-white rounded-lg"
+          >
+            <RotateCcw />
+          </Button>
         </div>
       </div>
 
@@ -275,8 +284,12 @@ const DashboardHome: React.FC = () => {
                   <TableCell>{user.schoolId}</TableCell>
                   <TableCell>{user.department}</TableCell>
                   <TableCell>{user.course}</TableCell>
-                  <TableCell>{format(user.timeIn, "MMM dd, yyyy HH:mm")}</TableCell>
-                  <TableCell>{format(user.timeOut, "MMM dd, yyyy HH:mm")}</TableCell>
+                  <TableCell>
+                    {format(user.timeIn, "MMM dd, yyyy HH:mm")}
+                  </TableCell>
+                  <TableCell>
+                    {format(user.timeOut, "MMM dd, yyyy HH:mm")}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
