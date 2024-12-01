@@ -106,8 +106,8 @@ export class DashboardService {
                     WHERE
                     ($1::VARCHAR IS NULL OR u.department ILIKE '%' || $1 || '%')
                     AND ($2::VARCHAR IS NULL OR u."program" ILIKE '%' || $2 || '%')
-                    AND ($3::integer IS NULL OR EXTRACT(YEAR FROM h.time_out) = $3)
-                    AND ($4::integer IS NULL OR EXTRACT(MONTH FROM h.time_out) = $4)
+                    AND ($3::integer IS NULL OR h.time_out_year = $3)
+                    AND ($4::integer IS NULL OR h.time_out_month = $4)
                     GROUP BY time_out::date
                     ORDER BY time_out ASC
                 )
@@ -121,12 +121,10 @@ export class DashboardService {
     async allProgramMonthByDay(year:number, month:number){
         try {
             const query=`
-            with daily_count as(
-                select count(*), u.program, u.department, extract(day from h.time_out) as day
+           with daily_count as(
+                select count(*), u.program, u.department, h.time_out_day as day
                 from history h join users u on u.school_id = h.school_id
-                where 
-                ($1::integer IS NULL OR EXTRACT(YEAR FROM h.time_out) = $1)
-                AND ($2::integer IS NULL OR EXTRACT(MONTH FROM h.time_out) = $2)
+                where h.time_out_year= $1 and h.time_out_month=$2
                 group by program, department, day 
             ),
 
@@ -134,6 +132,14 @@ export class DashboardService {
                 select TO_CHAR(DATE '2000-01-01' + ($2 - 1) * INTERVAL '1 month', 'FMMonth') as month, 
                 $1::text as year,  
                 program, department,
+                case 
+                	when department='CICS' then '#5490de'
+                	when department='COE' then '#fc746a'
+                	when department='CET' then '#8ce089'
+                	when department='CAFAD' then '#aa8ed1'
+                	else '#e89374'
+                end as color,
+                
                 sum(count) as visitors, 
                 jsonb_object_agg(day, count) as "dailyVisitors"
                 from daily_count
@@ -182,8 +188,8 @@ export class DashboardService {
                 where 
                 ($1::VARCHAR IS NULL OR u.department ILIKE '%' || $1 || '%')
                 AND ($2::VARCHAR IS NULL OR u."program" ILIKE '%' || $2 || '%')
-                AND ($3::integer IS NULL OR EXTRACT(YEAR FROM h.time_out) = $3)
-                AND ($4::integer IS NULL OR EXTRACT(MONTH FROM h.time_out) = $4)
+                AND ($3::integer IS NULL OR h.time_out_year = $3)
+                AND ($4::integer IS NULL OR h.time_out_month = $4)
                 AND ($5::VARCHAR IS NULL OR h.time_out::DATE = $5::DATE)
                 GROUP BY u.department
                 ORDER BY count desc
@@ -194,8 +200,4 @@ export class DashboardService {
             errorCatch(error)
         }
     }
-    
-    
-
-    
 }
