@@ -141,7 +141,7 @@ const DashboardHome: React.FC = () => {
                       const data = payload[0].payload;
                       return (
                         <div className="bg-white p-4 shadow-lg rounded">
-                          <p>{`Date: ${data.date}`}</p>
+                          <p>{`Date: ${format(data.date, "MMM dd, yyyy")}`}</p>
                           <p>{`Visitors: ${data.visitors}`}</p>
                         </div>
                       );
@@ -257,7 +257,7 @@ const DashboardHome: React.FC = () => {
             </div>
             <Button
               variant="outline"
-              onClick={() => exportToCSV(filters)}
+              onClick={() => exportToCSV(filters, filteredVisitorSummaryData)}
               className="font-noto_sans rounded-xl"
             >
               <FileDown size={16} className="mr-2" />

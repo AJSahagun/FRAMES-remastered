@@ -53,6 +53,7 @@ export const VisitorHistory: React.FC = () => {
     setYear,
     setSearchTerm,
     filteredLibraryUserData,
+    filteredVisitorSummaryData,
     resetFilters,
   } = useDashboardStore();
 
@@ -168,7 +169,7 @@ export const VisitorHistory: React.FC = () => {
   );
 
   const handleExportCSV = () => {
-    exportToCSV(filters);
+    exportToCSV(filters, filteredVisitorSummaryData);
   };
 
   React.useEffect(() => {

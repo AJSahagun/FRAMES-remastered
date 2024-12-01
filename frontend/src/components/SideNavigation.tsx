@@ -119,7 +119,7 @@ const SideNavigation: React.FC = () => {
           />
           <div>
             <div className="font-semibold">{user.username}</div>
-            <div className="text-sm text-red-200">{user.role}</div>
+            <div className="text-sm text-red-200 capitalize">{user.role}</div>
           </div>
           <FiLogOut className='w-full right-0'/>
         </div>

@@ -1,11 +1,11 @@
-import { monthlyVisitorSummaryData } from "@/data/dashboard-mockdata";
+import { MonthlyVisitorSummary } from "@/types/dashboard.types";
 import { DashboardFilters } from "@/types/dashboard.types";
 
 const months = Array.from({ length: 12 }, (_, i) =>
   new Date(0, i).toLocaleString("default", { month: "long" })
 );
 
-export function exportToCSV(filters: DashboardFilters) {
+export function exportToCSV(filters: DashboardFilters, monthlyVisitorSummaryData:MonthlyVisitorSummary[]) {
   const getDaysInMonth = (month: string, year: string): number => {
     const monthIndex = months.indexOf(month);
     return new Date(parseInt(year), monthIndex + 1, 0).getDate();

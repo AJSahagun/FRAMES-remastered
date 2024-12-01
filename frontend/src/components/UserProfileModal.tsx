@@ -29,7 +29,7 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ onClose }) => {
           />
           <div>
             <div className="font-bold text-lg text-tc">{user.username}</div>
-            <div className="text-gray-500">{user.role}</div>
+            <div className="text-gray-500 capitalize">{user.role}</div>
           </div>
         </div>
         <div className="space-y-2">

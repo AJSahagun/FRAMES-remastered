@@ -1,6 +1,4 @@
 export interface BaseVisitor {
-  course?: string;
-  department?: string;
   visitors: number;
   color?: string; // Optional for visualization
 }
