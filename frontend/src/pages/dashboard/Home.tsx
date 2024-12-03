@@ -48,7 +48,7 @@ const DashboardHome: React.FC = () => {
     setMonth,
     setYear,
     setSearchTerm,
-    resetFilters
+    resetFilters,
   } = useDashboardStore();
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 3;
@@ -76,6 +76,14 @@ const DashboardHome: React.FC = () => {
   const years = Array.from({ length: 10 }, (_, i) =>
     (new Date().getFullYear() - 5 + i).toString()
   );
+
+  const legendData = [
+    { name: "CoE", color: "#C30D26" },
+    { name: "CAFAD", color: "#8BA757" },
+    { name: "CET", color: "#FFAE4C" },
+    { name: "CICS", color: "#302977" },
+    { name: "Others", color: "#7C7070" },
+  ];
 
   return (
     <div className="p-6 space-y-6">
@@ -133,7 +141,12 @@ const DashboardHome: React.FC = () => {
           <CardContent>
             <ResponsiveContainer width="100%" height={150}>
               <LineChart data={filteredVisitorData}>
-                <XAxis dataKey="date" />
+                <XAxis
+                  dataKey="date"
+                  tickFormatter={(date: string) =>
+                    format(new Date(date), "MMM dd")
+                  }
+                />
                 <YAxis />
                 <Tooltip
                   content={({ active, payload }) => {
@@ -153,6 +166,7 @@ const DashboardHome: React.FC = () => {
                   type="monotone"
                   dataKey="visitors"
                   stroke="#8884d8"
+                  dot={false}
                   strokeWidth={2}
                 />
               </LineChart>
@@ -163,7 +177,7 @@ const DashboardHome: React.FC = () => {
         {/* Department Visitor Distribution */}
         <Card className="h-64">
           <CardContent className="flex items-center justify-center">
-            <div className="font-poppins absolute text-center z-0 translate-x-[-4rem]">
+            <div className="font-poppins absolute text-center z-0 translate-x-[-3.2rem]">
               <p className="text-xs font-base uppercase text-gray-400">
                 Total Visitors
               </p>
@@ -177,7 +191,7 @@ const DashboardHome: React.FC = () => {
                   cy="50%"
                   innerRadius={60}
                   outerRadius={80}
-                  paddingAngle={5}
+                  paddingAngle={1}
                   dataKey="visitors"
                 >
                   {filteredVisitorSummaryData.map((entry, index) => (
@@ -200,20 +214,18 @@ const DashboardHome: React.FC = () => {
                   }}
                 />
                 <Legend
-                  width={125}
+                  className="ml-3"
+                  width={100}
                   layout="vertical"
                   verticalAlign="middle"
                   align="right"
                   iconSize={10}
                   iconType="circle"
-                  formatter={(value, entry) => {
-                    if (entry && entry.payload) {
-                      const summaryData =
-                        entry.payload as unknown as MonthlyVisitorSummary;
-                      return `${summaryData.course} (${summaryData.department})`;
-                    }
-                    return value;
-                  }}
+                  payload={legendData.map((item) => ({
+                    value: item.name,
+                    type: "circle",
+                    color: item.color,
+                  }))}
                 />
               </PieChart>
             </ResponsiveContainer>
