@@ -3,11 +3,11 @@ import { Navigate, Outlet } from 'react-router-dom';
 import { useAuthStore } from '../services/auth.service';
 
 interface ProtectedRouteProps {
-  allowedRoles?: ('faculty' | 'admin')[];
+  allowedRoles?: ('librarian' | 'admin')[];
 }
 
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
-  allowedRoles = ['faculty', 'admin'] 
+  allowedRoles = ['librarian', 'admin'] 
 }) => {
   const { isAuthenticated, user } = useAuthStore();
 

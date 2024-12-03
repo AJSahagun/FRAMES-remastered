@@ -5,13 +5,14 @@ export interface LoginCredentials {
 
 export interface LoginResponse {
   token: string;
+  role: "librarian" | "admin";
 }
 
 export interface AuthState {
   token: string | null;
   user: {
     username: string;
-    role: "faculty" | "admin";
+    role: "librarian" | "admin";
   } | null;
   login: (credentials: LoginCredentials) => Promise<void>;
   logout: () => void;

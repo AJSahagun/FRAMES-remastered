@@ -3,13 +3,10 @@ import {
   MonthlyVisitorSummary,
   LibraryUser,
 } from "@/types/dashboard.types";
-import {
-  monthlySummaryResponse,
-  HistoryResponse,
-} from "@/types/db.types";
+import { monthlySummaryResponse, HistoryResponse } from "@/types/db.types";
 
 const DEPARTMENT_COLORS: Record<string, string> = {
-  CoE: "#C30D26",
+  COE: "#C30D26",
   CAFAD: "#8BA757",
   CET: "#FFAE4C",
   CICS: "#302977",
@@ -17,45 +14,45 @@ const DEPARTMENT_COLORS: Record<string, string> = {
 };
 
 export const transformMonthlySummaryData = (
-  response: monthlySummaryResponse
+  response: monthlySummaryResponse[]
 ): MonthlyVisitorSummary[] => {
-  return response.visitors.map((visitorGroup) => ({
-    month: response.month,
-    year: response.year,
-    course: visitorGroup.program,
-    department: visitorGroup.department,
-    visitors: visitorGroup.total_counts,
-    dailyVisitors: Object.fromEntries(
-      Object.entries(visitorGroup.counts_per_day).map(([day, count]) => [
-        parseInt(day),
-        count,
-      ])
-    ),
-    color:
-      DEPARTMENT_COLORS[visitorGroup.department] ||
-      DEPARTMENT_COLORS["default"],
-  }));
+  return response
+    .map((visitorGroup) => ({
+      month: visitorGroup.month,
+      year: visitorGroup.year,
+      course: visitorGroup.program,
+      department: visitorGroup.department || "Others",
+      visitors: parseInt(visitorGroup.visitors),
+      dailyVisitors: Object.fromEntries(
+        Object.entries(visitorGroup.dailyVisitors).map(([day, count]) => [
+          parseInt(day),
+          count,
+        ])
+      ),
+      color:
+        DEPARTMENT_COLORS[visitorGroup.department] ||
+        DEPARTMENT_COLORS["default"],
+    }))
+    .sort((a, b) => (a.department || "").localeCompare(b.department || ""));
 };
 
 export const transformDailyVisitorData = (
   summaryData: MonthlyVisitorSummary[]
 ): DailyVisitorEntry[] => {
-  const visitors: DailyVisitorEntry[] = [];
+  const aggregatedVisitors: Record<string, number> = {};
 
   summaryData.forEach((summary) => {
     Object.entries(summary.dailyVisitors).forEach(([day, count]) => {
-      visitors.push({
-        date: `${summary.year}-${summary.month
-          .slice(0, 3)
-          .toLowerCase()}-${day.padStart(2, "0")}`,
-        visitors: count,
-      });
+      const date = `${summary.year}-${summary.month
+        .slice(0, 3)
+        .toLowerCase()}-${day.padStart(2, "0")}`;
+      aggregatedVisitors[date] = (aggregatedVisitors[date] || 0) + count;
     });
   });
 
-  return visitors.sort(
-    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-  );
+  return Object.entries(aggregatedVisitors)
+    .map(([date, visitors]) => ({ date, visitors }))
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 };
 
 export const transformLibraryUserData = (

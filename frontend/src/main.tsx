@@ -37,7 +37,7 @@ const router = createBrowserRouter([
     element: <LoginPage/>
   },
   {
-    element: <ProtectedRoute allowedRoles={['faculty', 'admin']} />,
+    element: <ProtectedRoute allowedRoles={['librarian', 'admin']} />,
     children: [
       {
         element: <DashboardLayout />,

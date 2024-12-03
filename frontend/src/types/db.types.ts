@@ -56,26 +56,18 @@ export interface departmentConfig {
   color?: string;
 }
 
-export interface monthlyPerProgram extends departmentConfig {
+// Data for Pie chart, line graph, and CSV
+export interface monthlySummaryResponse extends departmentConfig {
+  month: string;
+  year: string;
   program: string;
-  total_counts: number;
-  counts_per_day: {
+  visitors: string;
+  dailyVisitors: {
     [day: string]: number;
   };
 }
 
-// Data for Pie chart and CSV
-export interface monthlySummaryResponse {
-  month: string;
-  year: string;
-  visitors : monthlyPerProgram[];
-}
-
-// Data for Line graph
-export interface dailyVisitorResponse {
-  month: string;
-  year: string;
-  total_counts_per_day: {
-    [day: string]: number;
-  };
+export interface QueryRequest{
+  month:number | null
+  year:number | null
 }

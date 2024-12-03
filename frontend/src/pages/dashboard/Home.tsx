@@ -166,7 +166,6 @@ const DashboardHome: React.FC = () => {
                   type="monotone"
                   dataKey="visitors"
                   stroke="#8884d8"
-                  dot={false}
                   strokeWidth={2}
                 />
               </LineChart>
@@ -191,7 +190,7 @@ const DashboardHome: React.FC = () => {
                   cy="50%"
                   innerRadius={60}
                   outerRadius={80}
-                  paddingAngle={1}
+                  paddingAngle={0}
                   dataKey="visitors"
                 >
                   {filteredVisitorSummaryData.map((entry, index) => (

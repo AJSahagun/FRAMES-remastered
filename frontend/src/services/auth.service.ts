@@ -22,7 +22,7 @@ export const useAuthStore = create<AuthState>()(
             token: response.data.token,
             user: { 
               username: credentials.username, 
-              role: 'admin' // Default role
+              role: response.data.role
             } 
           });
         } catch (error) {
