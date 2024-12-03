@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuthStore } from '../services/auth.service';
 import { useNavigate } from 'react-router-dom';
 import SettingsModal from '@/components/SettingsModal';
@@ -10,11 +10,12 @@ interface UserProfileModalProps {
 const UserProfileModal: React.FC<UserProfileModalProps> = ({ onClose }) => {
   const { user, logout } = useAuthStore();
   const navigate = useNavigate();
-  const [settingsModal, setSettingsModal] = React.useState(false);
+  const [settingsModal, setSettingsModal] = useState(false);
 
   const handleSettings = () => {
-    setSettingsModal(true);
-
+    setTimeout(() => {
+      setSettingsModal(true);
+    }, 150);
   }
 
 

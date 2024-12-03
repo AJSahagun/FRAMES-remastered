@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-interface PaginationState {
+interface RegisterPaginationState {
   currentPage: number;
   isFormValid: boolean;
   nextPage: () => void;
@@ -9,7 +9,7 @@ interface PaginationState {
   setPage: (page: number) => void;
 }
 
-export const usePaginationStore = create<PaginationState>((set) => ({
+export const useRegisterPaginationStore = create<RegisterPaginationState>((set) => ({
   currentPage: 1,
   isFormValid: false,
   nextPage: () => set((state) => ({ currentPage: state.currentPage + 1 })),

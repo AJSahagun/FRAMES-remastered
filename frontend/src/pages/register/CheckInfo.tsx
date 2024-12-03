@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { useRegistrationStore } from './stores/useRegistrationStore';
-import { usePaginationStore } from './stores/usePaginationStore';
+import { useRegisterPaginationStore } from './stores/useRegisterPaginationStore';
 import { useImageStore } from './stores/useImgStore';
 import { UserService } from '../../services/user.service';
 import { UserRegistrationData } from '../../types/user.types';
@@ -16,7 +16,7 @@ interface CheckInfoProps {
 
 const CheckInfo: React.FC<CheckInfoProps> = () => {
   const { formData, resetForm } = useRegistrationStore();
-  const { prevPage } = usePaginationStore();
+  const { prevPage } = useRegisterPaginationStore();
   const { imageUrl } = useImageStore();
   const navigate = useNavigate();
   const [hasAgreedToTerms, setHasAgreedToTerms] = useState(false);
