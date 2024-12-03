@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../services/auth.service.ts';
 import { useNavigationStore } from '../pages/dashboard/stores/useNavigationStore.ts';
@@ -44,13 +44,6 @@ const NAV_ITEMS: NavItem[] = [
     path: '/dashboard/terms-of-service',
     newTab: false,
     roles: ['admin']
-  },
-  {
-    id: 'settings',
-    label: 'Settings',
-    path: '/dashboard/settings',
-    newTab: false,
-    roles: ['admin']
   }
 ];
 
@@ -64,6 +57,14 @@ const SideNavigation: React.FC = () => {
   const { user } = useAuthStore();
   const { currentPath, setCurrentPath } = useNavigationStore();
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (isUserModalOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
+    }
+  }, [isUserModalOpen]);
 
   const handleNavItemClick = (path: string, newTab: boolean = false) => {
     if (newTab) {
