@@ -12,13 +12,11 @@ import { handleError } from '../core/config/errors';
 export class HistoryController {
   constructor(private readonly historyService: HistoryService) {}
 
-  @Version('2')
   @Post()
   create(@Body() createHistoryDto: CreateHistoryDto[]) {
     return this.historyService.create(createHistoryDto);
   }
 
-  @Version('2')
   @Get()
   @Roles(Role.Dev, Role.Admin, Role.Librarian)
   findAll() {
@@ -26,11 +24,12 @@ export class HistoryController {
   }
 
   @Get('query')
-  @Roles(Role.Dev, Role.Admin, Role.Librarian)
-  @Version('2')
+  // @Roles(Role.Dev, Role.Admin, Role.Librarian)
   async filterByQuery(@Query() query:FindHistoryDTO){
-    const result=await this.historyService.filterByQuery(query)
-    if(result.error) return handleError(result.error)
-    return result
+    try {
+      return await this.historyService.filterByQuery(query)
+    } catch (error) {
+      throw error
+    }
   }
 }

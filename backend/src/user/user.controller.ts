@@ -22,7 +22,6 @@ export class UserController {
     throw new HttpException('Success', HttpStatus.ACCEPTED)
   }
 
-  @Version('2')
   @Post()
   async createV2(@Body(ValidationPipe) createUserDto: CreateUserV2Dto) {
     const error = await this.userService.createV2(createUserDto);
@@ -30,15 +29,11 @@ export class UserController {
     
     throw new HttpException('Success', HttpStatus.ACCEPTED)
   }
-
-  @Version(['1', '2'])
   @Get()
   @Roles(Role.Dev, Role.Admin)
   findAll() {
     return this.userService.findAll();
   }
-
-  @Version(['1', '2'])
   @Get(':school_id')
   @Roles(Role.Dev, Role.Admin)
   async findOne(@Param('school_id') school_id: string) {

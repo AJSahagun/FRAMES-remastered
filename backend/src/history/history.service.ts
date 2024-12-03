@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { CreateHistoryDto } from './dto/create-history.dto';
 import { FindHistoryDTO } from './dto/find-history.dto';
+import { errorCatch } from '../core/config/errors';
 
 @Injectable()
 export class HistoryService {
@@ -48,8 +49,9 @@ export class HistoryService {
         FROM history h
         WHERE 
             ($1::DATE IS NULL OR time_in::DATE = $1)
-            AND ($2::INTEGER IS NULL OR EXTRACT(MONTH FROM time_in) = $2)
-            AND ($3::INTEGER IS NULL OR EXTRACT(YEAR FROM time_in) = $3)
+            AND ($2::INTEGER IS NULL OR time_out_year = $2)
+            AND ($3::INTEGER IS NULL OR time_out_month = $3)
+            
         GROUP BY school_id
       ),
 
@@ -58,18 +60,7 @@ export class HistoryService {
               u.school_id,
               u.department,
               u.program,
-              CONCAT(
-                  u.first_name,
-                  CASE
-                      WHEN u.middle_name IS NOT NULL THEN ' ' || u.middle_name
-                      ELSE ''
-                  END,
-                  ' ', u.last_name,
-                  CASE
-                      WHEN u.suffix IS NOT NULL THEN ' ' || u.suffix
-                      ELSE ''
-                  END
-              ) AS name,
+              format_name(u.first_name, u.middle_name, u.last_name, u.suffix) AS name,
               fh.filtered_history AS history
           FROM users u
           JOIN filtered_history fh ON u.school_id = fh.school_id
@@ -91,9 +82,9 @@ export class HistoryService {
     try {
       // catch undefined queries
       const filtered = [
-          q.date ?? null,      
+          q.date ?? null,     
+          q.year ?? null, 
           q.month ?? null,
-          q.year ?? null,
           q.school_id ?? null,
           q.name ?? null,
           q.department ?? null,
@@ -105,7 +96,7 @@ export class HistoryService {
       return result
 
     } catch (error) {
-      return {error}
+      errorCatch(error)
     }
   }
   
