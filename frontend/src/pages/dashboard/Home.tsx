@@ -153,6 +153,7 @@ const DashboardHome: React.FC = () => {
                   type="monotone"
                   dataKey="visitors"
                   stroke="#8884d8"
+                  dot={false}
                   strokeWidth={2}
                 />
               </LineChart>

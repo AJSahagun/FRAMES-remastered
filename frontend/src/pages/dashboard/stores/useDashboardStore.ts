@@ -1,11 +1,16 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import {
-  dailyVisitorData,
-  monthlyVisitorSummaryData,
-  libraryUserData,
+  monthlySummaryResponseData,
+  visitorHistoryData
 } from "@/data/dashboard-mockdata";
-import { DashboardFilters } from "@/types/dashboard.types";
+
+import { 
+  transformMonthlySummaryData, 
+  transformDailyVisitorData, 
+  transformLibraryUserData 
+} from '@/utils/dashboard-transformers';
+import { DashboardFilters, DailyVisitorEntry, MonthlyVisitorSummary, LibraryUser } from "@/types/dashboard.types";
 
 interface DashboardStore {
   filters: DashboardFilters;
@@ -13,9 +18,9 @@ interface DashboardStore {
   setYear: (year: string) => void;
   setSearchTerm: (searchTerm: string) => void;
   resetFilters: () => void;
-  filteredVisitorData: typeof dailyVisitorData;
-  filteredVisitorSummaryData: typeof monthlyVisitorSummaryData;
-  filteredLibraryUserData: typeof libraryUserData;
+  filteredVisitorData: DailyVisitorEntry[];
+  filteredVisitorSummaryData: MonthlyVisitorSummary[];
+  filteredLibraryUserData: LibraryUser[];
   applyFilters: () => void;
 }
 
@@ -25,13 +30,17 @@ const initialState: DashboardFilters = {
   searchTerm: "",
 };
 
+const transformedSummary = transformMonthlySummaryData(monthlySummaryResponseData);
+const transformedDailyVisitors = transformDailyVisitorData(transformedSummary);
+const transformedLibraryUsers = transformLibraryUserData(visitorHistoryData);
+
 export const useDashboardStore = create<DashboardStore>()(
   persist(
     (set, get) => ({
       filters: initialState,
-      filteredVisitorData: dailyVisitorData,
-      filteredVisitorSummaryData: monthlyVisitorSummaryData,
-      filteredLibraryUserData: libraryUserData,
+      filteredVisitorSummaryData: transformedSummary,
+      filteredVisitorData: transformedDailyVisitors,
+      filteredLibraryUserData: transformedLibraryUsers,
 
       setMonth: (month) => {
         set((state) => ({
@@ -62,7 +71,7 @@ export const useDashboardStore = create<DashboardStore>()(
       applyFilters: () => {
         const { month, year, searchTerm } = get().filters;
 
-        const filteredVisitorData = dailyVisitorData.filter((item) => {
+        const filteredVisitorData = transformedDailyVisitors.filter((item) => {
           const itemDate = new Date(item.date);
           return (
             itemDate.toLocaleString("default", { month: "long" }) === month &&
@@ -70,11 +79,11 @@ export const useDashboardStore = create<DashboardStore>()(
           );
         });
 
-        const filteredVisitorSummaryData = monthlyVisitorSummaryData.filter(
+        const filteredVisitorSummaryData = transformedSummary.filter(
           (item) => item.month === month && item.year === year
         );
 
-        const filteredLibraryUserData = libraryUserData.filter(user => {
+        const filteredLibraryUserData = transformedLibraryUsers.filter(user => {
           const userDate = new Date(user.timeIn);
           
           const matchesMonthYear = 
