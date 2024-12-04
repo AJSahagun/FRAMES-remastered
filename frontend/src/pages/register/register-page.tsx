@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useRegistrationStore } from "./stores/useRegistrationStore";
-import { usePaginationStore } from "./stores/usePaginationStore";
-import Pagination from "../../components/Pagination";
+import { useRegisterPaginationStore } from "./stores/useRegisterPaginationStore";
+import { RegisterPagination } from "../../components/Pagination";
 import RegisterFace from "./RegisterFace";
 import CheckInfo from "./CheckInfo";
 import FosterWeelerTag from '../../components/FosterWheelerTag';
@@ -11,7 +11,7 @@ import { useFormStore } from "./stores/useFormStore";
 import RegistrationGuide from "../../components/RegistrationGuide";
 
 export default function Register() {
-  const { currentPage, nextPage, prevPage } = usePaginationStore();
+  const { currentPage, nextPage, prevPage } = useRegisterPaginationStore();
   const { formData, localFormData, submitForm } = useRegistrationStore();
 
   const [showGuide, setShowGuide] = useState(true);
@@ -53,7 +53,7 @@ export default function Register() {
         </div>
 
         <div className="w-full mb-4">
-          <Pagination />
+          <RegisterPagination />
         </div>
 
         <div className="w-full px-10 flex justify-center lg:w-screen">
