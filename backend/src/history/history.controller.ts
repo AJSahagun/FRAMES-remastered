@@ -24,7 +24,7 @@ export class HistoryController {
   }
 
   @Get('query')
-  // @Roles(Role.Dev, Role.Admin, Role.Librarian)
+  @Roles(Role.Dev, Role.Admin, Role.Librarian)
   async filterByQuery(@Query() query:FindHistoryDTO){
     try {
       return await this.historyService.filterByQuery(query)
