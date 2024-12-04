@@ -5,7 +5,6 @@ import { Roles } from '../core/decorators/roles/roles.decorator';
 import { Role } from '../core/config/role.enum';
 import { JwtGuard } from '../core/guards/jwt.guard';
 import { FindHistoryDTO } from './dto/find-history.dto';
-import { handleError } from '../core/config/errors';
 
 @Controller('history')
 @UseGuards(JwtGuard)

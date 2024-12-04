@@ -58,12 +58,44 @@ For prod: `API_URL: https://frames-nest.onrender.com/v-/api/`
 
 #### Login Admin/Librarian
 ```http
-  POST /api/v2/login
+  POST /api/v2/auth/login
 ```
 ### Checklist:
 - Request body (case sensitive) - username, password
 ### Returns:
 - JWT that needs to be stored in frontend.
+
+#### User management - all requires admin token
+New account
+```
+  POST /api/v2/auth/accounts
+```
+### Checklist:
+- Request body (case sensitive) - username, password, role
+### Returns:
+- 2** if success
+
+Fetch all accounts
+```
+  GET /api/v2/auth/accounts
+```
+Update an account
+```
+  PATCH /api/v2/auth/accounts/:username
+```
+### Checklist:
+- Request body (case sensitive) - username param, [username, password, role] all optional
+### Returns:
+- 2** if success
+
+Delete an account
+```
+  DELETE /api/v2/auth/accounts/:username
+```
+### Checklist:
+- Request body (case sensitive) - username param
+### Returns:
+- 2** if success
 
 ## Error Codes
 https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
