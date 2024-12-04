@@ -1,61 +1,62 @@
-import axios, { AxiosError } from 'axios';
-import { apiClient } from './api.service';
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import { API_CONFIG } from '../config/api.config';
-import { AuthState, LoginResponse } from '../types/auth.types';
+import { AxiosError } from "axios";
+import { apiClient } from "./api.service";
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
+import { API_CONFIG } from "../config/api.config";
+import { AuthState, LoginResponse } from "../types/auth.types";
 
 export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
       token: null,
       user: null,
-      
+
       login: async (credentials) => {
         try {
           const response = await apiClient.post<LoginResponse>(
-            API_CONFIG.ENDPOINTS.LOGIN, 
+            API_CONFIG.ENDPOINTS.LOGIN,
             credentials
           );
-          
-          set({ 
+
+          set({
             token: response.data.token,
-            user: { 
-              username: credentials.username, 
-              role: response.data.role
-            } 
+            user: {
+              username: credentials.username,
+              role: response.data.role,
+            },
           });
         } catch (error) {
           if (error instanceof AxiosError) {
-            const errorMessage = error.response?.data?.message || 'Login failed';
+            const errorMessage =
+              error.response?.data?.message || "Login failed";
             throw new Error(errorMessage);
           }
           throw error;
         }
       },
-      
+
       logout: () => {
         set({ token: null, user: null });
       },
-      
+
       isAuthenticated: () => {
         const { token } = get();
         return !!token;
-      }
+      },
     }),
     {
-      name: 'auth-storage',
+      name: "auth-storage",
       partialize: (state) => ({
         token: state.token,
-        user: state.user
-      })
+        user: state.user,
+      }),
     }
   )
 );
 
 // Axios interceptor to add token to requests
 export const setupAuthInterceptor = () => {
-  axios.interceptors.request.use(
+  apiClient.interceptors.request.use(
     (config) => {
       const token = useAuthStore.getState().token;
       if (token) {
@@ -63,6 +64,8 @@ export const setupAuthInterceptor = () => {
       }
       return config;
     },
-    (error) => Promise.reject(error)
+    (error) => {
+      return Promise.reject(error);
+    }
   );
 };

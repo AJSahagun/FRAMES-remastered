@@ -5,7 +5,6 @@ export const API_CONFIG = {
     USER: '/api/v2/user',
     HISTORY: '/api/v2/history/query',
     LOGIN: '/api/v2/auth/login',
-    MONTH_BY_DAY: '/api/v2/dashboard/month-by-day',
     ALL_PROGRAM_MONTH_BY_DAY: '/api/v2/dashboard/all-program-month-by-day',
   },
 } as const;
