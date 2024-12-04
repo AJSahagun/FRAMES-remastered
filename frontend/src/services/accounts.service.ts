@@ -18,4 +18,19 @@ export class AccountService {
       throw error;
     }
   }
+
+  static async createAccount(accountData: AccountsResponse): Promise<AccountsResponse> {
+    try {
+      const response = await apiClient.post<AccountsResponse>(
+        API_CONFIG.ENDPOINTS.ACCOUNTS,
+        accountData
+      );
+      return response.data;
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        console.error("Error creating account:", error.response?.data || error.message);
+      }
+      throw error;
+    }
+  }  
 }

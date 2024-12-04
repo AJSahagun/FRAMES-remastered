@@ -47,6 +47,22 @@ const ManageUsers: React.FC = () => {
     setShowCreateUserModal(true);
   };
 
+  const handleCreateUserSubmit = async (newUser: AccountsResponse) => {
+    try {
+      // Call the createAccount method from AccountService
+      await AccountService.createAccount(newUser);
+
+      // After successful account creation, refetch the updated account list
+      const response = await AccountService.getAccounts();
+      setAccountsData(response);
+
+      // Close the modal
+      setShowCreateUserModal(false);
+    } catch (error) {
+      console.error('Error creating new user:', error);
+    }
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -156,11 +172,13 @@ const ManageUsers: React.FC = () => {
           <>
             <div className="fixed inset-0 bg-black opacity-10 z-40"></div>
             <div className="fixed inset-0 flex items-center justify-center z-50">
-              <CreateUserModal onClose={() => { setShowCreateUserModal(false); }} />
+              <CreateUserModal
+                onClose={() => setShowCreateUserModal(false)}
+                onSubmit={handleCreateUserSubmit} // Pass the submit handler here
+              />
             </div>
           </>
         )}
-
       </div>
     </div>
   );
