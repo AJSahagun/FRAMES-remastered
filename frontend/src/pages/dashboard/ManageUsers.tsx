@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Search, MoreHorizontal } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { toast } from "react-toastify";
@@ -30,13 +30,10 @@ const ManageUsers: React.FC = () => {
   const [showEditUserModal, setShowEditUserModal] = useState(false);
   const [showActionModal, setShowActionModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState<AccountsResponse | null>(null);
-  const [showDeleteModal, setShowDeleteModal] = useState(false); // For delete confirmation modal
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const totalPages = Math.ceil(accountsData.length / rowsPerPage);
-  
-  const actionMenuRef = useRef<HTMLDivElement | null>(null); // Ref for detecting clicks outside the menu
-
   const handlePageChange = (pageNumber: number) => {
-    if (pageNumber < 1 || pageNumber > totalPages) return;  // Prevents going beyond valid page numbers
+    if (pageNumber < 1 || pageNumber > totalPages) return; 
     setCurrentPage(pageNumber);
   };
 
@@ -70,13 +67,13 @@ const ManageUsers: React.FC = () => {
   }; 
 
   const handleDeleteSubmit = async () => {
-    console.log("Deleting user: ", selectedUser); // Ensure this is logged
+    console.log("Deleting user: ", selectedUser);
     if (selectedUser) {
       try {
-        await AccountService.deleteAccount(selectedUser.username);  // API call to delete
-        const response = await AccountService.getAccounts(); // Refresh list of users
-        setAccountsData(response); // Update the user list
-        setShowDeleteModal(false);  // Close the modal
+        await AccountService.deleteAccount(selectedUser.username); 
+        const response = await AccountService.getAccounts(); 
+        setAccountsData(response);
+        setShowDeleteModal(false);
         toast.success("User deleted successfully!", { position: "top-center" });
       } catch (error) {
         toast.error("Failed to delete user.", { position: "top-center" });
@@ -85,20 +82,6 @@ const ManageUsers: React.FC = () => {
     }
   };
   
-  // Close action menu when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (actionMenuRef.current && !actionMenuRef.current.contains(event.target as Node)) {
-        setShowActionModal(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -157,7 +140,7 @@ const ManageUsers: React.FC = () => {
                   <TableRow key={index}>
                     <TableCell>{user.username}</TableCell>
                     <TableCell>{user.role}</TableCell>
-                    <TableCell>{user.date_created ? format(parseDateTime(user.date_created), "yyyy-MM-dd") : 'N/A'}</TableCell>
+                    <TableCell className = "pl-7">{user.date_created ? format(parseDateTime(user.date_created), "yyyy-MM-dd") : 'N/A'}</TableCell>
                     <TableCell>
                       <div className="flex justify-start ml-5">
                       <button onClick={() => handleActionClick(user)}>
@@ -230,50 +213,47 @@ const ManageUsers: React.FC = () => {
         />
       )}
 
-{showActionModal && selectedUser && (
-  <div
-    className="absolute inset-0 flex items-center justify-center bg-black/50 z-50"
-    onClick={() => setShowActionModal(false)} // Close modal when clicking outside
-  >
-    <div
-      className="bg-white w-1/5 rounded-lg p-4 space-y-4"
-      onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside modal
-    >
-      <div className="flex justify-between">
-        <h2 className = "font-poppins font-medium mt-1">Manage User Accounts</h2>
-        <button
-          className="p-2 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-200 transition duration-200"
-          onClick={() => setShowActionModal(false)}
+      {showActionModal && selectedUser && (
+        <div
+          className="absolute inset-0 flex items-center justify-center bg-black/50 z-50"
+          onClick={() => setShowActionModal(false)} 
         >
-          <FaTimes size={15} />
-        </button>
-      </div>
-      <div className="flex justify-between space-x-4">
-        <button
-          className="w-1/2 font-poppins font-light tracking-wider text-sm text-white bg-accent border-2 border-bg rounded-md p-2 drop-shadow-md hover:ring-2 hover:ring-slate-600 transition-colors duration-300 active:opacity-80"
-          onClick={() => {
-            setShowEditUserModal(true);
-            setShowActionModal(false);
-          }}
-        >
-          Edit
-        </button>
-        <button
-          className="w-1/2 bg-btnBg font-poppins font-light tracking-wider text-sm text-white border-2 border-bg rounded-md p-2 drop-shadow-md hover:ring-2 hover:ring-slate-600 transition-colors duration-300 active:opacity-80"
-          onClick={() => {
-            setShowDeleteModal(true);
-            setShowActionModal(false);
-          }}
-        >
-          Delete
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-
-
-
+          <div
+            className="bg-white w-1/5 rounded-lg p-4 space-y-4"
+            onClick={(e) => e.stopPropagation()} 
+          >
+            <div className="flex justify-between">
+              <h2 className = "font-poppins font-medium ml-1 mt-1">Manage User Accounts</h2>
+              <button
+                className="p-2 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-200 transition duration-200"
+                onClick={() => setShowActionModal(false)}
+              >
+                <FaTimes size={15} />
+              </button>
+            </div>
+            <div className="flex justify-between space-x-4">
+              <button
+                className="w-1/2 font-poppins font-light tracking-wider text-sm text-white bg-accent border-2 border-bg rounded-md p-2 drop-shadow-md hover:ring-2 hover:ring-slate-600 transition-colors duration-300 active:opacity-80"
+                onClick={() => {
+                  setShowEditUserModal(true);
+                  setShowActionModal(false);
+                }}
+              >
+                Edit
+              </button>
+              <button
+                className="w-1/2 bg-btnBg font-poppins font-light tracking-wider text-sm text-white border-2 border-bg rounded-md p-2 drop-shadow-md hover:ring-2 hover:ring-slate-600 transition-colors duration-300 active:opacity-80"
+                onClick={() => {
+                  setShowDeleteModal(true);
+                  setShowActionModal(false);
+                }}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
