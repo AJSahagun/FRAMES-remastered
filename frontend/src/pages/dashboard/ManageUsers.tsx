@@ -2,8 +2,14 @@ import { useState, useEffect, useRef } from 'react';
 import { Search, MoreHorizontal } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { toast } from "react-toastify";
+import { FaTimes } from 'react-icons/fa';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
+import { 
+Pagination, 
+PaginationContent, 
+PaginationItem, 
+PaginationLink, 
+PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { format } from 'date-fns';
 import CreateUserModal from '@/components/createUserModal';
@@ -22,7 +28,7 @@ const ManageUsers: React.FC = () => {
   const currentRows = accountsData.slice(indexOfFirstRow, indexOfLastRow);
   const [showCreateUserModal, setShowCreateUserModal] = useState(false);
   const [showEditUserModal, setShowEditUserModal] = useState(false);
-  const [showActionMenu, setShowActionMenu] = useState(false);
+  const [showActionModal, setShowActionModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState<AccountsResponse | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false); // For delete confirmation modal
   const totalPages = Math.ceil(accountsData.length / rowsPerPage);
@@ -50,12 +56,6 @@ const ManageUsers: React.FC = () => {
     }
   };
 
-  const handleEditUser = (user: AccountsResponse) => {
-    setSelectedUser(user);
-    setShowEditUserModal(true);
-    setShowActionMenu(false); // Close the action menu when edit is chosen
-  };
-
   const handleEditUserSubmit = async (updatedUser: AccountsResponse) => {
     try {
       await AccountService.updateAccount(updatedUser.username, updatedUser);
@@ -67,15 +67,7 @@ const ManageUsers: React.FC = () => {
       console.error('Error updating user:', error);
       toast.error("Failed to update user", { position: "top-center" });
     }
-  };
-
-  const handleDeleteUser = (user: AccountsResponse) => {
-    console.log("Selected user for deletion: ", user); // Check if the correct user is selected
-    setSelectedUser(user);
-    setShowDeleteModal(true);
-    setShowActionMenu(false);
-  };
-  
+  }; 
 
   const handleDeleteSubmit = async () => {
     console.log("Deleting user: ", selectedUser); // Ensure this is logged
@@ -97,7 +89,7 @@ const ManageUsers: React.FC = () => {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (actionMenuRef.current && !actionMenuRef.current.contains(event.target as Node)) {
-        setShowActionMenu(false);
+        setShowActionModal(false);
       }
     };
 
@@ -119,14 +111,9 @@ const ManageUsers: React.FC = () => {
     fetchData();
   }, []);
 
-  // Toggle the action menu for the user
-  const handleActionMenuToggle = (user: AccountsResponse) => {
-    if (selectedUser !== user) {
-      setShowActionMenu(true);
-      setSelectedUser(user);
-    } else {
-      setShowActionMenu(prev => !prev);
-    }
+  const handleActionClick = (user: AccountsResponse) => {
+    setSelectedUser(user);
+    setShowActionModal(true);
   };
 
   return (
@@ -173,30 +160,9 @@ const ManageUsers: React.FC = () => {
                     <TableCell>{user.date_created ? format(parseDateTime(user.date_created), "yyyy-MM-dd") : 'N/A'}</TableCell>
                     <TableCell>
                       <div className="flex justify-start ml-5">
-                        <button
-                          onClick={() => handleActionMenuToggle(user)}
-                        >
-                          <MoreHorizontal />
-                        </button>
-                        {showActionMenu && selectedUser === user && (
-                          <div className="mt-4 origin-top-right absolute max-w-[200px] w-[100px] rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-40">
-                            <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
-                              <button
-                                className="flex justify-start w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-                                onClick={() => handleEditUser(user)}
-                              >
-                                Edit
-                              </button>
-
-                              <button
-                                className="flex justify-start w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-                                onClick={() => handleDeleteUser(user)} // Trigger delete modal
-                              >
-                                Delete
-                              </button>
-                            </div>
-                          </div>
-                        )}
+                      <button onClick={() => handleActionClick(user)}>
+                        <MoreHorizontal />
+                      </button>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -263,6 +229,51 @@ const ManageUsers: React.FC = () => {
           user={selectedUser}
         />
       )}
+
+{showActionModal && selectedUser && (
+  <div
+    className="absolute inset-0 flex items-center justify-center bg-black/50 z-50"
+    onClick={() => setShowActionModal(false)} // Close modal when clicking outside
+  >
+    <div
+      className="bg-white w-1/5 rounded-lg p-4 space-y-4"
+      onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside modal
+    >
+      <div className="flex justify-between">
+        <h2 className = "font-poppins font-medium mt-1">Manage User Accounts</h2>
+        <button
+          className="p-2 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-200 transition duration-200"
+          onClick={() => setShowActionModal(false)}
+        >
+          <FaTimes size={15} />
+        </button>
+      </div>
+      <div className="flex justify-between space-x-4">
+        <button
+          className="w-1/2 font-poppins font-light tracking-wider text-sm text-white bg-accent border-2 border-bg rounded-md p-2 drop-shadow-md hover:ring-2 hover:ring-slate-600 transition-colors duration-300 active:opacity-80"
+          onClick={() => {
+            setShowEditUserModal(true);
+            setShowActionModal(false);
+          }}
+        >
+          Edit
+        </button>
+        <button
+          className="w-1/2 bg-btnBg font-poppins font-light tracking-wider text-sm text-white border-2 border-bg rounded-md p-2 drop-shadow-md hover:ring-2 hover:ring-slate-600 transition-colors duration-300 active:opacity-80"
+          onClick={() => {
+            setShowDeleteModal(true);
+            setShowActionModal(false);
+          }}
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+
+
     </div>
   );
 };
