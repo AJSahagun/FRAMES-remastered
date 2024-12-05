@@ -16,7 +16,7 @@ async function bootstrap() {
   })
   app.enableCors({
     origin:process.env.FRAMES_FRONTEND_URL,
-    methods:'GET, POST, PUT'
+    methods:'GET, POST, PUT, PATCH, DELETE'
   })
   app.useGlobalPipes(new ValidationPipe());
   await app.listen(3001);
