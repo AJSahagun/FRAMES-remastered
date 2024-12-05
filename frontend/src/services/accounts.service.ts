@@ -31,15 +31,10 @@ export class AccountService {
 
   static async updateAccount(username: string, accountData: Partial<AccountsResponse>): Promise<AccountsResponse> {
     try {
-      const token = useAuthStore.getState().token; // Get token from store
-      const userRole = useAuthStore.getState().user?.role; // Get the user's role
-      if (userRole !== "admin") { // Ensure only admin can update
-        throw new Error("Unauthorized: Only admins can update accounts.");
-      }
-  
-      const headers = token ? { Authorization: `Bearer ${token}` } : {}; // Set header only if token exists
+      const token = useAuthStore.getState().token; 
+      const headers = token ? { Authorization: `Bearer ${token}` } : {}; 
       const response = await apiClient.patch<AccountsResponse>(
-        API_CONFIG.ENDPOINTS.UPDATE_ACCOUNT.replace(':username', username), 
+        API_CONFIG.ENDPOINTS.UPDATE_DELETE_ACCOUNT.replace(':username', username), 
         accountData, 
         { headers }
       );
@@ -54,15 +49,10 @@ export class AccountService {
   
   static async deleteAccount(username: string): Promise<void> {
     try {
-      const token = useAuthStore.getState().token; // Get token from store
-      const userRole = useAuthStore.getState().user?.role; // Get the user's role
-      if (userRole !== "admin") { // Ensure only admin can delete
-        throw new Error("Unauthorized: Only admins can delete accounts.");
-      }
-  
-      const headers = token ? { Authorization: `Bearer ${token}` } : {}; // Set header only if token exists
+      const token = useAuthStore.getState().token;
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
       await apiClient.delete(
-        API_CONFIG.ENDPOINTS.DELETE_ACCOUNT.replace(':username', username), 
+        API_CONFIG.ENDPOINTS.UPDATE_DELETE_ACCOUNT.replace(':username', username), 
         { headers }
       );
       console.log(`Account with username ${username} has been deleted successfully.`);

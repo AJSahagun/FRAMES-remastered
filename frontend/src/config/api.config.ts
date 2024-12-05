@@ -7,7 +7,6 @@ export const API_CONFIG = {
     LOGIN: '/api/v2/auth/login',
     ALL_PROGRAM_MONTH_BY_DAY: '/api/v2/dashboard/all-program-month-by-day',
     ACCOUNTS: '/api/v2/auth/accounts',
-    UPDATE_ACCOUNT: '/api/v2/auth/accounts/:username', 
-    DELETE_ACCOUNT: '/api/v2/auth/accounts/:username',
+    UPDATE_DELETE_ACCOUNT: '/api/v2/auth/accounts/:username', 
   },
 } as const;
