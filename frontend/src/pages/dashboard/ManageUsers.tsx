@@ -30,6 +30,7 @@ const ManageUsers: React.FC = () => {
   const actionMenuRef = useRef<HTMLDivElement | null>(null); // Ref for detecting clicks outside the menu
 
   const handlePageChange = (pageNumber: number) => {
+    if (pageNumber < 1 || pageNumber > totalPages) return;  // Prevents going beyond valid page numbers
     setCurrentPage(pageNumber);
   };
 
@@ -69,25 +70,29 @@ const ManageUsers: React.FC = () => {
   };
 
   const handleDeleteUser = (user: AccountsResponse) => {
+    console.log("Selected user for deletion: ", user); // Check if the correct user is selected
     setSelectedUser(user);
     setShowDeleteModal(true);
-    setShowActionMenu(false); // Close the action menu when delete is chosen
+    setShowActionMenu(false);
   };
+  
 
   const handleDeleteSubmit = async () => {
+    console.log("Deleting user: ", selectedUser); // Ensure this is logged
     if (selectedUser) {
       try {
-        await AccountService.deleteAccount(selectedUser.username);  // Delete account
-        const response = await AccountService.getAccounts(); // Refresh the user list
-        setAccountsData(response);
+        await AccountService.deleteAccount(selectedUser.username);  // API call to delete
+        const response = await AccountService.getAccounts(); // Refresh list of users
+        setAccountsData(response); // Update the user list
         setShowDeleteModal(false);  // Close the modal
         toast.success("User deleted successfully!", { position: "top-center" });
       } catch (error) {
         toast.error("Failed to delete user.", { position: "top-center" });
+        console.error("Error deleting user:", error);
       }
     }
   };
-
+  
   // Close action menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -113,6 +118,16 @@ const ManageUsers: React.FC = () => {
     };
     fetchData();
   }, []);
+
+  // Toggle the action menu for the user
+  const handleActionMenuToggle = (user: AccountsResponse) => {
+    if (selectedUser !== user) {
+      setShowActionMenu(true);
+      setSelectedUser(user);
+    } else {
+      setShowActionMenu(prev => !prev);
+    }
+  };
 
   return (
     <div className="max-h-dvh p-6">
@@ -159,10 +174,7 @@ const ManageUsers: React.FC = () => {
                     <TableCell>
                       <div className="flex justify-start ml-5">
                         <button
-                          onClick={() => {
-                            setSelectedUser(user);
-                            setShowActionMenu((prev) => !prev);
-                          }}
+                          onClick={() => handleActionMenuToggle(user)}
                         >
                           <MoreHorizontal />
                         </button>
@@ -192,8 +204,8 @@ const ManageUsers: React.FC = () => {
               </TableBody>
             </Table>
 
-            {/* Pagination */}
-            <div className="flex justify-between items-center mt-4">
+             {/* Pagination */}
+             <div className="flex justify-between items-center mt-4">
               <Pagination>
                 <PaginationContent>
                   <PaginationItem>
@@ -227,29 +239,30 @@ const ManageUsers: React.FC = () => {
             </div>
           </CardContent>
         </Card>
+        </div>
 
-        {/* Create and Edit Modals */}
-        {showCreateUserModal && (
-          <CreateUserModal 
-          onClose={() => setShowCreateUserModal(false)} 
-          onSubmit={handleCreateUserSubmit} />
-        )}
+      {showCreateUserModal && (
+        <CreateUserModal
+          onClose={() => setShowCreateUserModal(false)}
+          onSubmit={handleCreateUserSubmit}
+        />
+      )}
 
-        {showEditUserModal && selectedUser && (
-          <EditUserModal user={selectedUser} 
-          onClose={() => setShowEditUserModal(false)} 
-          onSubmit={handleEditUserSubmit} />
-        )}
+      {showEditUserModal && selectedUser && (
+        <EditUserModal
+          onClose={() => setShowEditUserModal(false)}
+          onSubmit={handleEditUserSubmit}
+          user={selectedUser}
+        />
+      )}
 
-        {/* Delete Confirmation Modal */}
-        {showDeleteModal && selectedUser && (
-          <DeleteConfirmationModal
-            username={selectedUser.username}
-            onClose={() => setShowDeleteModal(false)}
-            onConfirm={handleDeleteSubmit} 
-          />
-        )}
-      </div>
+      {showDeleteModal && selectedUser && (
+        <DeleteConfirmationModal
+          onClose={() => setShowDeleteModal(false)}
+          onConfirm={handleDeleteSubmit}
+          user={selectedUser}
+        />
+      )}
     </div>
   );
 };

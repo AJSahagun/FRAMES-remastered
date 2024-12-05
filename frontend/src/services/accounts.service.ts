@@ -1,10 +1,10 @@
 import { apiClient } from "./api.service";
 import { AxiosError } from "axios";
 import { AccountsResponse } from "@/types/accounts.type";
-import { API_CONFIG } from "../config/api.config";
+import { API_CONFIG } from "../config/api.config";  // No need to import getAccountEndpoint
+import { useAuthStore } from "./auth.service"; 
 
 export class AccountService {
-  // Fetch all accounts
   static async getAccounts(): Promise<AccountsResponse[]> {
     try {
       const response = await apiClient.get<AccountsResponse[]>(API_CONFIG.ENDPOINTS.ACCOUNTS);
@@ -17,7 +17,6 @@ export class AccountService {
     }
   }
 
-  // Create a new account
   static async createAccount(accountData: AccountsResponse): Promise<AccountsResponse> {
     try {
       const response = await apiClient.post<AccountsResponse>(API_CONFIG.ENDPOINTS.ACCOUNTS, accountData);
@@ -30,23 +29,21 @@ export class AccountService {
     }
   }
 
-  //Update an account
   static async updateAccount(username: string, accountData: Partial<AccountsResponse>): Promise<AccountsResponse> {
     try {
-      const updatedUsername = accountData.username;
-
-      if (updatedUsername && updatedUsername !== username) {
-        const updatedData = { ...accountData };
-        delete updatedData.username;  
-
-        const response = await apiClient.patch<AccountsResponse>(API_CONFIG.ENDPOINTS.UPDATE_DELETE_ACCOUNTS.replace(':username', username), updatedData);
-
-        return response.data;
-      } else {
-        const response = await apiClient.put<AccountsResponse>(API_CONFIG.ENDPOINTS.UPDATE_DELETE_ACCOUNTS.replace(':username', username), accountData);
-
-        return response.data;
+      const token = useAuthStore.getState().token; // Get token from store
+      const userRole = useAuthStore.getState().user?.role; // Get the user's role
+      if (userRole !== "admin") { // Ensure only admin can update
+        throw new Error("Unauthorized: Only admins can update accounts.");
       }
+  
+      const headers = token ? { Authorization: `Bearer ${token}` } : {}; // Set header only if token exists
+      const response = await apiClient.patch<AccountsResponse>(
+        API_CONFIG.ENDPOINTS.UPDATE_ACCOUNT.replace(':username', username), 
+        accountData, 
+        { headers }
+      );
+      return response.data;
     } catch (error) {
       if (error instanceof AxiosError) {
         console.error("Error updating account:", error.response?.data || error.message);
@@ -54,11 +51,20 @@ export class AccountService {
       throw error;
     }
   }
-
-  // Delete an account
+  
   static async deleteAccount(username: string): Promise<void> {
     try {
-      await apiClient.delete(API_CONFIG.ENDPOINTS.ACCOUNTS.replace(':username', username));
+      const token = useAuthStore.getState().token; // Get token from store
+      const userRole = useAuthStore.getState().user?.role; // Get the user's role
+      if (userRole !== "admin") { // Ensure only admin can delete
+        throw new Error("Unauthorized: Only admins can delete accounts.");
+      }
+  
+      const headers = token ? { Authorization: `Bearer ${token}` } : {}; // Set header only if token exists
+      await apiClient.delete(
+        API_CONFIG.ENDPOINTS.DELETE_ACCOUNT.replace(':username', username), 
+        { headers }
+      );
       console.log(`Account with username ${username} has been deleted successfully.`);
     } catch (error) {
       if (error instanceof AxiosError) {
