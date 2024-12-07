@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Search, MoreHorizontal } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { toast } from "react-toastify";
 import { FaTimes } from 'react-icons/fa';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
@@ -12,26 +11,37 @@ PaginationLink,
 PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { format } from 'date-fns';
+import { useAccountStore } from "@/pages/dashboard/stores/useAccountsStore";
 import CreateUserModal from '@/components/createUserModal';
 import EditUserModal from '@/components/editUserModal';
-import DeleteConfirmationModal from '@/components/deleteUserModal';
-import { AccountService } from '@/services/accounts.service';
+import DeleteUserModal from '@/components/deleteUserModal';
 import { AccountsResponse, parseDateTime } from '@/types/accounts.type';
 
 const ManageUsers: React.FC = () => {
-  const [accountsData, setAccountsData] = useState<AccountsResponse[]>([]);
-  const [searchTerm, setSearchTerm] = useState<string>(""); 
-  const [currentPage, setCurrentPage] = useState(1);
-  const rowsPerPage = 10;
-  const indexOfLastRow = currentPage * rowsPerPage;
-  const indexOfFirstRow = indexOfLastRow - rowsPerPage;
-  const currentRows = accountsData.slice(indexOfFirstRow, indexOfLastRow);
+  const { accounts, fetchAccounts } = useAccountStore((state) => ({
+    accounts: state.accounts,
+    fetchAccounts: state.fetchAccounts,
+  }));
+
   const [showCreateUserModal, setShowCreateUserModal] = useState(false);
   const [showEditUserModal, setShowEditUserModal] = useState(false);
   const [showActionModal, setShowActionModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState<AccountsResponse | null>(null);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const totalPages = Math.ceil(accountsData.length / rowsPerPage);
+  const [showDeleteUserModal, setShowDeleteUserModal] = useState(false);
+
+  const [searchTerm, setSearchTerm] = useState<string>(""); 
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const rowsPerPage = 10;
+  const indexOfLastRow = currentPage * rowsPerPage;
+  const indexOfFirstRow = indexOfLastRow - rowsPerPage;
+  const currentRows = accounts.slice(indexOfFirstRow, indexOfLastRow);
+  const totalPages = Math.ceil(accounts.length / rowsPerPage);
+
+  useEffect(() => {
+    fetchAccounts();
+  }, [fetchAccounts]);
+
   const handlePageChange = (pageNumber: number) => {
     if (pageNumber < 1 || pageNumber > totalPages) return; 
     setCurrentPage(pageNumber);
@@ -41,59 +51,15 @@ const ManageUsers: React.FC = () => {
     setShowCreateUserModal(true);
   };
 
-  const handleCreateUserSubmit = async (newUser: AccountsResponse) => {
-    try {
-      await AccountService.createAccount(newUser);
-      const response = await AccountService.getAccounts();
-      setAccountsData(response);
-      setShowCreateUserModal(false);
-      toast.success("User created successfully!", { position: "top-center" });
-    } catch (error) {
-      console.error('Error creating new user:', error);
-    }
+  const handleOpenEditModal = (user: AccountsResponse) => {
+    setSelectedUser(user);
+    setShowEditUserModal(true);
   };
-
-  const handleEditUserSubmit = async (updatedUser: AccountsResponse) => {
-    try {
-      await AccountService.updateAccount(updatedUser.username, updatedUser);
-      const response = await AccountService.getAccounts();
-      setAccountsData(response);
-      setShowEditUserModal(false); // Close the edit modal after successful update
-      toast.success("User updated successfully!", { position: "top-center" });
-    } catch (error) {
-      console.error('Error updating user:', error);
-      toast.error("Failed to update user", { position: "top-center" });
-    }
-  }; 
-
-  const handleDeleteSubmit = async () => {
-    console.log("Deleting user: ", selectedUser);
-    if (selectedUser) {
-      try {
-        await AccountService.deleteAccount(selectedUser.username); 
-        const response = await AccountService.getAccounts(); 
-        setAccountsData(response);
-        setShowDeleteModal(false);
-        toast.success("User deleted successfully!", { position: "top-center" });
-      } catch (error) {
-        toast.error("Failed to delete user.", { position: "top-center" });
-        console.error("Error deleting user:", error);
-      }
-    }
+  const handleOpenDeleteModal = (user: AccountsResponse) => {
+    setSelectedUser(user);
+    setShowDeleteUserModal(true);
   };
   
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await AccountService.getAccounts();
-        setAccountsData(response);
-      } catch (error) {
-        console.error('Error fetching accounts:', error);
-      }
-    };
-    fetchData();
-  }, []);
-
   const handleActionClick = (user: AccountsResponse) => {
     setSelectedUser(user);
     setShowActionModal(true);
@@ -190,70 +156,80 @@ const ManageUsers: React.FC = () => {
         </Card>
         </div>
 
-      {showCreateUserModal && (
+        {showCreateUserModal && (
         <CreateUserModal
           onClose={() => setShowCreateUserModal(false)}
-          onSubmit={handleCreateUserSubmit}
-        />
-      )}
+          onSubmit={() => {
+            fetchAccounts();
+            setShowCreateUserModal(false);
+          }}
+          />
+        )}
 
-      {showEditUserModal && selectedUser && (
-        <EditUserModal
-          onClose={() => setShowEditUserModal(false)}
-          onSubmit={handleEditUserSubmit}
-          user={selectedUser}
-        />
-      )}
+        {showEditUserModal && selectedUser && (
+          <EditUserModal
+            user={selectedUser}
+            onClose={() => setShowEditUserModal(false)}
+            onSubmit={() => {
+              fetchAccounts();
+              setShowEditUserModal(false);
+            }}
+          />
+        )}
 
-      {showDeleteModal && selectedUser && (
-        <DeleteConfirmationModal
-          onClose={() => setShowDeleteModal(false)}
-          onConfirm={handleDeleteSubmit}
-          user={selectedUser}
-        />
-      )}
+        {showDeleteUserModal && selectedUser && (
+          <DeleteUserModal
+            user={selectedUser}
+            onClose={() => setShowDeleteUserModal(false)}
+            onConfirm={() => {
+              fetchAccounts();
+              setShowDeleteUserModal(false);
+            }}
+          />
+        )}
 
-      {showActionModal && selectedUser && (
-        <div
-          className="absolute inset-0 flex items-center justify-center bg-black/50 z-50"
-          onClick={() => setShowActionModal(false)} 
-        >
+
+        {showActionModal && selectedUser && (
           <div
-            className="bg-white w-1/5 rounded-lg p-4 space-y-4"
-            onClick={(e) => e.stopPropagation()} 
+            className="absolute inset-0 flex items-center justify-center bg-black/50 z-50"
+            onClick={() => setShowActionModal(false)} 
           >
-            <div className="flex justify-between">
-              <h2 className = "font-poppins font-medium ml-1 mt-1">Manage User Accounts</h2>
-              <button
-                className="p-2 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-200 transition duration-200"
-                onClick={() => setShowActionModal(false)}
-              >
-                <FaTimes size={15} />
-              </button>
-            </div>
-            <div className="flex justify-between space-x-4">
-              <button
-                className="w-1/2 font-poppins font-light tracking-wider text-sm text-white bg-accent border-2 border-bg rounded-md p-2 drop-shadow-md hover:ring-2 hover:ring-slate-600 transition-colors duration-300 active:opacity-80"
-                onClick={() => {
-                  setShowEditUserModal(true);
-                  setShowActionModal(false);
-                }}
-              >
-                Edit
-              </button>
-              <button
-                className="w-1/2 bg-btnBg font-poppins font-light tracking-wider text-sm text-white border-2 border-bg rounded-md p-2 drop-shadow-md hover:ring-2 hover:ring-slate-600 transition-colors duration-300 active:opacity-80"
-                onClick={() => {
-                  setShowDeleteModal(true);
-                  setShowActionModal(false);
-                }}
-              >
-                Delete
-              </button>
+            <div
+              className="bg-white w-1/5 rounded-lg p-4 space-y-4"
+              onClick={(e) => e.stopPropagation()} 
+            >
+              <div className="flex justify-between">
+                <h2 className = "font-poppins font-medium ml-1 mt-1">Manage User Accounts</h2>
+                <button
+                  className="p-2 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-200 transition duration-200"
+                  onClick={() => setShowActionModal(false)}
+                >
+                  <FaTimes size={15} />
+                </button>
+              </div>
+              <div className="flex justify-between space-x-4">
+                <button
+                  className="w-1/2 font-poppins font-light tracking-wider text-sm text-white bg-accent border-2 border-bg rounded-md p-2 drop-shadow-md hover:ring-2 hover:ring-slate-600 transition-colors duration-300 active:opacity-80"
+                  onClick={() => {
+                    handleOpenEditModal(selectedUser);
+                    setShowActionModal(false);
+                  }}
+                >
+                  Edit
+                </button>
+                <button
+                  className="w-1/2 bg-btnBg font-poppins font-light tracking-wider text-sm text-white border-2 border-bg rounded-md p-2 drop-shadow-md hover:ring-2 hover:ring-slate-600 transition-colors duration-300 active:opacity-80"
+                  onClick={() => {
+                    handleOpenDeleteModal(selectedUser)
+                    setShowActionModal(false);
+                  }}
+                >
+                  Delete
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
     </div>
   );
 };

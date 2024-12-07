@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { AccountService } from "@/services/accounts.service";
+import { useAccountStore } from "@/pages/dashboard/stores/useAccountsStore";
 import { AccountsResponse } from "@/types/accounts.type";
 
 interface DeleteUserModalProps {
@@ -10,30 +10,30 @@ interface DeleteUserModalProps {
   onConfirm: () => void;
 }
 
-const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
-  user,
-  onClose,
-  onConfirm,
-}) => {
+const DeleteUserModal: React.FC<DeleteUserModalProps> = ({ user, onClose, onConfirm }) => {
   const [isLoading, setIsLoading] = useState(false);
+  const { deleteAccount } = useAccountStore((state) => ({
+    deleteAccount: state.deleteAccount,
+  }));
 
   const handleDelete = async () => {
     setIsLoading(true);
     try {
-      await AccountService.deleteAccount(user.username);
-      onConfirm();
+      await deleteAccount(user.username);
       toast.success("User deleted successfully!", { position: "top-center" });
-      onClose(); 
+      onConfirm();
+      onClose();
     } catch (error) {
       toast.error("Failed to delete user.", { position: "top-center" });
+      console.error("Error deleting user:", error);
+    } finally {
       setIsLoading(false);
-      console.error("Error deleting user:", error); 
     }
   };
 
   return (
     <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-50" onClick={onClose}>
-      <ToastContainer /> 
+      <ToastContainer />
       <div className="bg-white rounded-lg p-6 px-8 space-y-2 flex flex-col drop-shadow-md" onClick={(e) => e.stopPropagation()}>
         <div className="flex space-x-0">
           <div className="flex items-center justify-start w-64">

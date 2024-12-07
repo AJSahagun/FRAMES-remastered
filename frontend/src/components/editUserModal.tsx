@@ -4,7 +4,7 @@ import { toast, ToastContainer } from "react-toastify";
 import { FaTimes } from 'react-icons/fa';
 import 'react-toastify/dist/ReactToastify.css';
 import * as Yup from "yup";
-import { AccountService } from "@/services/accounts.service";
+import { useAccountStore } from "@/pages/dashboard/stores/useAccountsStore";
 import { AccountsResponse } from "@/types/accounts.type";
 
 interface EditUserFormValues {
@@ -16,7 +16,7 @@ interface EditUserFormValues {
 interface EditUserModalProps {
   user: AccountsResponse;
   onClose: () => void;
-  onSubmit: (updatedUser: AccountsResponse) => void;
+  onSubmit: () => void;
 }
 
 const validationSchema = Yup.object({
@@ -27,25 +27,29 @@ const validationSchema = Yup.object({
 
 const EditUserModal: React.FC<EditUserModalProps> = ({ user, onClose, onSubmit }) => {
   const [isLoading, setIsLoading] = useState(false);
-
+  const { updateAccount } = useAccountStore((state) => ({
+    updateAccount: state.updateAccount,
+  }));
+  
   const handleSubmit = async (values: EditUserFormValues) => {
     const updatedUser: Partial<AccountsResponse> = {
       username: values.username ?? user.username,
       password: values.password ?? user.password,
-      role: values.role ?? user.role, 
-      date_created: user.date_created,  
+      role: values.role ?? user.role,
+      date_created: user.date_created,
     };
-    
+
     setIsLoading(true);
     try {
-      await AccountService.updateAccount(user.username, updatedUser as AccountsResponse);
-      await onSubmit(updatedUser as AccountsResponse);
-      setIsLoading(false);
+      await updateAccount(user.username, updatedUser);
       toast.success("User updated successfully!", { position: "top-center" });
+      onSubmit();
+      onClose();
     } catch (error) {
-      setIsLoading(false);
       toast.error("Failed to update user", { position: "top-center" });
       console.error(error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -90,11 +94,17 @@ const EditUserModal: React.FC<EditUserModalProps> = ({ user, onClose, onSubmit }
             </div>
 
             <div className="w-full flex items-center justify-center">
-              <button type="submit" className="w-1/3 font-poppins font-light tracking-wider text-sm text-white bg-accent border-2 border-bg rounded-md p-2 drop-shadow-md hover:ring-2 hover:ring-slate-600 transition-colors duration-300 active:opacity-80" disabled={isLoading}> {isLoading ? ( <div className="spinner-border animate-spin inline-block w-4 h-4 border-2 rounded-full border-white border-t-transparent mt-1"></div>
-                ) : (
-                  "Submit"
-                )}
-              </button>
+                <button
+                  type="submit"
+                  className="w-1/3 font-poppins font-light tracking-wider text-sm text-white bg-accent border-2 border-bg rounded-md p-2 drop-shadow-md hover:ring-2 hover:ring-slate-600 transition-colors duration-300 active:opacity-80"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <div className="spinner-border animate-spin inline-block w-4 h-4 border-2 rounded-full border-white border-t-transparent mt-1" />
+                  ) : (
+                    "Submit"
+                  )}
+                </button>
             </div>
           </Form>
         </Formik>
