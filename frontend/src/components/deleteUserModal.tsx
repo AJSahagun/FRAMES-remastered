@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useAccountStore } from "@/pages/dashboard/stores/useAccountsStore";
-import { useAuthStore } from "@/services/auth.service";// Import auth store for user state comparison
+import { useAuthStore } from "@/services/auth.service";
 import { AccountsResponse } from "@/types/accounts.type";
+import { AccountService } from "@/services/accounts.service";
 
 interface DeleteUserModalProps {
   user: AccountsResponse;
@@ -13,11 +13,8 @@ interface DeleteUserModalProps {
 
 const DeleteUserModal: React.FC<DeleteUserModalProps> = ({ user, onClose, onConfirm }) => {
   const [isLoading, setIsLoading] = useState(false);
-  const { deleteAccount } = useAccountStore((state) => ({
-    deleteAccount: state.deleteAccount,
-  }));
 
-  const loggedInUser = useAuthStore((state) => state.user?.username); // Get logged-in user's username
+  const loggedInUser = useAuthStore((state) => state.user?.username);
 
   const handleDelete = async () => {
     if (user.username === loggedInUser) {
@@ -27,13 +24,13 @@ const DeleteUserModal: React.FC<DeleteUserModalProps> = ({ user, onClose, onConf
 
     setIsLoading(true);
     try {
-      await deleteAccount(user.username);
+      await AccountService.deleteAccount(user.username);
       toast.success("User deleted successfully!", { position: "top-center" });
       onConfirm();
       onClose();
     } catch (error) {
-      toast.error("Failed to delete user.", { position: "top-center" });
-      console.error("Error deleting user:", error);
+      console.error("Error while deleting user:", error);
+      toast.error("You are currently offline. Failed to delete user.", { position: "top-center" });
     } finally {
       setIsLoading(false);
     }
@@ -41,7 +38,6 @@ const DeleteUserModal: React.FC<DeleteUserModalProps> = ({ user, onClose, onConf
 
   return (
     <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-50" onClick={onClose}>
-      <ToastContainer/>
       <div className="bg-white rounded-lg p-6 px-8 space-y-2 flex flex-col drop-shadow-md" onClick={(e) => e.stopPropagation()}>
         <div className="flex space-x-0">
           <div className="flex items-center justify-start w-64">

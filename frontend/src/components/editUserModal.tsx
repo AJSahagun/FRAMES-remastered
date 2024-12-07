@@ -1,11 +1,12 @@
 import { Formik, Form, ErrorMessage, Field } from "formik";
 import { useState } from "react";
-import { toast, ToastContainer } from "react-toastify";
-import { FaTimes } from 'react-icons/fa';
+import { toast } from "react-toastify";
+import { FaTimes } from "react-icons/fa";
 import 'react-toastify/dist/ReactToastify.css';
 import * as Yup from "yup";
 import { useAccountStore } from "@/pages/dashboard/stores/useAccountsStore";
 import { AccountsResponse } from "@/types/accounts.type";
+import { AccountService } from "@/services/accounts.service";
 
 interface EditUserFormValues {
   username?: string;
@@ -22,9 +23,6 @@ interface EditUserModalProps {
 
 const EditUserModal: React.FC<EditUserModalProps> = ({ user, onClose, onSubmit }) => {
   const [isLoading, setIsLoading] = useState(false);
-  const { updateAccount } = useAccountStore((state) => ({
-    updateAccount: state.updateAccount,
-  }));
 
   const validationSchema = Yup.object({
     username: Yup.string().min(3)
@@ -45,18 +43,17 @@ const EditUserModal: React.FC<EditUserModalProps> = ({ user, onClose, onSubmit }
       username: values.username ?? user.username,
       password: values.password ?? user.password,
       role: values.role ?? user.role,
-      date_created: user.date_created,
     };
 
     setIsLoading(true);
     try {
-      await updateAccount(user.username, updatedUser);
+      await AccountService.updateAccount(user.username, updatedUser);
       toast.success("User updated successfully!", { position: "top-center" });
       onSubmit();
       onClose();
     } catch (error) {
-      toast.error("Failed to update user", { position: "top-center" });
-      console.error(error);
+      console.error("Error updating user", error);
+      toast.error("You are currently offline. Failed to update user.", { position: "top-center" });
     } finally {
       setIsLoading(false);
     }
@@ -64,7 +61,6 @@ const EditUserModal: React.FC<EditUserModalProps> = ({ user, onClose, onSubmit }
 
   return (
     <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-50" onClick={onClose}>
-      <ToastContainer />
       <div className="bg-white rounded-lg p-6 px-8 space-y-8 flex flex-col drop-shadow-md" onClick={(e) => e.stopPropagation()} >
         <div className="flex space-x-0">
           <div className="flex items-center justify-start w-64">

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Search, MoreHorizontal } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { FaTimes } from 'react-icons/fa';
+import { ToastContainer } from 'react-toastify';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
 Pagination, 
@@ -67,6 +68,7 @@ const ManageUsers: React.FC = () => {
 
   return (
     <div className="max-h-dvh p-6">
+      <ToastContainer/>
       <div className="flex justify-between items-center">
         <h1 className="font-poppins text-primary text-4xl xl:text-5xl font-semibold">Manage Users</h1>
         <div className="relative drop-shadow-md mr-6">

@@ -6,6 +6,7 @@ import { FaTimes } from "react-icons/fa";
 import 'react-toastify/dist/ReactToastify.css';
 import * as Yup from "yup";
 import { AccountsResponse } from "@/types/accounts.type";
+import { AccountService } from "@/services/accounts.service";
 
 interface CreateUserModalProps {
   onClose: () => void;
@@ -14,9 +15,6 @@ interface CreateUserModalProps {
 
 const CreateUserModal: React.FC<CreateUserModalProps> = ({ onClose, onSubmit }) => {
   const [isLoading, setIsLoading] = useState(false);
-  const { addAccount } = useAccountStore((state) => ({
-    addAccount: state.addAccount,
-  }));
 
   const validationSchema = Yup.object({
     username: Yup.string().required("Username is required").min(3)
@@ -41,17 +39,17 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({ onClose, onSubmit }) 
     };
 
     setIsLoading(true);
-      try {
-        await addAccount(newUser);
-        toast.success("User created successfully!", { position: "top-center" });
+    try {
+      await AccountService.createAccount(newUser);
+        toast.success("Account created successfully!", { position: "top-center" });
         onSubmit();
         onClose();
-      } catch (error) {
-        toast.error("Failed to create user", { position: "top-center" });
-        console.error(error);
-      } finally {
-        setIsLoading(false);
-      }
+    } catch (error) {
+      console.error("User creation error", error);
+      toast.error("You are currently offline. Failed to create an account.", { position: "top-center" });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
