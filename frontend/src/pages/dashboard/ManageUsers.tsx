@@ -18,9 +18,11 @@ import DeleteUserModal from '@/components/deleteUserModal';
 import { AccountsResponse, parseDateTime } from '@/types/accounts.type';
 
 const ManageUsers: React.FC = () => {
-  const { accounts, fetchAccounts } = useAccountStore((state) => ({
-    accounts: state.accounts,
+  const { filteredAccounts, fetchAccounts, searchTerm, setSearchTerm } = useAccountStore((state) => ({
     fetchAccounts: state.fetchAccounts,
+    filteredAccounts: state.filteredAccounts,
+    searchTerm: state.searchTerm,
+    setSearchTerm: state.setSearchTerm,
   }));
 
   const [showCreateUserModal, setShowCreateUserModal] = useState(false);
@@ -29,14 +31,12 @@ const ManageUsers: React.FC = () => {
   const [selectedUser, setSelectedUser] = useState<AccountsResponse | null>(null);
   const [showDeleteUserModal, setShowDeleteUserModal] = useState(false);
 
-  const [searchTerm, setSearchTerm] = useState<string>(""); 
-
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 8;
   const indexOfLastRow = currentPage * rowsPerPage;
   const indexOfFirstRow = indexOfLastRow - rowsPerPage;
-  const currentRows = accounts.slice(indexOfFirstRow, indexOfLastRow);
-  const totalPages = Math.ceil(accounts.length / rowsPerPage);
+  const currentRows = filteredAccounts.slice(indexOfFirstRow, indexOfLastRow);
+  const totalPages = Math.ceil(filteredAccounts.length / rowsPerPage);
 
   useEffect(() => {
     fetchAccounts();
