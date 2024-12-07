@@ -32,7 +32,7 @@ const ManageUsers: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState<string>(""); 
 
   const [currentPage, setCurrentPage] = useState(1);
-  const rowsPerPage = 10;
+  const rowsPerPage = 8;
   const indexOfLastRow = currentPage * rowsPerPage;
   const indexOfFirstRow = indexOfLastRow - rowsPerPage;
   const currentRows = accounts.slice(indexOfFirstRow, indexOfLastRow);

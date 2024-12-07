@@ -2,6 +2,7 @@ import { useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useAccountStore } from "@/pages/dashboard/stores/useAccountsStore";
+import { useAuthStore } from "@/services/auth.service";// Import auth store for user state comparison
 import { AccountsResponse } from "@/types/accounts.type";
 
 interface DeleteUserModalProps {
@@ -16,7 +17,14 @@ const DeleteUserModal: React.FC<DeleteUserModalProps> = ({ user, onClose, onConf
     deleteAccount: state.deleteAccount,
   }));
 
+  const loggedInUser = useAuthStore((state) => state.user?.username); // Get logged-in user's username
+
   const handleDelete = async () => {
+    if (user.username === loggedInUser) {
+      toast.error("You cannot delete your own account.", { position: "top-center" });
+      return;
+    }
+
     setIsLoading(true);
     try {
       await deleteAccount(user.username);
@@ -33,7 +41,7 @@ const DeleteUserModal: React.FC<DeleteUserModalProps> = ({ user, onClose, onConf
 
   return (
     <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-50" onClick={onClose}>
-      <ToastContainer />
+      <ToastContainer/>
       <div className="bg-white rounded-lg p-6 px-8 space-y-2 flex flex-col drop-shadow-md" onClick={(e) => e.stopPropagation()}>
         <div className="flex space-x-0">
           <div className="flex items-center justify-start w-64">

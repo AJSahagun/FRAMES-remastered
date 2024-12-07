@@ -12,17 +12,25 @@ interface CreateUserModalProps {
   onSubmit: () => void; 
 }
 
-const validationSchema = Yup.object({
-  username: Yup.string().required("Username is required").min(3),
-  password: Yup.string().required("Password is required").min(8),
-  role: Yup.string().required("Role is required").oneOf(['librarian', 'admin'])
-});
-
 const CreateUserModal: React.FC<CreateUserModalProps> = ({ onClose, onSubmit }) => {
   const [isLoading, setIsLoading] = useState(false);
   const { addAccount } = useAccountStore((state) => ({
     addAccount: state.addAccount,
   }));
+
+  const validationSchema = Yup.object({
+    username: Yup.string().required("Username is required").min(3)
+      .test(
+        "unique-username",
+        "Username is already taken",
+        function (value) {
+          const accounts = useAccountStore.getState().accounts;
+          return !accounts.some(account => account.username === value);
+        }
+      ),
+    password: Yup.string().required("Password is required").min(8),
+    role: Yup.string().required("Role is required").oneOf(["librarian", "admin"]),
+  });
 
   const handleSubmit = async (values: { username: string; password: string; role: string }) => {
     const newUser: AccountsResponse = {

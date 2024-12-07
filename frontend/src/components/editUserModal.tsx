@@ -19,17 +19,26 @@ interface EditUserModalProps {
   onSubmit: () => void;
 }
 
-const validationSchema = Yup.object({
-  username: Yup.string().min(3, "Username must be at least 3 characters."),
-  password: Yup.string().min(8, "Password must be at least 8 characters."),
-  role: Yup.string().oneOf(["librarian", "admin"], "Invalid role."),
-});
 
 const EditUserModal: React.FC<EditUserModalProps> = ({ user, onClose, onSubmit }) => {
   const [isLoading, setIsLoading] = useState(false);
   const { updateAccount } = useAccountStore((state) => ({
     updateAccount: state.updateAccount,
   }));
+
+  const validationSchema = Yup.object({
+    username: Yup.string().min(3)
+      .test(
+        "unique-username",
+        "Username is already taken",
+        function (value) {
+          const accounts = useAccountStore.getState().accounts;
+          return !accounts.some(account => account.username === value && account.username !== user.username);
+        }
+    ), 
+    password: Yup.string().min(8, "Password must be at least 8 characters."),
+    role: Yup.string().oneOf(["librarian", "admin"], "Invalid role."),
+  });
   
   const handleSubmit = async (values: EditUserFormValues) => {
     const updatedUser: Partial<AccountsResponse> = {
