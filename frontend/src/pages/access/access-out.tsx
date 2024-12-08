@@ -7,10 +7,12 @@ import { db } from '../../config/db';
 import { useBulkRequest } from './hooks/useBulkRequest';
 import { findBestMatch } from '../../services/facematch.service';
 import { useSync } from './hooks/useSync';
+import { SettingsService } from '@/services/settings.service';
 
 export default function Access_OUT() {
   const [time, setTime] = useState(new Date().toLocaleTimeString());
-  const [occupantCount, setOccupantCount] = useState<number>(0); 
+  const [occupantCount, setOccupantCount] = useState<number>(0);
+  const [occupantLimit, setOccupantLimit] = useState<number>(0);
   const { rows, latestRequestTime } = useBulkRequest();
   const { syncStatus } = useSync();
   const date2=new Date().toISOString()
@@ -45,6 +47,22 @@ export default function Access_OUT() {
       clearInterval(interval); 
     };
   }, [latestRequestTime]); 
+
+  useEffect(() => {
+    const fetchOccupantLimit = async () => {
+      try {
+        const response = await SettingsService.getMaxOccupants();
+        setOccupantLimit(response.max_occupants);
+      } catch (error) {
+        console.error("Error fetching occupant limit:", error);
+        toast.error("Failed to load current occupant limit.", {
+          position: "top-center",
+        });
+      }
+    };
+
+    fetchOccupantLimit();
+  }, []);
 
   const date = new Date().toLocaleDateString('en-us', { weekday:"long", year:"numeric", month:"short", day:"numeric"});
 
@@ -132,7 +150,7 @@ export default function Access_OUT() {
             <p>
               <span className="font-poppins font-semibold text-8xl gradient-text">{occupantCount}</span>
               <span className="font-poppins font-medium text-6xl text-accent">/</span>
-              <span className="font-poppins font-semibold text-6xl text-accent">250</span>
+              <span className="font-poppins font-semibold text-6xl text-accent">{occupantLimit}</span>
             </p>
             <h2 className="font-noto_sans font-semibold text-6xl text-accent">OCCUPANTS</h2>
           </div>

@@ -8,6 +8,7 @@ import { db } from '../../config/db';
 import { useSync } from './hooks/useSync';
 import { findBestMatchBySchoolId } from '../../services/facematch.service';
 import { Encodings } from '../../types/db.types';
+import { SettingsService } from '@/services/settings.service';
 
 interface FormValues {
   schoolId: string;
@@ -33,6 +34,7 @@ export default function Access_IN() {
   const [occupantCount, setOccupantCount] = useState<number>(0);
   const { syncStatus } = useSync();
   const [shouldCapture, setShouldCapture] = useState(false);
+  const [occupantLimit, setOccupantLimit] = useState<number>(0);
   const formikRef = useRef<FormikProps<FormValues>>(null);
   const date = new Date().toLocaleDateString('en-us', { weekday: "long", year: "numeric", month: "short", day: "numeric" });
   const date2 = new Date().toISOString();
@@ -47,7 +49,6 @@ export default function Access_IN() {
       console.error('Error fetching occupant count:', error);
     }
   };
-  
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -62,6 +63,22 @@ export default function Access_IN() {
       clearInterval(timer);
       clearInterval(interval);
     };
+  }, []);
+
+  useEffect(() => {
+    const fetchOccupantLimit = async () => {
+      try {
+        const response = await SettingsService.getMaxOccupants();
+        setOccupantLimit(response.max_occupants);
+      } catch (error) {
+        console.error("Error fetching occupant limit:", error);
+        toast.error("Failed to load current occupant limit.", {
+          position: "top-center",
+        });
+      }
+    };
+
+    fetchOccupantLimit();
   }, []);
 
   const recordLatestEncoding = async (data:Encodings)=>{
@@ -231,7 +248,7 @@ export default function Access_IN() {
                     <p>
                       <span className="font-poppins font-semibold text-7xl gradient-text">{occupantCount}</span>
                       <span className="font-poppins font-medium text-5xl text-accent">/</span>
-                      <span className="font-poppins font-semibold text-5xl text-accent">250</span>
+                      <span className="font-poppins font-semibold text-5xl text-accent">{occupantLimit}</span>
                     </p>
                     <h2 className="font-noto_sans font-semibold text-5xl text-accent">OCCUPANTS</h2>
                   </div>
