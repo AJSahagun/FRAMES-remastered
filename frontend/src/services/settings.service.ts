@@ -37,7 +37,7 @@ export class SettingsService {
   static async getTOS(): Promise<TOSResponse> {
     try {
       const response = await apiClient.get(API_CONFIG.ENDPOINTS.TOS);
-      return response.data;
+      return { tos: response.data };
     } catch (error) {
       this.handleError(error, "Error fetching Terms of Service");
       throw error;
