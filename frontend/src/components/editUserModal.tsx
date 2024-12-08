@@ -80,7 +80,11 @@ const EditUserModal: React.FC<EditUserModalProps> = ({ user, onClose, onSubmit }
           >
           <Form className="space-y-4 flex flex-col justify-center items-center w-full">
             <div className="w-full flex flex-col items-start pl-4 pr-4">
-              <Field as="select" name="role" placeholder="Role" className="w-full p-3 bg-sf placeholder:text-sm outline-none rounded-lg text-md text-accent transition-all duration-300 tracking-wide">
+              <Field as="select"name="role" placeholder="Role" disabled={user.role === "admin"}
+                className={`w-full p-3 bg-sf placeholder:text-sm outline-none rounded-lg text-md text-accent transition-all duration-300 tracking-wide ${
+                    user.role === "admin" ? "bg-gray-200 cursor-not-allowed" : ""
+                  }`}
+                >
                 <option value="" disabled>Select Role</option>
                 <option value="librarian">Librarian</option>
                 <option value="admin">Admin</option>
