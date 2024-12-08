@@ -6,7 +6,7 @@ const DashboardLayout: React.FC = () => {
   return (
     <div className="flex">
       <SideNavigation />
-      <main className="ml-64 xl:ml-80 w-3/4 xl:w-4/5 p-6">
+      <main className="ml-64 xl:ml-80 w-3/4 xl:w-4/5">
         <Outlet />
       </main>
     </div>

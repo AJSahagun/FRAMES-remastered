@@ -67,10 +67,10 @@ const ManageUsers: React.FC = () => {
   };
 
   return (
-    <div className="max-h-dvh p-6">
+    <div className="max-h-dvh p-6 px-8">
       <ToastContainer/>
-      <div className="flex justify-between items-center">
-        <h1 className="font-poppins text-primary text-4xl xl:text-5xl font-semibold">Manage Users</h1>
+      <div className="flex justify-between items-center mt-4">
+        <h1 className="font-poppins text-primary text-3xl xl:text-4xl font-semibold">Manage Users</h1>
         <div className="relative drop-shadow-md mr-6">
           <Search className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
           <Input

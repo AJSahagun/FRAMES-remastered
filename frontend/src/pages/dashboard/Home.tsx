@@ -80,11 +80,11 @@ const DashboardHome: React.FC = () => {
   );
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 px-8 space-y-6 h-dvh">
       <ToastContainer/>
       {/* Header */}
       <div className="flex justify-between items-center">
-        <h1 className="font-poppins text-primary text-4xl xl:text-5xl font-semibold">
+        <h1 className="font-poppins text-primary text-3xl xl:text-4xl font-semibold">
           Dashboard
         </h1>
         <div className="flex space-x-4">

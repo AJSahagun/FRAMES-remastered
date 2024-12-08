@@ -188,10 +188,10 @@ export const VisitorHistory: React.FC = () => {
   };
 
   return (
-    <div className="p-6">
+    <div className="p-6 px-8">
       <ToastContainer/>
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="font-poppins text-primary text-4xl xl:text-5xl font-semibold">
+      <div className="flex justify-between items-center mb-4 mt-4">
+        <h1 className="font-poppins text-primary text-3xl xl:text-4xl font-semibold">
           Visitor History
         </h1>
         <div className="flex items-center space-x-2">

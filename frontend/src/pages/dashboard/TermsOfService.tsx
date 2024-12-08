@@ -8,8 +8,10 @@ import {
   toolbarPlugin,
   UndoRedo,
   BoldItalicUnderlineToggles,
-  CodeToggle,
-  ListsToggle
+  // CodeToggle,
+  ListsToggle,
+  BlockTypeSelect
+
 } from '@mdxeditor/editor';
 import '@mdxeditor/editor/style.css';
 import { toast, ToastContainer } from 'react-toastify';
@@ -75,10 +77,10 @@ const TermsOfService: React.FC = () => {
   };
 
   return (
-    <div className="h-screen flex flex-col p-6">
+    <div className="h-screen flex-grow flex flex-col p-6 px-8">
       {/* Header */}
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="font-poppins text-primary text-4xl xl:text-5xl font-semibold">
+      <div className="flex justify-between items-center mb-4 mt-4">
+        <h1 className="font-poppins text-primary text-3xl xl:text-4xl font-semibold">
           Terms of Service
         </h1>
         <div className="flex items-center space-x-4">
@@ -94,7 +96,7 @@ const TermsOfService: React.FC = () => {
       </div>
 
       {/* Content Area */}
-      <div className="flex-grow flex flex-col">
+      <div className="flex flex-col px-28">
         {editorEnabled ? (
           <div className="flex-grow border-2 border-accent rounded-md overflow-hidden">
             <div className="bg-green-100 p-2 text-center">
@@ -102,7 +104,8 @@ const TermsOfService: React.FC = () => {
             </div>
             
             <MDXEditor 
-              markdown={markdown} 
+              className="prose prose-lg"
+              markdown={markdown}
               plugins={[
                 headingsPlugin(),
                 listsPlugin(),
@@ -112,14 +115,18 @@ const TermsOfService: React.FC = () => {
                   toolbarContents: () => (
                     <>
                       <UndoRedo />
-                      <BoldItalicUnderlineToggles />
-                      <CodeToggle />
-                      <ListsToggle />
+                      <BoldItalicUnderlineToggles/>
+                      <ListsToggle/>
+                      <BlockTypeSelect />
+
                     </>
                   )
                 })
               ]}
-              onChange={(newMarkdown) => setMarkdown(newMarkdown)} 
+              onChange={(newMarkdown) => {
+                console.log('Updated Markdown:', newMarkdown);
+                setMarkdown(newMarkdown)}
+              } 
               readOnly={isPreview}
             />
           </div>
@@ -139,10 +146,13 @@ const TermsOfService: React.FC = () => {
       </div>
 
       {/* Footer Buttons */}
-      <div className="flex justify-between mt-4">
+      <div className="flex justify-end mt-4 px-28">
         <div className="space-x-2">
           {!editorEnabled ? (
-            <Button onClick={handleEnableEditor}>
+            <Button onClick={handleEnableEditor} 
+            variant='outline'
+            className="bg-card ring-1 ring-accent hover:ring-offset-2 active:opacity-80"
+            >
               Edit Terms of Service
             </Button>
           ) : (
@@ -150,10 +160,13 @@ const TermsOfService: React.FC = () => {
               <Button 
                 variant="outline" 
                 onClick={() => setEditorEnabled(false)}
+                className="bg-card hover:brightness-75 active:opacity-80"
               >
                 Cancel
               </Button>
-              <Button onClick={openSaveModal}>
+              <Button onClick={openSaveModal}
+              className="hover:bg-btnBg bg-btnBg hover:brightness-75 active:opacity-80"
+              >
                 Save Changes
               </Button>
             </>
@@ -175,11 +188,16 @@ const TermsOfService: React.FC = () => {
           </DialogHeader>
           <DialogFooter>
             <DialogClose asChild>
-              <Button variant="outline">Cancel</Button>
+              <Button variant="outline"
+              className="bg-card"
+              >
+                Cancel
+              </Button>
             </DialogClose>
             <Button 
               onClick={handleSaveChanges} 
               disabled={isLoading}
+              className="hover:bg-btnBg bg-btnBg hover:brightness-75 active:opacity-80"
             >
               {isLoading ? 'Saving...' : 'Confirm Save'}
             </Button>
