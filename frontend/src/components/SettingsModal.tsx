@@ -2,14 +2,15 @@ import { toast, ToastContainer } from "react-toastify";
 import { useState, useEffect } from "react";
 import ColorPickerButton from "@/components/ColorPickerButton";
 import { useDashboardStore } from "@/pages/dashboard/stores/useDashboardStore";
-import { SettingsService } from '@/services/settings.service';
+import { SettingsService } from "@/services/settings.service";
 
 interface SettingsModalProps {
   onClose: () => void;
 }
 
 const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
-  const { departmentColors, saveDepartmentColors } = useDashboardStore();
+  const { departmentColors, saveDepartmentColors, resetFilters } =
+    useDashboardStore();
   const [deptColorsPage, setDeptColorsPage] = useState(true);
   const [occupantLimitPage, setOccupantLimitPage] = useState(false);
   const [departments, setDepartments] = useState(departmentColors);
@@ -17,21 +18,21 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
   const [enableEditOccupant, setEnableEditOccupant] = useState(false);
   const [occupantLimit, setOccupantLimit] = useState<number>(0);
 
-	useEffect(() => {
-		const fetchOccupantLimit = async () => {
-			try {
-				const response = await SettingsService.getMaxOccupants();
-				setOccupantLimit(response.max_occupants);
-			} catch (error) {
-				console.error("Error fetching occupant limit:", error);
-				toast.error("Failed to load current occupant limit.", { 
-					position: "top-center" 
-				});
-			}
-		};
-	
-		fetchOccupantLimit();
-	}, []);
+  useEffect(() => {
+    const fetchOccupantLimit = async () => {
+      try {
+        const response = await SettingsService.getMaxOccupants();
+        setOccupantLimit(response.max_occupants);
+      } catch (error) {
+        console.error("Error fetching occupant limit:", error);
+        toast.error("Failed to load current occupant limit.", {
+          position: "top-center",
+        });
+      }
+    };
+
+    fetchOccupantLimit();
+  }, []);
 
   const handleColorChange = (index: number, color: string) => {
     const updatedDepartments = [...departments];
@@ -42,6 +43,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
   const handleDeptColorsSubmit = async () => {
     try {
       saveDepartmentColors(departments);
+      resetFilters();
 
       await new Promise((resolve) => setTimeout(resolve, 500));
       toast.success("Department colors updated successfully!", {
@@ -68,33 +70,33 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
   };
 
   const handleOccupantChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const value = parseInt(e.target.value, 10);
-		setOccupantLimit(isNaN(value) ? 0 : value);
-	};
+    const value = parseInt(e.target.value, 10);
+    setOccupantLimit(isNaN(value) ? 0 : value);
+  };
 
   const handleOccupantSubmit = async () => {
-		if (enableEditOccupant && occupantLimit !== undefined) {
-			try {
-				await SettingsService.updateMaxOccupants({ 
-					max_occupants: occupantLimit 
-				});
-	
-				setEnableEditOccupant(false);
-				toast.success("Occupant limit updated successfully!", { 
-					position: "top-center" 
-				});
-			} catch (error) {
-				toast.error("Failed to update occupant limit.", { 
-					position: "top-center" 
-				});
-				console.error("Error updating occupant limit:", error);
-			}
-		} else {
-			toast.error("Please enter a valid occupant limit.", { 
-				position: "top-center" 
-			});
-		}
-	};
+    if (enableEditOccupant && occupantLimit !== undefined) {
+      try {
+        await SettingsService.updateMaxOccupants({
+          max_occupants: occupantLimit,
+        });
+
+        setEnableEditOccupant(false);
+        toast.success("Occupant limit updated successfully!", {
+          position: "top-center",
+        });
+      } catch (error) {
+        toast.error("Failed to update occupant limit.", {
+          position: "top-center",
+        });
+        console.error("Error updating occupant limit:", error);
+      }
+    } else {
+      toast.error("Please enter a valid occupant limit.", {
+        position: "top-center",
+      });
+    }
+  };
 
   return (
     <div className="absolute  inset-0 bg-black/20 flex items-center justify-center z-50">

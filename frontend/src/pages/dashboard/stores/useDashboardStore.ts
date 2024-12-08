@@ -72,11 +72,7 @@ export const useDashboardStore = create<DashboardStore>()(
             year: yearNumber,
           });
 
-          const transformedSummary = transformMonthlySummaryData(
-            monthlySummaryResponse
-          );
-
-          const backendColors = extractDepartmentColors(transformedSummary);
+          const backendColors = extractDepartmentColors(monthlySummaryResponse);
           const localColors = get().loadDepartmentColors();
 
           const mergedColors = backendColors.map((backendColor) => {
@@ -85,6 +81,10 @@ export const useDashboardStore = create<DashboardStore>()(
             );
             return localColor || backendColor;
           });
+
+          const transformedSummary = transformMonthlySummaryData(
+            monthlySummaryResponse, localColors
+          );
 
           const transformedDailyVisitors =
             transformDailyVisitorData(transformedSummary);

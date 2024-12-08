@@ -2,18 +2,18 @@ import {
   DailyVisitorEntry,
   MonthlyVisitorSummary,
   LibraryUser,
-  DepartmentColors
+  DepartmentColors,
 } from "@/types/dashboard.types";
 import { monthlySummaryResponse, HistoryResponse } from "@/types/db.types";
 
 export const extractDepartmentColors = (
-  summaryData: MonthlyVisitorSummary[]
+  summaryData: monthlySummaryResponse[]
 ): DepartmentColors[] => {
   const uniqueDepartments = new Map<string, string>();
 
-  summaryData.forEach(({ department, color }) => {
-    const departmentName = department || "Others";
-    const departmentColor = color || "#7C7070";
+  summaryData.forEach((entry) => {
+    const departmentName = entry.department || "Others";
+    const departmentColor = entry.color || "#7C7070";
 
     if (!uniqueDepartments.has(departmentName)) {
       uniqueDepartments.set(departmentName, departmentColor);
@@ -26,25 +26,33 @@ export const extractDepartmentColors = (
   }));
 };
 
-
 export const transformMonthlySummaryData = (
-  response: monthlySummaryResponse[]
+  response: monthlySummaryResponse[],
+  departmentColors?: DepartmentColors[]
 ): MonthlyVisitorSummary[] => {
+  const colorMap = new Map(
+    departmentColors?.map(({ name, color }) => [name, color])
+  );
+
   return response
-    .map((visitorGroup) => ({
-      month: visitorGroup.month,
-      year: visitorGroup.year,
-      course: visitorGroup.program,
-      department: visitorGroup.department || "Others",
-      visitors: parseInt(visitorGroup.visitors),
-      dailyVisitors: Object.fromEntries(
-        Object.entries(visitorGroup.dailyVisitors).map(([day, count]) => [
-          parseInt(day),
-          count,
-        ])
-      ),
-      color: visitorGroup.color || "#7C7070",
-    }))
+    .map((visitorGroup) => {
+      const department = visitorGroup.department || "Others";
+
+      return {
+        month: visitorGroup.month,
+        year: visitorGroup.year,
+        course: visitorGroup.program,
+        department,
+        visitors: parseInt(visitorGroup.visitors),
+        dailyVisitors: Object.fromEntries(
+          Object.entries(visitorGroup.dailyVisitors).map(([day, count]) => [
+            parseInt(day),
+            count,
+          ])
+        ),
+        color: colorMap?.get(department) || visitorGroup.color || "#7C7070",
+      };
+    })
     .sort((a, b) => (a.department || "").localeCompare(b.department || ""));
 };
 
