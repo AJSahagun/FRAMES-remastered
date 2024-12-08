@@ -30,6 +30,9 @@ interface DashboardStore {
   error: string | null;
   fetchDashboardData: () => Promise<void>;
   applyFilters: () => void;
+  loadDepartmentColors: () => DepartmentColors[];
+  saveDepartmentColors: (updatedColors: DepartmentColors[]) => void;
+  updateDepartmentColor: (name: string, color: string) => void;
 }
 
 const initialState: DashboardFilters = {
@@ -73,8 +76,15 @@ export const useDashboardStore = create<DashboardStore>()(
             monthlySummaryResponse
           );
 
-          const transformedDepartmentColors =
-            extractDepartmentColors(transformedSummary);
+          const backendColors = extractDepartmentColors(transformedSummary);
+          const localColors = get().loadDepartmentColors();
+
+          const mergedColors = backendColors.map((backendColor) => {
+            const localColor = localColors.find(
+              (color) => color.name === backendColor.name
+            );
+            return localColor || backendColor;
+          });
 
           const transformedDailyVisitors =
             transformDailyVisitorData(transformedSummary);
@@ -87,7 +97,7 @@ export const useDashboardStore = create<DashboardStore>()(
             filteredVisitorSummaryData: transformedSummary,
             filteredVisitorData: transformedDailyVisitors,
             filteredLibraryUserData: transformedLibraryUsers,
-            departmentColors: transformedDepartmentColors,
+            departmentColors: mergedColors,
             isLoading: false,
           });
 
@@ -101,6 +111,25 @@ export const useDashboardStore = create<DashboardStore>()(
           set({ isLoading: false, error: errorMessage });
           toast.error(`${errorMessage}`);
         }
+      },
+
+      loadDepartmentColors: () => {
+        const storedColors = localStorage.getItem("departmentColors");
+        return storedColors ? JSON.parse(storedColors) : [];
+      },
+
+      saveDepartmentColors: (updatedColors: DepartmentColors[]) => {
+        localStorage.setItem("departmentColors", JSON.stringify(updatedColors));
+        set({ departmentColors: updatedColors });
+      },
+
+      updateDepartmentColor: (name: string, color: string) => {
+        const currentColors = get().departmentColors;
+        const updatedColors = currentColors.map((entry) =>
+          entry.name === name ? { ...entry, color } : entry
+        );
+
+        get().saveDepartmentColors(updatedColors);
       },
 
       setMonth: (month) => {

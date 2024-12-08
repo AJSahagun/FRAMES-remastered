@@ -133,11 +133,11 @@ export class DashboardService {
                 $1::text as year,  
                 program, department,
                 case 
-                	when department='CICS' then '#5490de'
-                	when department='COE' then '#fc746a'
-                	when department='CET' then '#8ce089'
-                	when department='CAFAD' then '#aa8ed1'
-                	else '#e89374'
+                	when department='CICS' then '#302977'
+                	when department='COE' then '#C30D26'
+                	when department='CET' then '#FFAE4C'
+                	when department='CAFAD' then '#8BA757'
+                	else '#7C7070'
                 end as color,
                 
                 sum(count) as visitors, 
