@@ -8,7 +8,7 @@ interface SettingsModalProps {
 
 const initialDepartments = [
 	{ name: 'CAFAD', color: '#8BA757' },
-  { name: 'CET', color: '#FFAE4C' },
+  	{ name: 'CET', color: '#FFAE4C' },
 	{ name: 'CICS', color: '#201693' },
 	{ name: 'CoE', color: '#C30D26' },
 	{ name: 'Others', color: '#7C7070' },

@@ -38,6 +38,7 @@ import { MonthlyVisitorSummary } from "@/types/dashboard.types";
 import { useDashboardStore } from "./stores/useDashboardStore";
 import { format } from "date-fns";
 import { exportToCSV } from "@/utils/export-csv";
+import { ToastContainer } from "react-toastify";
 
 const DashboardHome: React.FC = () => {
   const {
@@ -45,6 +46,7 @@ const DashboardHome: React.FC = () => {
     filteredVisitorData,
     filteredVisitorSummaryData,
     filteredLibraryUserData,
+    departmentColors,
     setMonth,
     setYear,
     setSearchTerm,
@@ -77,16 +79,9 @@ const DashboardHome: React.FC = () => {
     (new Date().getFullYear() - 5 + i).toString()
   );
 
-  const legendData = [
-    { name: "CoE", color: "#C30D26" },
-    { name: "CAFAD", color: "#8BA757" },
-    { name: "CET", color: "#FFAE4C" },
-    { name: "CICS", color: "#302977" },
-    { name: "Others", color: "#7C7070" },
-  ];
-
   return (
     <div className="p-6 space-y-6">
+      <ToastContainer/>
       {/* Header */}
       <div className="flex justify-between items-center">
         <h1 className="font-poppins text-primary text-4xl xl:text-5xl font-semibold">
@@ -220,7 +215,7 @@ const DashboardHome: React.FC = () => {
                   align="right"
                   iconSize={10}
                   iconType="circle"
-                  payload={legendData.map((item) => ({
+                  payload={departmentColors.map((item) => ({
                     value: item.name,
                     type: "circle",
                     color: item.color,

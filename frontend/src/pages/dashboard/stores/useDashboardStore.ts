@@ -1,16 +1,19 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { DashboardService } from "@/services/dashboard.service";
+import { toast } from "react-toastify";
 import {
   DashboardFilters,
   DailyVisitorEntry,
   MonthlyVisitorSummary,
   LibraryUser,
+  DepartmentColors,
 } from "@/types/dashboard.types";
 import {
   transformMonthlySummaryData,
   transformDailyVisitorData,
   transformLibraryUserData,
+  extractDepartmentColors,
 } from "@/utils/dashboard-transformers";
 
 interface DashboardStore {
@@ -22,6 +25,7 @@ interface DashboardStore {
   filteredVisitorData: DailyVisitorEntry[];
   filteredVisitorSummaryData: MonthlyVisitorSummary[];
   filteredLibraryUserData: LibraryUser[];
+  departmentColors: DepartmentColors[];
   isLoading: boolean;
   error: string | null;
   fetchDashboardData: () => Promise<void>;
@@ -41,6 +45,7 @@ export const useDashboardStore = create<DashboardStore>()(
       filteredVisitorSummaryData: [],
       filteredVisitorData: [],
       filteredLibraryUserData: [],
+      departmentColors: [],
       isLoading: false,
       error: null,
 
@@ -68,6 +73,9 @@ export const useDashboardStore = create<DashboardStore>()(
             monthlySummaryResponse
           );
 
+          const transformedDepartmentColors =
+            extractDepartmentColors(transformedSummary);
+
           const transformedDailyVisitors =
             transformDailyVisitorData(transformedSummary);
 
@@ -79,18 +87,19 @@ export const useDashboardStore = create<DashboardStore>()(
             filteredVisitorSummaryData: transformedSummary,
             filteredVisitorData: transformedDailyVisitors,
             filteredLibraryUserData: transformedLibraryUsers,
+            departmentColors: transformedDepartmentColors,
             isLoading: false,
           });
 
           get().applyFilters();
         } catch (error) {
-          set({
-            isLoading: false,
-            error:
-              error instanceof Error
-                ? error.message
-                : "An unknown error occurred",
-          });
+          const errorMessage =
+            error instanceof Error
+              ? error.message
+              : "An unknown error occurred";
+
+          set({ isLoading: false, error: errorMessage });
+          toast.error(`${errorMessage}`);
         }
       },
 

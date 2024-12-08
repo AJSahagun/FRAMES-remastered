@@ -40,11 +40,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
 import { useDashboardStore } from "./stores/useDashboardStore";
 import { LibraryUser, parseDateTime } from "@/types/dashboard.types";
 import { exportToCSV } from "@/utils/export-csv";
 import TablePagination from "@/components/TablePagination";
+import { ToastContainer } from "react-toastify";
 
 export const VisitorHistory: React.FC = () => {
   const {
@@ -188,7 +188,8 @@ export const VisitorHistory: React.FC = () => {
   };
 
   return (
-    <div className="p-6 bg-background rounded-lg">
+    <div className="p-6">
+      <ToastContainer/>
       <div className="flex justify-between items-center mb-4">
         <h1 className="font-poppins text-primary text-4xl xl:text-5xl font-semibold">
           Visitor History

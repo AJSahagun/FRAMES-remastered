@@ -26,10 +26,15 @@ export interface LibraryUser {
 
 export const parseDateTime = (dateString: string): Date => {
   return new Date(dateString);
-}
+};
 
 export interface DashboardFilters {
   month: string;
   year: string;
   searchTerm: string;
+}
+
+export interface DepartmentColors {
+  name: string;
+  color: string;
 }

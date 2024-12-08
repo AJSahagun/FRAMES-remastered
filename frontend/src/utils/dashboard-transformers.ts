@@ -2,16 +2,30 @@ import {
   DailyVisitorEntry,
   MonthlyVisitorSummary,
   LibraryUser,
+  DepartmentColors
 } from "@/types/dashboard.types";
 import { monthlySummaryResponse, HistoryResponse } from "@/types/db.types";
 
-const DEPARTMENT_COLORS: Record<string, string> = {
-  COE: "#C30D26",
-  CAFAD: "#8BA757",
-  CET: "#FFAE4C",
-  CICS: "#302977",
-  default: "#7C7070",
+export const extractDepartmentColors = (
+  summaryData: MonthlyVisitorSummary[]
+): DepartmentColors[] => {
+  const uniqueDepartments = new Map<string, string>();
+
+  summaryData.forEach(({ department, color }) => {
+    const departmentName = department || "Others";
+    const departmentColor = color || "#7C7070";
+
+    if (!uniqueDepartments.has(departmentName)) {
+      uniqueDepartments.set(departmentName, departmentColor);
+    }
+  });
+
+  return Array.from(uniqueDepartments.entries()).map(([name, color]) => ({
+    name,
+    color,
+  }));
 };
+
 
 export const transformMonthlySummaryData = (
   response: monthlySummaryResponse[]
@@ -29,9 +43,7 @@ export const transformMonthlySummaryData = (
           count,
         ])
       ),
-      color:
-        DEPARTMENT_COLORS[visitorGroup.department] ||
-        DEPARTMENT_COLORS["default"],
+      color: visitorGroup.color || "#7C7070",
     }))
     .sort((a, b) => (a.department || "").localeCompare(b.department || ""));
 };
