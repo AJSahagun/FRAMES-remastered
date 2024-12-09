@@ -5,11 +5,13 @@ export default function LoginPage() {
     <div className="flex flex-col h-dvh">
       {/* logo */}
       <div className="w-full items-baseline justify-normal xl:w-4/12 mt-8 xl:ml-16">
+      <a href="/">
         <img
           src="logos\FRAMES_title-logo.png"
           alt="FRAMES logo"
           className="w-2/5"
         />
+        </a>
       </div>
 
       <div className="w-full flex flex-row">

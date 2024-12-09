@@ -44,6 +44,7 @@ const Form: React.FC = () => {
 		{ setSubmitting }: FormikHelpers<FormValues>
 		) => {
 			setTimeout(() => {
+				console.log(values);
 				setSubmitting(false);
 			}, 1000);
 		};
