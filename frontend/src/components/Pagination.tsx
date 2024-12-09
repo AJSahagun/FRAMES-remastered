@@ -1,7 +1,11 @@
-import { usePaginationStore } from "../pages/register/stores/usePaginationStore";
+import { useRegisterPaginationStore } from "../pages/register/stores/useRegisterPaginationStore";
 
-const Pagination = () => {
-  const { currentPage } = usePaginationStore();
+interface PaginationProps {
+  store: () => { currentPage: number };
+}
+
+const Pagination: React.FC<PaginationProps> = ({ store }) => {
+  const { currentPage } = store();
 
   return (
     <div className="flex justify-center items-center space-x-3 my-6 lg:my-2">
@@ -18,4 +22,5 @@ const Pagination = () => {
   );
 };
 
-export default Pagination;
+// Usage in different components
+export const RegisterPagination = () => <Pagination store={useRegisterPaginationStore} />;

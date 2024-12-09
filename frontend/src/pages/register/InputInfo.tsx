@@ -1,4 +1,3 @@
-// InputInfo.tsx
 import React from "react";
 import { useRegistrationStore } from "./stores/useRegistrationStore";
 import { Formik, Form, Field, ErrorMessage } from 'formik';

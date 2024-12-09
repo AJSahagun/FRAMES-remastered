@@ -6,8 +6,9 @@ import FaceRecognition from '../../components/FaceRecognition';
 import { toast } from 'react-toastify';
 import { db } from '../../config/db';
 import { useSync } from './hooks/useSync';
-import { findBestMatchBySchoolId } from '../../services/faceMatchService';
+import { findBestMatchBySchoolId } from '../../services/facematch.service';
 import { Encodings } from '../../types/db.types';
+import { SettingsService } from '@/services/settings.service';
 
 interface FormValues {
   schoolId: string;
@@ -31,8 +32,9 @@ const validationSchema = Yup.object({
 export default function Access_IN() {
   const [time, setTime] = useState(new Date().toLocaleTimeString());
   const [occupantCount, setOccupantCount] = useState<number>(0);
-  const [isConnected] = useSync();
+  const { syncStatus } = useSync();
   const [shouldCapture, setShouldCapture] = useState(false);
+  const [occupantLimit, setOccupantLimit] = useState<number>(0);
   const formikRef = useRef<FormikProps<FormValues>>(null);
   const date = new Date().toLocaleDateString('en-us', { weekday: "long", year: "numeric", month: "short", day: "numeric" });
   const date2 = new Date().toISOString();
@@ -47,7 +49,6 @@ export default function Access_IN() {
       console.error('Error fetching occupant count:', error);
     }
   };
-  
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -62,6 +63,22 @@ export default function Access_IN() {
       clearInterval(timer);
       clearInterval(interval);
     };
+  }, []);
+
+  useEffect(() => {
+    const fetchOccupantLimit = async () => {
+      try {
+        const response = await SettingsService.getMaxOccupants();
+        setOccupantLimit(response.max_occupants);
+      } catch (error) {
+        console.error("Error fetching occupant limit:", error);
+        toast.error("Failed to load current occupant limit.", {
+          position: "top-center",
+        });
+      }
+    };
+
+    fetchOccupantLimit();
   }, []);
 
   const recordLatestEncoding = async (data:Encodings)=>{
@@ -191,9 +208,9 @@ export default function Access_IN() {
                       </p>
                     </div>
                     <div className="flex items-start mt-1 mr-8">
-                      <div className={`flex items-center space-x-2 ${isConnected ? 'text-green-500' : 'text-primary'}`}>
-                        <span className="font-poppins text-xl">{isConnected ? 'Online' : 'Offline'}</span>
-                        <div className={`w-4 h-4 rounded-full ${isConnected ? 'bg-green-500' : 'bg-btnBg'}`} />
+                      <div className={`flex items-center space-x-2 ${syncStatus.isConnected ? 'text-green-500' : 'text-primary'}`}>
+                        <span className="font-poppins text-xl">{syncStatus.isConnected ? 'Online' : 'Offline'}</span>
+                        <div className={`w-4 h-4 rounded-full ${syncStatus.isConnected ? 'bg-green-500' : 'bg-btnBg'}`} />
                       </div>
                     </div>
                   </div>
@@ -211,7 +228,7 @@ export default function Access_IN() {
                         type="text"
                         name="schoolId"
                         placeholder="Enter code"
-                        autocomplete="off"
+                        autoComplete="off"
                         className="w-full px-8 py-4 rounded-md bg-accent font-poppins text-white text-lg placeholder:text-lg placeholder:font-poppins focus:outline-secondary"
                       />
                       {formikProps.values.schoolId && (
@@ -231,7 +248,7 @@ export default function Access_IN() {
                     <p>
                       <span className="font-poppins font-semibold text-7xl gradient-text">{occupantCount}</span>
                       <span className="font-poppins font-medium text-5xl text-accent">/</span>
-                      <span className="font-poppins font-semibold text-5xl text-accent">250</span>
+                      <span className="font-poppins font-semibold text-5xl text-accent">{occupantLimit}</span>
                     </p>
                     <h2 className="font-noto_sans font-semibold text-5xl text-accent">OCCUPANTS</h2>
                   </div>

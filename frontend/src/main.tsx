@@ -1,7 +1,10 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { createBrowserRouter, RouterProvider} from 'react-router-dom';
-
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { ProtectedRoute } from './components/ProtectedRoute';
+import { WebSocketProvider } from './pages/access/contexts/WebSocketContext';
+import { setupAuthInterceptor } from './services/auth.service';
+import DashboardLayout from './pages/dashboard/layout/DashboardLayout';
 import './index.css'
 import App from './App';
 import Register from './pages/register/register-page';
@@ -9,7 +12,12 @@ import LearnMore from './pages/register/LearnMore';
 import Access_IN from './pages/access/access-in';
 import Access_OUT from './pages/access/access-out';
 import LoginPage from './pages/login/Login';
+import VisitorHistory from './pages/dashboard/VisitorHistory';
+import DashboardHome from './pages/dashboard/Home';
+import ManageUsers from './pages/dashboard/ManageUsers';
+import TermsOfService from './pages/dashboard/TermsOfService';
 
+setupAuthInterceptor();
 
 const router = createBrowserRouter([
   {
@@ -25,21 +33,53 @@ const router = createBrowserRouter([
     element: <Register/>
   },
   {
-    path: '/access/in',
-    element: <Access_IN/>
-  },
-  {
-    path: '/access/out',
-    element: <Access_OUT/>
-  },
-  {
     path: '/login',
     element: <LoginPage/>
+  },
+  {
+    element: <ProtectedRoute allowedRoles={['librarian', 'admin']} />,
+    children: [
+      {
+        element: <DashboardLayout />,
+        children: [
+          {
+            path: '/dashboard',
+            element: <DashboardHome />
+          },
+          {
+            path: '/dashboard/visitor-history',
+            element: <VisitorHistory/>
+          },
+          {
+            path: '/dashboard/manage-users',
+            element: <ManageUsers/>
+          },
+          {
+            path: '/dashboard/terms-of-service',
+            element: <TermsOfService/>
+          }
+        ]
+      },
+      {
+        path: '/access/in',
+        element: <Access_IN/>
+      },
+      {
+        path: '/access/out',
+        element: <Access_OUT/>
+      }
+    ]
+  },
+  {
+    path: '/unauthorized',
+    element: <div>Unauthorized Access</div>
   }
-])
+]);
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <RouterProvider router={router}/>
+    <WebSocketProvider>
+      <RouterProvider router={router}/>
+    </WebSocketProvider>
   </StrictMode>
 )
