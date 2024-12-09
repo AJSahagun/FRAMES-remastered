@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { MDXEditor } from "@mdxeditor/editor";
+import { MDXEditor, MDXEditorMethods } from "@mdxeditor/editor";
 import {
   headingsPlugin,
   listsPlugin,
@@ -8,7 +8,6 @@ import {
   toolbarPlugin,
   UndoRedo,
   BoldItalicUnderlineToggles,
-  // CodeToggle,
   ListsToggle,
   BlockTypeSelect,
 } from "@mdxeditor/editor";
@@ -33,10 +32,11 @@ const TermsOfService: React.FC = () => {
   const [editorEnabled, setEditorEnabled] = useState(false);
   const [markdown, setMarkdown] = useState("");
   const [isPreview, setIsPreview] = useState(false);
+  const [isRawText, setIsRawText] = useState(false);
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const editorRef = React.useRef<MDXEditorMethods>(null);
 
-  // Fetch initial TOS on component mount
   useEffect(() => {
     const fetchTOS = async () => {
       try {
@@ -71,12 +71,20 @@ const TermsOfService: React.FC = () => {
     setIsPreview(checked);
   };
 
+  const handleRawTextToggle = (checked: boolean) => {
+    setIsRawText(checked);
+  };
+
   const openSaveModal = () => {
     setIsSaveModalOpen(true);
   };
 
+  const handleManualMarkdownChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setMarkdown(e.target.value);
+  };
+
   return (
-    <div className="h-screen flex-grow flex flex-col p-6 px-8">
+    <div className="h-screen flex flex-col p-6 px-8">
       {/* Header */}
       <div className="flex justify-between items-center mb-4 mt-4">
         <h1 className="font-poppins text-primary text-3xl xl:text-4xl font-semibold">
@@ -91,56 +99,82 @@ const TermsOfService: React.FC = () => {
               onCheckedChange={handlePreviewToggle}
             />
           </div>
+          {editorEnabled && (
+            <div className="flex items-center space-x-2">
+              <Label htmlFor="raw-text-toggle">Raw Text</Label>
+              <Switch
+                id="raw-text-toggle"
+                checked={isRawText}
+                onCheckedChange={handleRawTextToggle}
+              />
+            </div>
+          )}
         </div>
       </div>
 
       {/* Content Area */}
-      <div className="flex flex-col px-28">
+      <div className="flex-grow flex flex-col px-28 overflow-hidden">
         {editorEnabled ? (
-          <div className="flex-grow border-2 border-accent rounded-md overflow-hidden">
+          <div className="flex-grow border-2 border-accent rounded-md overflow-hidden flex flex-col">
             <div className="bg-green-100 p-2 text-center">
               <p className="text-sm text-green-950">
                 You are currently editing
               </p>
             </div>
 
-            <MDXEditor
-              contentEditableClassName="prose"
-              markdown={markdown}
-              plugins={[
-                headingsPlugin(),
-                listsPlugin(),
-                quotePlugin(),
-                markdownShortcutPlugin(),
-                toolbarPlugin({
-                  toolbarContents: () => (
-                    <>
-                      <UndoRedo />
-                      <BoldItalicUnderlineToggles />
-                      <ListsToggle />
-                      <BlockTypeSelect />
-                    </>
-                  ),
-                }),
-              ]}
-              onChange={(newMarkdown) => {
-                console.log("Updated Markdown:", newMarkdown);
-                setMarkdown(newMarkdown);
-              }}
-              readOnly={isPreview}
-            />
+            {isRawText ? (
+              <textarea
+                className="w-full h-full p-4 resize-none overflow-auto"
+                value={markdown}
+                onChange={handleManualMarkdownChange}
+                placeholder="Enter markdown text here..."
+              />
+            ) : (
+              <MDXEditor
+                ref={editorRef}
+                className="h-full overflow-auto"
+                contentEditableClassName="prose"
+                markdown={markdown}
+                plugins={[
+                  headingsPlugin(),
+                  listsPlugin(),
+                  quotePlugin(),
+                  markdownShortcutPlugin(),
+                  toolbarPlugin({
+                    toolbarContents: () => (
+                      <>
+                        <UndoRedo />
+                        <BoldItalicUnderlineToggles />
+                        <ListsToggle />
+                        <BlockTypeSelect />
+                      </>
+                    ),
+                  }),
+                ]}
+                onChange={(newMarkdown) => {
+                  setMarkdown(newMarkdown);
+                }}
+                readOnly={isPreview}
+              />
+            )}
           </div>
         ) : (
           <div className="flex-grow border rounded-md overflow-auto p-4 bg-slate-50">
             {isPreview ? (
               <MDXEditor
+              ref={editorRef}
+                className="h-full overflow-auto"
                 contentEditableClassName="prose"
                 markdown={markdown}
-                plugins={[headingsPlugin()]}
+                plugins={[
+                  headingsPlugin(),
+                  listsPlugin(),
+                  quotePlugin(),
+                ]}
                 readOnly={true}
               />
             ) : (
-              <pre className="whitespace-pre-wrap">{markdown}</pre>
+              <pre className="whitespace-pre-wrap overflow-auto h-full">{markdown}</pre>
             )}
           </div>
         )}
