@@ -4,7 +4,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { WebSocketProvider } from './pages/access/contexts/WebSocketContext';
 import { setupAuthInterceptor } from './services/auth.service';
-import DashboardLayout from './components/DashboardLayout';
+import DashboardLayout from './pages/dashboard/layout/DashboardLayout';
 import './index.css'
 import App from './App';
 import Register from './pages/register/register-page';

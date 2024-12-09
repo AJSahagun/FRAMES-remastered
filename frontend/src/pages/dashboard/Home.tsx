@@ -50,7 +50,7 @@ const DashboardHome: React.FC = () => {
     setMonth,
     setYear,
     setSearchTerm,
-    resetFilters,
+    resetFilters
   } = useDashboardStore();
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 3;
@@ -81,7 +81,7 @@ const DashboardHome: React.FC = () => {
 
   return (
     <div className="p-4 px-8 space-y-6 h-dvh">
-      <ToastContainer/>
+      <ToastContainer />
       {/* Header */}
       <div className="flex justify-between items-center">
         <h1 className="font-poppins text-primary text-3xl xl:text-4xl font-semibold">

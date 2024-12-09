@@ -203,5 +203,3 @@ export const useDashboardStore = create<DashboardStore>()(
     }
   )
 );
-
-useDashboardStore.getState().fetchDashboardData();
