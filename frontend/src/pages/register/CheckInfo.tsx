@@ -53,7 +53,6 @@ const CheckInfo: React.FC<CheckInfoProps> = () => {
       const response = await UserService.registerUser(formData);
   
       if (response.statusCode === 202) {
-        console.log('Registration successful:', response.message);
         toast.success('Your information has been submitted successfully.');
   
         resetForm();
@@ -69,9 +68,7 @@ const CheckInfo: React.FC<CheckInfoProps> = () => {
     }
   };
 
-  const handleConfirmSubmit = () => {
-    console.log("handleConfirmSubmit called with formData:", formData);
-  
+  const handleConfirmSubmit = () => {  
     if (validateFormData(formData)) {
       handleSubmit(formData);
     } else {

@@ -31,7 +31,6 @@ export default function Register() {
     if (isFormValid) {
       submitForm();
       localStorage.setItem("formData", JSON.stringify(localFormData));
-      console.log("Cached formData:", JSON.stringify(localFormData));
       nextPage();
     }
   };
