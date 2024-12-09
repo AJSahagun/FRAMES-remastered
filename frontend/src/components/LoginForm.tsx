@@ -27,10 +27,12 @@ const LoginForm: React.FC = () => {
       toast.success("Login Successful");
       
       setTimeout(() => {
+        setIsLoading(false);
         navigate("/dashboard");
       }, 1000);
     } catch (error) {
       console.error("Login Failed:", error);
+      setIsLoading(false);
       toast.error(error instanceof Error ? error.message : "Login failed");
     }
   };
