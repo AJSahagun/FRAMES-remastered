@@ -1,38 +1,37 @@
-import React, { useState, useEffect } from 'react';
-import { MDXEditor } from '@mdxeditor/editor';
-import { 
-  headingsPlugin, 
-  listsPlugin, 
-  quotePlugin, 
+import React, { useState, useEffect } from "react";
+import { MDXEditor } from "@mdxeditor/editor";
+import {
+  headingsPlugin,
+  listsPlugin,
+  quotePlugin,
   markdownShortcutPlugin,
   toolbarPlugin,
   UndoRedo,
   BoldItalicUnderlineToggles,
   // CodeToggle,
   ListsToggle,
-  BlockTypeSelect
-
-} from '@mdxeditor/editor';
-import '@mdxeditor/editor/style.css';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle, 
+  BlockTypeSelect,
+} from "@mdxeditor/editor";
+import "@mdxeditor/editor/style.css";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
   DialogDescription,
   DialogFooter,
-  DialogClose 
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
-import { SettingsService } from '@/services/settings.service';
+  DialogClose,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { SettingsService } from "@/services/settings.service";
 
 const TermsOfService: React.FC = () => {
   const [editorEnabled, setEditorEnabled] = useState(false);
-  const [markdown, setMarkdown] = useState('');
+  const [markdown, setMarkdown] = useState("");
   const [isPreview, setIsPreview] = useState(false);
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -44,7 +43,7 @@ const TermsOfService: React.FC = () => {
         const response = await SettingsService.getTOS();
         setMarkdown(response.tos);
       } catch {
-        toast.error('Failed to fetch Terms of Service');
+        toast.error("Failed to fetch Terms of Service");
       }
     };
     fetchTOS();
@@ -58,11 +57,11 @@ const TermsOfService: React.FC = () => {
     setIsLoading(true);
     try {
       await SettingsService.updateTOS({ tos: markdown });
-      toast.success('Terms of Service updated successfully');
+      toast.success("Terms of Service updated successfully");
       setEditorEnabled(false);
       setIsSaveModalOpen(false);
     } catch {
-      toast.error('Failed to update Terms of Service');
+      toast.error("Failed to update Terms of Service");
     } finally {
       setIsLoading(false);
     }
@@ -86,7 +85,7 @@ const TermsOfService: React.FC = () => {
         <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-2">
             <Label htmlFor="preview-toggle">Preview Mode</Label>
-            <Switch 
+            <Switch
               id="preview-toggle"
               checked={isPreview}
               onCheckedChange={handlePreviewToggle}
@@ -100,11 +99,13 @@ const TermsOfService: React.FC = () => {
         {editorEnabled ? (
           <div className="flex-grow border-2 border-accent rounded-md overflow-hidden">
             <div className="bg-green-100 p-2 text-center">
-              <p className="text-sm text-green-950">You are currently editing</p>
+              <p className="text-sm text-green-950">
+                You are currently editing
+              </p>
             </div>
-            
-            <MDXEditor 
-              className="prose prose-lg"
+
+            <MDXEditor
+              contentEditableClassName="prose"
               markdown={markdown}
               plugins={[
                 headingsPlugin(),
@@ -115,26 +116,26 @@ const TermsOfService: React.FC = () => {
                   toolbarContents: () => (
                     <>
                       <UndoRedo />
-                      <BoldItalicUnderlineToggles/>
-                      <ListsToggle/>
+                      <BoldItalicUnderlineToggles />
+                      <ListsToggle />
                       <BlockTypeSelect />
-
                     </>
-                  )
-                })
+                  ),
+                }),
               ]}
               onChange={(newMarkdown) => {
-                console.log('Updated Markdown:', newMarkdown);
-                setMarkdown(newMarkdown)}
-              } 
+                console.log("Updated Markdown:", newMarkdown);
+                setMarkdown(newMarkdown);
+              }}
               readOnly={isPreview}
             />
           </div>
         ) : (
           <div className="flex-grow border rounded-md overflow-auto p-4 bg-slate-50">
             {isPreview ? (
-              <MDXEditor 
-                markdown={markdown} 
+              <MDXEditor
+                contentEditableClassName="prose"
+                markdown={markdown}
                 plugins={[headingsPlugin()]}
                 readOnly={true}
               />
@@ -149,23 +150,25 @@ const TermsOfService: React.FC = () => {
       <div className="flex justify-end mt-4 px-28">
         <div className="space-x-2">
           {!editorEnabled ? (
-            <Button onClick={handleEnableEditor} 
-            variant='outline'
-            className="bg-card ring-1 ring-accent hover:ring-offset-2 active:opacity-80"
+            <Button
+              onClick={handleEnableEditor}
+              variant="outline"
+              className="bg-card ring-1 ring-accent hover:ring-offset-2 active:opacity-80"
             >
               Edit Terms of Service
             </Button>
           ) : (
             <>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={() => setEditorEnabled(false)}
                 className="bg-card hover:brightness-75 active:opacity-80"
               >
                 Cancel
               </Button>
-              <Button onClick={openSaveModal}
-              className="hover:bg-btnBg bg-btnBg hover:brightness-75 active:opacity-80"
+              <Button
+                onClick={openSaveModal}
+                className="hover:bg-btnBg bg-btnBg hover:brightness-75 active:opacity-80"
               >
                 Save Changes
               </Button>
@@ -175,38 +178,34 @@ const TermsOfService: React.FC = () => {
       </div>
 
       {/* Save Confirmation Modal */}
-      <Dialog 
-        open={isSaveModalOpen} 
-        onOpenChange={setIsSaveModalOpen}
-      >
+      <Dialog open={isSaveModalOpen} onOpenChange={setIsSaveModalOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Confirm Save Changes</DialogTitle>
             <DialogDescription>
-              Are you sure you want to save these changes to the Terms of Service?
+              Are you sure you want to save these changes to the Terms of
+              Service?
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <DialogClose asChild>
-              <Button variant="outline"
-              className="bg-card"
-              >
+              <Button variant="outline" className="bg-card">
                 Cancel
               </Button>
             </DialogClose>
-            <Button 
-              onClick={handleSaveChanges} 
+            <Button
+              onClick={handleSaveChanges}
               disabled={isLoading}
               className="hover:bg-btnBg bg-btnBg hover:brightness-75 active:opacity-80"
             >
-              {isLoading ? 'Saving...' : 'Confirm Save'}
+              {isLoading ? "Saving..." : "Confirm Save"}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       {/* Toast Notifications */}
-      <ToastContainer 
+      <ToastContainer
         position="bottom-right"
         autoClose={3000}
         hideProgressBar={false}

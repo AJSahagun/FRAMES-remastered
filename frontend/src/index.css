@@ -83,44 +83,44 @@ body {
   background-color: hsl(10, 27%, 96%);
 }
 
-h1 {
+.prose h1 {
   font-size: 2em;
   font-weight: 600;
   word-spacing: 3%;
 }
 
 
-h2 {
+.prose h2 {
   font-size: 1.75em;
   font-weight: 600;
   word-spacing: 3%;
 }
 
-h3 {
+.prose h3 {
   font-size: 1.5em; 
   font-weight: 600;
   word-spacing: 3%;
 }
 
-h4 {
+.prose h4 {
   font-size: 1.25em;
   font-weight: 600;
   word-spacing: 3%;
 }
 
-h5 {
+.prose h5 {
   font-size: 1em; 
   font-weight: 600;
   word-spacing: 3%;
 }
 
-h6 {
+.prose h6 {
   font-size: 0.875em; 
   font-weight: 600;
   word-spacing: 3%;
 }
 
-blockquote {
+.prose blockquote {
   font-size: 1.2em;
   font-style: italic;
   color: #555;
