@@ -3,6 +3,7 @@ export const API_CONFIG = {
   API_KEY: import.meta.env.VITE_API_KEY || "",
   ENDPOINTS: {
     USER: "/api/v2/user",
+    SYNC_HISTORY: "/api/v2/history/",
     HISTORY: "/api/v2/history/query",
     LOGIN: "/api/v2/auth/login",
     ALL_PROGRAM_MONTH_BY_DAY: "/api/v2/dashboard/all-program-month-by-day",
