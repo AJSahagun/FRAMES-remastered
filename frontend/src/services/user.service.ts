@@ -12,8 +12,6 @@ export class UserService {
         API_CONFIG.ENDPOINTS.USER,
         backendData
       );
-
-      console.log('Backend response:', response.data);
       return response.data;
     } catch (error) {
       if (error instanceof AxiosError) {

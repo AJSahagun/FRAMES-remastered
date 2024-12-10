@@ -55,7 +55,6 @@ export class AccountService {
         API_CONFIG.ENDPOINTS.UPDATE_DELETE_ACCOUNT.replace(':username', username), 
         { headers }
       );
-      console.log(`Account with username ${username} has been deleted successfully.`);
     } catch (error) {
       if (error instanceof AxiosError) {
         console.error("Error deleting account:", error.response?.data || error.message);

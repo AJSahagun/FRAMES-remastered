@@ -13,7 +13,7 @@ export default function Access_OUT() {
   const [time, setTime] = useState(new Date().toLocaleTimeString());
   const [occupantCount, setOccupantCount] = useState<number>(0);
   const [occupantLimit, setOccupantLimit] = useState<number>(0);
-  const { rows, latestRequestTime } = useBulkRequest();
+  const { latestRequestTime } = useBulkRequest();
   const { syncStatus } = useSync();
   const date2=new Date().toISOString()
 
@@ -39,7 +39,6 @@ export default function Access_OUT() {
     const interval = setInterval(() => {
       fetchOccupantCount(); 
     }, 1000); 
-    console.log(rows+": "+latestRequestTime)
   
     // 3. Cleanup function to clear both the timer and the polling interval when the component unmounts
     return () => {

@@ -52,8 +52,6 @@ export const useBulkRequest = () => {
           latestRequestTime: currentTime,
           error: null
         });
-      } else {
-        console.log("No records to sync");
       }
     } catch (error) {
       console.error("Bulk request failed", error);
