@@ -34,11 +34,9 @@ export class UserGateway implements OnGatewayConnection, OnGatewayDisconnect{
       return;
     }
 
-    console.log('Client connected:', client.id);
   }
 
   handleDisconnect(client: Socket) {
-    console.log('Client disconnected:', client.id);
   }
 
 
