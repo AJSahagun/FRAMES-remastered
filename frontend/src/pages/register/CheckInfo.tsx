@@ -78,9 +78,13 @@ const CheckInfo: React.FC<CheckInfoProps> = () => {
   };
   
 
-  const filteredFormData = Object.entries(formData).filter(
-    ([key]) => (key !== 'encoding' && key !== 'imageUrl') ,
-  );
+  const filteredFormData = Object.entries(formData)
+  .filter(([key]) => key !== 'encoding' && key !== 'imageUrl')
+  .map(([key, value]) => {
+    // Use a regular expression to insert a space before each uppercase letter
+    const newKey = key.replace(/([A-Z])/g, ' $1');
+    return [newKey.trim(), value]; // Trim to remove leading space
+  });
 
 
   const departmentLabelMap = departmentOptions.reduce((acc, option) => {
@@ -129,9 +133,9 @@ const CheckInfo: React.FC<CheckInfoProps> = () => {
           key=='imageUrl'? null :(
             value !== '' && (
               <div key={key} className="flex flex-col mt-4 mx-12 w-4/5 lg:flex-row lg:w-full lg:mt-7">
-                <span className="font-semibold text-tc w-full">{key.charAt(0).toUpperCase() + key.slice(1)}</span>
-                <span className="w-full px-6 py-2 rounded-lg bg-sf">
-                  {key === 'department' ? departmentLabelMap[value] : key === 'program' ? programLabelMap[value] : typeof value === 'string' ? (value as string).toUpperCase() : value}
+                <span className="font-semibold text-tc w-full capitalize">{key.charAt(0) + key.slice(1)}</span>
+                <span className="w-full px-6 py-2 rounded-lg bg-sf capitalize">
+                  {key === 'department' ? departmentLabelMap[value] : key === 'program' ? programLabelMap[value] : typeof value === 'string' ? (value as string) : value}
                 </span>
               </div>
             )
