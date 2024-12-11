@@ -81,9 +81,8 @@ const CheckInfo: React.FC<CheckInfoProps> = () => {
   const filteredFormData = Object.entries(formData)
   .filter(([key]) => key !== 'encoding' && key !== 'imageUrl')
   .map(([key, value]) => {
-    // Use a regular expression to insert a space before each uppercase letter
     const newKey = key.replace(/([A-Z])/g, ' $1');
-    return [newKey.trim(), value]; // Trim to remove leading space
+    return [newKey.trim(), value];
   });
 
 
@@ -177,7 +176,7 @@ const CheckInfo: React.FC<CheckInfoProps> = () => {
       </div>
 
       {showConfirmDialog && (
-        <div className="fixed inset-0 flex items-center justify-center bg-card bg-opacity-50">
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30">
           <div className="bg-white px-8 py-6 rounded-lg shadow-md">
             <h3 className="text-lg font-bold mb-2 text-tc">Are you sure all the information you provided are correct?</h3>
             <div className="flex justify-end space-x-4">
