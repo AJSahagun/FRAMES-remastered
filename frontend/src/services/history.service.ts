@@ -7,7 +7,7 @@ export class HistoryService {
   static async recordHistory(data:Occupants[]): Promise<ApiResponse<Occupants>> {
     try {
       const response = await apiClient.post<ApiResponse<Occupants>>(
-        API_CONFIG.ENDPOINTS.HISTORY,
+        API_CONFIG.ENDPOINTS.ACCESS,
         data
       );
       return response.data;

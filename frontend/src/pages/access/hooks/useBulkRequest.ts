@@ -67,7 +67,7 @@ export const useBulkRequest = () => {
 
     const interval = setInterval(() => {
       sendBulkRequest();
-    }, 60 * 30 * 1000); // Every 30 minutes
+    }, 60 * 1 * 1000);
 
     return () => clearInterval(interval);
   }, [isAuthenticated, sendBulkRequest]);
