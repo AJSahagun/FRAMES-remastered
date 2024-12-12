@@ -39,6 +39,7 @@ export default function Access_OUT() {
     const interval = setInterval(() => {
       fetchOccupantCount(); 
     }, 1000); 
+    console.log(latestRequestTime)
   
     // 3. Cleanup function to clear both the timer and the polling interval when the component unmounts
     return () => {

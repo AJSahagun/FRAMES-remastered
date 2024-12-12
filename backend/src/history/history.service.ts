@@ -15,11 +15,24 @@ export class HistoryService {
       const historyValues = createHistoryDto.map((dto) => {
         const timeIn = dto.time_in;
         const timeOut = dto.time_out || null;
-        return `('${dto.school_id}', '${timeIn}', ${timeOut ? `'${timeOut}'` : 'NULL'})`;
+  
+        // Extract year, month, and day from time_out if it exists
+        const timeOutYear = timeOut ? new Date(timeOut).getFullYear() : null;
+        const timeOutMonth = timeOut ? new Date(timeOut).getMonth() + 1 : null; // Months are 0-based
+        const timeOutDay = timeOut ? new Date(timeOut).getDate() : null;
+  
+        return `(
+          '${dto.school_id}', 
+          '${timeIn}', 
+          ${timeOut ? `'${timeOut}'` : 'NULL'}, 
+          ${timeOutYear ? `'${timeOutYear}'` : 'NULL'}, 
+          ${timeOutMonth ? `'${timeOutMonth}'` : 'NULL'}, 
+          ${timeOutDay ? `'${timeOutDay}'` : 'NULL'}
+        )`;
       });
 
       const historyInsertQuery = `
-        INSERT INTO history ("school_id", "time_in", "time_out")
+        INSERT INTO history ("school_id", "time_in", "time_out", "time_out_year", "time_out_month", "time_out_day")
         VALUES ${historyValues.join(', ')};
       `;
 
