@@ -1,4 +1,4 @@
-import { IsJSON, IsNotEmpty, IsOptional } from 'class-validator';
+import { ArrayMaxSize, ArrayMinSize, IsArray, IsJSON, IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
 import { Role } from '../../core/config/role.enum';
 
 export class CreateUserV2Dto {
@@ -20,6 +20,9 @@ export class CreateUserV2Dto {
   @IsOptional()
   program: string;
 
-  @IsNotEmpty()
+  @IsArray()
+  @ArrayMinSize(128)
+  @ArrayMaxSize(128)
+  @IsNumber({}, { each: true })
   encoding: number[];
 }
