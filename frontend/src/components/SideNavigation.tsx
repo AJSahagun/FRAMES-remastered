@@ -1,0 +1,140 @@
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuthStore } from '../services/auth.service.ts';
+import { useNavigationStore } from '../pages/dashboard/stores/useNavigationStore.ts';
+import UserProfileModal from './UserProfileModal.tsx';
+import { NavItem } from '../types/navigation.types.ts';
+import { FiLogOut } from "react-icons/fi";
+
+const NAV_ITEMS: NavItem[] = [
+  { 
+    id: 'dashboard', 
+    label: 'Dashboard', 
+    path: '/dashboard',
+    newTab: false
+  },
+  { 
+    id: 'visitor-history', 
+    label: 'Visitor History', 
+    path: '/dashboard/visitor-history',
+    newTab: false
+  },
+  { 
+    id: 'access-in', 
+    label: 'Access Check-in', 
+    path: '/access/in',
+    newTab: true
+  },
+  { 
+    id: 'access-out', 
+    label: 'Access Check-out', 
+    path: '/access/out',
+    newTab: true
+  },
+  {
+    id: 'manage-user',
+    label: 'Manage Users',
+    path: '/dashboard/manage-users',
+    newTab: false,
+    roles: ['admin']
+  },
+  {
+    id: 'terms-of-service',
+    label: 'Terms of Service',
+    path: '/dashboard/terms-of-service',
+    newTab: false,
+    roles: ['admin']
+  }
+];
+
+// Function to get navigation items based on user role
+const getNavItemsForRole = (role: string): NavItem[] => {
+  return NAV_ITEMS.filter(item => !item.roles || item.roles.includes(role));
+};
+
+const SideNavigation: React.FC = () => {
+  const navigate = useNavigate();
+  const { user } = useAuthStore();
+  const { currentPath, setCurrentPath } = useNavigationStore();
+  const [isUserModalOpen, setIsUserModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (isUserModalOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
+    }
+  }, [isUserModalOpen]);
+
+  const handleNavItemClick = (path: string, newTab: boolean = false) => {
+    if (newTab) {
+      window.open(path, '_blank');
+    } else {
+      navigate(path);
+      setCurrentPath(path);
+    }
+  };
+
+  const navItemsForUser = user ? getNavItemsForRole(user.role) : [];
+
+  return (
+    <>
+    <div 
+      className="fixed left-0 top-0 h-full w-1/4 xl:w-1/5 bg-gradient-to-bl from-tc to-80% to-btnHover text-white flex flex-col drop-shadow-2xl"
+    >
+      {/* Top Logo/Icon Section */}
+      <div className="flex justify-center items-center py-6">
+        <div className="xl:w-64 flex items-center justify-center">
+          <img src="\logos\frames-white-logo-big.png" alt="Frames White Logo" />
+        </div>
+      </div>
+
+      {/* Navigation Items */}
+      <nav className="flex-grow pl-6 xl:pl-8 space-y-1 text-white font-noto_sans text-base xl:text-lg">
+        {navItemsForUser.map((item) => (
+          <button
+            key={item.id}
+            onClick={() => handleNavItemClick(item.path, item.newTab)}
+            className={`
+              w-full flex items-center space-x-3 py-2 pl-6 xl:pl-8 rounded-l-full transition-colors duration-200
+              ${currentPath === item.path 
+                ? 'bg-tc font-normal' 
+                : 'hover:bg-red-700/50 font-light'}
+            `}
+          >
+            <span>{item.label}</span>
+          </button>
+        ))}
+      </nav>
+
+      {/* User Profile Section */}
+      {user && (
+        <div 
+          className="p-4 border-t border-red-700 flex items-center space-x-3 cursor-pointer hover:bg-btnBg"
+          onClick={() => setIsUserModalOpen(true)}
+        >
+          <img 
+            src="logos/user-logo.jpg"
+            alt={user.username} 
+            className="w-12 h-12 rounded-full object-cover"
+          />
+          <div>
+            <div className="font-semibold">{user.username}</div>
+            <div className="text-sm text-red-200 capitalize">{user.role}</div>
+          </div>
+          <FiLogOut className='w-full right-0'/>
+        </div>
+      )}
+    </div>
+
+      {/* User Profile Modal */}
+      {isUserModalOpen && (
+        <UserProfileModal 
+          onClose={() => setIsUserModalOpen(false)}
+        />
+      )}
+    </>
+  );
+};
+
+export default SideNavigation;

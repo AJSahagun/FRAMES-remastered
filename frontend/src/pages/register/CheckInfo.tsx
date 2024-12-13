@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { useRegistrationStore } from './stores/useRegistrationStore';
-import { usePaginationStore } from './stores/usePaginationStore';
+import { useRegisterPaginationStore } from './stores/useRegisterPaginationStore';
 import { useImageStore } from './stores/useImgStore';
 import { UserService } from '../../services/user.service';
 import { UserRegistrationData } from '../../types/user.types';
@@ -16,7 +16,7 @@ interface CheckInfoProps {
 
 const CheckInfo: React.FC<CheckInfoProps> = () => {
   const { formData, resetForm } = useRegistrationStore();
-  const { prevPage } = usePaginationStore();
+  const { prevPage } = useRegisterPaginationStore();
   const { imageUrl } = useImageStore();
   const navigate = useNavigate();
   const [hasAgreedToTerms, setHasAgreedToTerms] = useState(false);
@@ -53,7 +53,6 @@ const CheckInfo: React.FC<CheckInfoProps> = () => {
       const response = await UserService.registerUser(formData);
   
       if (response.statusCode === 202) {
-        console.log('Registration successful:', response.message);
         toast.success('Your information has been submitted successfully.');
   
         resetForm();
@@ -69,9 +68,7 @@ const CheckInfo: React.FC<CheckInfoProps> = () => {
     }
   };
 
-  const handleConfirmSubmit = () => {
-    console.log("handleConfirmSubmit called with formData:", formData);
-  
+  const handleConfirmSubmit = () => {  
     if (validateFormData(formData)) {
       handleSubmit(formData);
     } else {
@@ -81,9 +78,12 @@ const CheckInfo: React.FC<CheckInfoProps> = () => {
   };
   
 
-  const filteredFormData = Object.entries(formData).filter(
-    ([key]) => (key !== 'encoding' && key !== 'imageUrl') ,
-  );
+  const filteredFormData = Object.entries(formData)
+  .filter(([key]) => key !== 'encoding' && key !== 'imageUrl')
+  .map(([key, value]) => {
+    const newKey = key.replace(/([A-Z])/g, ' $1');
+    return [newKey.trim(), value];
+  });
 
 
   const departmentLabelMap = departmentOptions.reduce((acc, option) => {
@@ -110,7 +110,7 @@ const CheckInfo: React.FC<CheckInfoProps> = () => {
   return (
     <div className="w-full relative justify-center items-center">
       <div className="text-center">
-      <h1 className="text-tc font-poppins md:text-5xl lg:mt-2">Confirmation</h1>
+      <h1 className="text-tc font-poppins font-semibold md:text-5xl lg:mt-2">Confirmation</h1>
       </div>
       <ToastContainer position="top-center"/>
 
@@ -132,9 +132,9 @@ const CheckInfo: React.FC<CheckInfoProps> = () => {
           key=='imageUrl'? null :(
             value !== '' && (
               <div key={key} className="flex flex-col mt-4 mx-12 w-4/5 lg:flex-row lg:w-full lg:mt-7">
-                <span className="font-semibold text-tc w-full">{key.charAt(0).toUpperCase() + key.slice(1)}</span>
-                <span className="w-full px-6 py-2 rounded-lg bg-sf">
-                  {key === 'department' ? departmentLabelMap[value] : key === 'program' ? programLabelMap[value] : typeof value === 'string' ? (value as string).toUpperCase() : value}
+                <span className="font-semibold text-tc w-full capitalize">{key.charAt(0) + key.slice(1)}</span>
+                <span className="w-full px-6 py-2 rounded-lg bg-sf capitalize">
+                  {key === 'department' ? departmentLabelMap[value] : key === 'program' ? programLabelMap[value] : typeof value === 'string' ? (value as string) : value}
                 </span>
               </div>
             )
@@ -176,7 +176,7 @@ const CheckInfo: React.FC<CheckInfoProps> = () => {
       </div>
 
       {showConfirmDialog && (
-        <div className="fixed inset-0 flex items-center justify-center bg-card bg-opacity-50">
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30">
           <div className="bg-white px-8 py-6 rounded-lg shadow-md">
             <h3 className="text-lg font-bold mb-2 text-tc">Are you sure all the information you provided are correct?</h3>
             <div className="flex justify-end space-x-4">

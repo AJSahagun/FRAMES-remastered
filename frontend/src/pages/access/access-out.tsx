@@ -5,14 +5,16 @@ import FaceRecognition from '../../components/FaceRecognition';
 import { toast } from 'react-toastify';
 import { db } from '../../config/db';
 import { useBulkRequest } from './hooks/useBulkRequest';
-import { findBestMatch } from '../../services/faceMatchService';
+import { findBestMatch } from '../../services/facematch.service';
 import { useSync } from './hooks/useSync';
+import { SettingsService } from '@/services/settings.service';
 
 export default function Access_OUT() {
   const [time, setTime] = useState(new Date().toLocaleTimeString());
-  const [occupantCount, setOccupantCount] = useState<number>(0); 
-  const [rows, latestRequestTime]= useBulkRequest();
-  const [isConnected] = useSync()
+  const [occupantCount, setOccupantCount] = useState<number>(0);
+  const [occupantLimit, setOccupantLimit] = useState<number>(0);
+  const { latestRequestTime } = useBulkRequest();
+  const { syncStatus } = useSync();
   const date2=new Date().toISOString()
 
   const fetchOccupantCount = async () => {
@@ -37,7 +39,7 @@ export default function Access_OUT() {
     const interval = setInterval(() => {
       fetchOccupantCount(); 
     }, 1000); 
-    console.log(rows+": "+latestRequestTime)
+    console.log(latestRequestTime)
   
     // 3. Cleanup function to clear both the timer and the polling interval when the component unmounts
     return () => {
@@ -45,6 +47,22 @@ export default function Access_OUT() {
       clearInterval(interval); 
     };
   }, [latestRequestTime]); 
+
+  useEffect(() => {
+    const fetchOccupantLimit = async () => {
+      try {
+        const response = await SettingsService.getMaxOccupants();
+        setOccupantLimit(response.max_occupants);
+      } catch (error) {
+        console.error("Error fetching occupant limit:", error);
+        toast.error("Failed to load current occupant limit.", {
+          position: "top-center",
+        });
+      }
+    };
+
+    fetchOccupantLimit();
+  }, []);
 
   const date = new Date().toLocaleDateString('en-us', { weekday:"long", year:"numeric", month:"short", day:"numeric"});
 
@@ -110,9 +128,9 @@ export default function Access_OUT() {
               </p>
             </div>
               <div className="flex items-start mt-1 mr-8">
-                <div className={`flex items-center space-x-2 ${isConnected ? 'text-green-500' : 'text-primary'}`}>
-                  <span className="font-poppins text-xl">{isConnected ? 'Online' : 'Offline'}</span>
-                  <div className={`w-4 h-4 rounded-full ${isConnected ? 'bg-green-500' : 'bg-btnBg'}`} />
+                <div className={`flex items-center space-x-2 ${syncStatus.isConnected ? 'text-green-500' : 'text-primary'}`}>
+                  <span className="font-poppins text-xl">{syncStatus.isConnected ? 'Online' : 'Offline'}</span>
+                  <div className={`w-4 h-4 rounded-full ${syncStatus.isConnected ? 'bg-green-500' : 'bg-btnBg'}`} />
                   </div>
                 </div>
               </div>
@@ -132,7 +150,7 @@ export default function Access_OUT() {
             <p>
               <span className="font-poppins font-semibold text-8xl gradient-text">{occupantCount}</span>
               <span className="font-poppins font-medium text-6xl text-accent">/</span>
-              <span className="font-poppins font-semibold text-6xl text-accent">250</span>
+              <span className="font-poppins font-semibold text-6xl text-accent">{occupantLimit}</span>
             </p>
             <h2 className="font-noto_sans font-semibold text-6xl text-accent">OCCUPANTS</h2>
           </div>

@@ -10,3 +10,4 @@ import { ApiKeyService } from '../core/services/api-key/api-key.service';
   providers: [HistoryService, ApiKeyService], 
 })
 export class HistoryModule {}
+ 

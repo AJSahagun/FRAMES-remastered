@@ -1,8 +1,6 @@
 import Dexie, { type EntityTable } from 'dexie';
 import { Encodings, Occupants } from '../types/db.types';
 
-
-
 const db = new Dexie('frames') as Dexie & {
   encodings: EntityTable<Encodings>;
   occupants: EntityTable<Occupants>;

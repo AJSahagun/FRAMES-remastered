@@ -15,3 +15,10 @@ export interface ApiResponse<T> {
   message: string;
   statusCode: number;
 }
+
+export interface User {
+  id: string;
+  name: string;
+  role: string;
+  photoUrl: string;
+}
