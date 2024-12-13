@@ -9,7 +9,7 @@ export default function App() {
   const { imagesLoaded, setImagesLoaded } = useImageStore();
 
   const images = useMemo(() => [
-    "images/face-scan-2.jpg",
+    "/images/face-scan-1.jpg",
     "/images/library.jpg",
     "/images/library-2.jpg",
     "/images/library-3.jpg", 
