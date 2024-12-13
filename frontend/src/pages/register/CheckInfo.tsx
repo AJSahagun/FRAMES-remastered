@@ -110,7 +110,7 @@ const CheckInfo: React.FC<CheckInfoProps> = () => {
   return (
     <div className="w-full relative justify-center items-center">
       <div className="text-center">
-      <h1 className="text-tc font-poppins md:text-5xl lg:mt-2">Confirmation</h1>
+      <h1 className="text-tc font-poppins font-semibold md:text-5xl lg:mt-2">Confirmation</h1>
       </div>
       <ToastContainer position="top-center"/>
 
