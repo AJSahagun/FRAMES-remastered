@@ -334,7 +334,7 @@ const RegisterFace: React.FC<RegisterFaceProps> = () => {
     <div className="w-full flex flex-col items-center">
       <ToastContainer />
       <div className="text-center">
-        <h1 className="text-tc font-poppins md:text-5xl lg:mt-2">Scan Face</h1>
+        <h1 className="text-tc font-poppins font-semibold md:text-5xl lg:mt-2">Scan Face</h1>
       </div>
 
       <div className="container mx-auto p-4 

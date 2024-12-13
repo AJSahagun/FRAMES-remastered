@@ -68,7 +68,7 @@ const InputInfo: React.FC<InputInfoProps> = ({ onNext }) => {
       {({ setFieldValue, values }) => (
         <Form className="w-full flex flex-col relative items-center">
           <div className="text-center">
-            <h1 className="text-tc font-poppins md:text-5xl lg:mt-2 lg:mb-10">Registration</h1>
+            <h1 className="text-tc font-poppins font-semibold md:text-5xl lg:mt-2 lg:mb-10">Registration</h1>
           </div>
 
           <div className="w-full relative flex flex-col lg:flex-row lg:w-3/4 items-center justify-center mt-8 space-y-3 lg:space-x-2">

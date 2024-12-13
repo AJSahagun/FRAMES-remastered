@@ -9,7 +9,7 @@ export default function App() {
   const { imagesLoaded, setImagesLoaded } = useImageStore();
 
   const images = useMemo(() => [
-    "images/face-scan-1.jpg",
+    "images/face-scan-2.jpg",
     "/images/library.jpg",
     "/images/library-2.jpg",
     "/images/library-3.jpg", 
@@ -131,7 +131,7 @@ export default function App() {
           </svg>
 
           {/* Image slider */}
-          <div className="relative w-full h-60 md:h-96 lg:flex lg:h-4/5 lg:mt-4 fade-in-up">
+          <div className="relative w-full h-60 md:h-96 xl:h-3/4 lg:mt-4 fade-in-up">
             {imagesLoaded && images.map((img, index) => (
               <div
                 key={index}
@@ -140,7 +140,7 @@ export default function App() {
                 }`}
               >
                 <img
-                  className="object-cover w-full h-full rounded-lg shadow-lg lg:rounded-none lg:shadow-none"
+                  className="object-cover w-full xl:h-full rounded-lg shadow-lg lg:rounded-none lg:shadow-none"
                   src={img}
                   alt={`Slide ${index + 1}`}
                 />
@@ -149,7 +149,7 @@ export default function App() {
             
           </div>
           {/* Foster Wheeler Tag */}
-          <div className="hidden lg:flex w-3/5 absolute right-0 -mt-6 ml-10 font-poppins fade-in-up">
+          <div className="hidden lg:flex w-3/5 absolute right-0 -mt-9 ml-10 font-poppins fade-in-up">
             <div className="flex w-full ">
               <div className="flex w-full h-10 px-9 pr-1 bg-primary py-6 justify-center items-center  text-white shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)]">
                 <p className="text-lg font-poppins md:text-base align-middle tracking-wide">
@@ -198,19 +198,19 @@ export default function App() {
               </h2>
             </div>
             <div className="relative w-full">
-              <p className="pr-5 mb-5 font-light font-noto_sans md:text-lg lg:mx-0 fade-in-up">
-                Face Recognition Access Monitoring Enhanced System [FRAMES] is a ...
+              <p className="flex items-center justify-center min-[1024px]:w-4/6 xl:w-2/3 pr-5 mb-5 font-light font-noto_sans md:text-md xl:text-lg fade-in-up">
+                Face Recognition Access Monitoring Enhanced System [FRAMES] is a biometric authentication mechanism. Its primary purpose is to verify the identity of individuals entering and exiting the library using facial recognition, ushering in a new era of security, efficiency, and user-friendly access control.
               </p>
 
             </div>
-            <div className="flex flex-col w-full md:flex-row mx-auto md:mx-4 space-y-3 md:space-y-0 pr-40 lg:mx-0">
-              <a href="/register" className='relative w-full lg:w-1/2 lg:mr-6'>
+            <div className="flex flex-col w-full mx-auto md:flex-row md:mx-4 space-y-3 md:space-y-0 md:space-x-4 lg:space-x-0 min-[1024px]:w-3/5 xl:pr-40 lg:mx-0">
+              <a href="/register" className='flex w-full min-[1024px]:w-4/6 xl:w-1/2 lg:mr-6'>
                 <button className="inline-flex items-center justify-center h-12 font-poppins font-medium tracking-wide px-8 w-full
                 text-white transition duration-300 rounded-md shadow-md bg-btnBg hover:brightness-110 hover:-translate-y-2 focus:shadow-outline focus:outline-none fade-in-up">
                   REGISTER NOW
                 </button>
               </a>
-              <a href="/learnmore" className='relative w-full lg:w-1/2 lg:mr-10'>
+              <a href="/learnmore" className='relative w-full min-[1024px]:w-4/6 xl:w-1/2 lg:mr-10'>
                 <button className="inline-flex items-center justify-center h-12   font-poppins font-semibold tracking-wide w-full 
                 bg-slate-200 text-accent bg-sf rounded-md shadow-md transition duration-500 hover:bg-slate-300 fade-in-up">
                   Learn more
@@ -226,7 +226,7 @@ export default function App() {
           
           
           {/* Second Slider Indicator */}
-          <div className="justify-center items-center space-x-3 my-6 hidden">
+          {/* <div className="justify-center items-center space-x-3 my-6 hidden">
             {images.map((_, index) => (
               <span
                 key={index}
@@ -236,7 +236,7 @@ export default function App() {
                 } h-3 bg-secondary rounded-full transition-all ease-in-out duration-300 cursor-pointer fade-in-up`}
               />
             ))}
-          </div>
+          </div> */}
 
 
 
